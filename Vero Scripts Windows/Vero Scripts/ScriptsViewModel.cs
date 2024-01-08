@@ -1,7 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Net.Http;
-using System.Text.Json;
 using Vero_Scripts.Properties;
 
 namespace Vero_Scripts
@@ -57,6 +54,11 @@ namespace Vero_Scripts
         {
             try
             {
+                // Disable client-side caching.
+                httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+                {
+                    NoCache = true
+                };
                 var hubsUri = new Uri("https://andydragon.com/depot/VERO/hubs.json");
                 var content = await httpClient.GetStringAsync(hubsUri);
                 if (!string.IsNullOrEmpty(content))
