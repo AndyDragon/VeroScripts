@@ -265,6 +265,22 @@ namespace Vero_Scripts
             }
         }
 
+        private bool communityTag = false;
+
+        public bool CommunityTag
+        {
+            get { return communityTag; }
+            set
+            {
+                if (communityTag != value)
+                {
+                    communityTag = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CommunityTag)));
+                    UpdateScripts();
+                }
+            }
+        }
+
         private string featureScript = "";
 
         public string FeatureScript
@@ -370,9 +386,9 @@ namespace Vero_Scripts
             else
             {
                 var pageName = (Page == "default" || string.IsNullOrEmpty(Page)) ? PageName : Page;
-                var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage);
-                var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage);
-                var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage);
+                var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, CommunityTag);
+                var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, CommunityTag);
+                var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, CommunityTag);
                 FeatureScript = featureScriptTemplate
                     .Replace("%%PAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
@@ -394,12 +410,21 @@ namespace Vero_Scripts
             }
         }
 
-        private string GetTemplate(string templateName, string pageName, bool firstForPage)
+        private string GetTemplate(
+            string templateName, 
+            string pageName, 
+            bool firstForPage, 
+            bool communityTag)
         {
             TemplatePackage? template = null;
             var defaultHub = Hubs.Hubs.FirstOrDefault(hub => hub.Name == "default");
             var hub = Hubs.Hubs.FirstOrDefault(hub => hub.Name == pageName);
-            if (firstForPage)
+            if (communityTag)
+            {
+                template = hub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+                template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+            } 
+            else if (firstForPage)
             {
                 template = hub?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
                 template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);

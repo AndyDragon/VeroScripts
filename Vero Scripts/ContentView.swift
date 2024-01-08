@@ -104,6 +104,7 @@ struct ContentView: View {
     @State var PageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
     @State var PageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
     @State var FirstForPage: Bool = false
+    @State var CommunityTag: Bool = false
     @State var FeatureScript: String = ""
     @State var CommentScript: String = ""
     @State var OriginalPostScript: String = ""
@@ -204,6 +205,10 @@ struct ContentView: View {
                         Text("First feature on page")
                     }
                     .focusable()
+                    Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
+                        Text("From community tag")
+                    }
+                    .focusable()
 #else
                     Spacer()
 #endif
@@ -214,6 +219,10 @@ struct ContentView: View {
             HStack {
                 Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
                     Text("First feature on page")
+                }
+                .focusable()
+                Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
+                    Text("From community tag")
                 }
                 .focusable()
                 Spacer()
@@ -419,6 +428,10 @@ struct ContentView: View {
     func firstForPageChanged(to value: Bool) {
         updateScripts()
     }
+    
+    func communityTagChanged(to value: Bool) {
+        updateScripts()
+    }
 
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
@@ -446,9 +459,21 @@ struct ContentView: View {
             CommentScript = ""
         } else {
             let pageName = Page == "default" ? PageName : Page
-            let featureScriptTemplate = getTemplateFromHubs("feature", from: pageName, firstFeature: FirstForPage) ?? ""
-            let commentScriptTemplate = getTemplateFromHubs("comment", from: pageName, firstFeature: FirstForPage) ?? ""
-            let originalPostScriptTemplate = getTemplateFromHubs("original post", from: pageName, firstFeature: FirstForPage) ?? ""
+            let featureScriptTemplate = getTemplateFromHubs(
+                "feature",
+                from: pageName,
+                firstFeature: FirstForPage,
+                communityTag: CommunityTag) ?? ""
+            let commentScriptTemplate = getTemplateFromHubs(
+                "comment",
+                from: pageName,
+                firstFeature: FirstForPage,
+                communityTag: CommunityTag) ?? ""
+            let originalPostScriptTemplate = getTemplateFromHubs(
+                "original post",
+                from: pageName,
+                firstFeature: FirstForPage,
+                communityTag: CommunityTag) ?? ""
             FeatureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
@@ -470,11 +495,16 @@ struct ContentView: View {
         }
     }
     
-    func getTemplateFromHubs(_ templateName: String, from hubName: String, firstFeature: Bool) -> String! {
+    func getTemplateFromHubs(_ templateName: String, from hubName: String, firstFeature: Bool, communityTag: Bool) -> String! {
         var template: Template!
         let defaultHub = HubsCatalog.hubs.first(where: { hub in hub.name == "default" });
         let hub = HubsCatalog.hubs.first(where: { hub in hub.name == hubName});
-        if FirstForPage {
+        if communityTag {
+            template = hub?.templates.first(where: { template in template.name == "community " + templateName})
+            if template == nil {
+                template = defaultHub?.templates.first(where: { template in template.name == "community " + templateName})
+            }
+        } else if firstFeature {
             template = hub?.templates.first(where: { template in template.name == "first " + templateName})
             if template == nil {
                 template = defaultHub?.templates.first(where: { template in template.name == "first " + templateName})
