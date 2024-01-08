@@ -1,4 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using Vero_Scripts.Properties;
 
 namespace Vero_Scripts
