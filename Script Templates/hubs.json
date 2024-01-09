@@ -259,6 +259,23 @@
       ]
     },
     {
+      "name": "bridges",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "🏆 Congratulations!  You have been featured on Snap Bridges @%%USERNAME%% 💙.\nKeep up the good work and keep sharing it with us. ✨\n"
+        },
+        {
+          "name": "feature",
+          "template": "#snap_%%PAGENAME%%\n\n⭐️ Featured SNAP %%MEMBERLEVEL%%: @%%PAGENAME%% ⭐️\n\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n\nCC Snap Community Owner Jane\n@snap_owner\n\nPlease check out @snap_kingdom for more of our Snap_community pages.\n\n#snap_community\n#vero\n#verofamily\n#verofriends\n#snap_bridges\n\n#snap_%%PAGENAME%%_@%%PAGENAME%%\n#snap_featured_@%%PAGENAME%%\n.\n"
+        },
+        {
+          "name": "original post",
+          "template": "🏆✨ Featured on Snap Bridges ✨🏆"
+        }
+      ]
+    },
+    {
       "name": "butterflies",
       "templates": [
         {
