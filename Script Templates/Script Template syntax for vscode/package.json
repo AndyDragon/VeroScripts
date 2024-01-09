@@ -1,0 +1,58 @@
+{
+    "name": "scriptTemplate-vscode",
+    "publisher": "AndyDragon",
+    "author": {
+        "name": "AndyDragon",
+        "email": "andydragon@live.com"
+    },
+    "license": "MIT",
+    "homepage": "https://github.com/andydragon/VeroScripts/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/andydragon/VeroScripts"
+    },
+    "bugs": {
+        "url": "https://github.com/andydragon/VeroScripts/issues",
+        "email": "andydragon@live.com"
+      },
+    "displayName": "Script Template for VSCode",
+    "description": "VSCode language support for VERO Script Templates",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "categories": [
+        "File Formats"
+    ],
+    "keywords": [
+        "VERO"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "scriptTemplate",
+                "aliases": [
+                    "scriptTemplate",
+                    "template"
+                ],
+                "extensions": [
+                    ".template"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "scriptTemplate",
+                "scopeName": "source.scriptTemplate",
+                "path": "./syntaxes/scriptTemplate.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "wla-dx-asm",
+                "path": "./snippets.json"
+            }
+        ]
+    }
+}
