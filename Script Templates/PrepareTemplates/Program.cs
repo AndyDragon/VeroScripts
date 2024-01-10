@@ -62,6 +62,7 @@ class Program
             .Replace("%%USERNAME%%", "aabbcc")
             .Replace("%%PAGENAME%%", "somepage")
             .Replace("%%YOURNAME%%", "ddeeff")
+            .Replace("%%YOURFIRSTNAME%%", "Gghhii")
             .Replace("%%MEMBERLEVEL%%", "VIP Gold member")
             .Replace("%%STAFFLEVEL%%", "Admin");
         var lines = result.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
