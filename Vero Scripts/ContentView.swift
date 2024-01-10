@@ -96,6 +96,71 @@ extension URLSession {
     }
 }
 
+final class PlaceholderValue: ObservableObject {
+    @Published var Value = ""
+}
+
+final class PlaceholderList: ObservableObject {
+    @Published var PlaceholderDict = [String: PlaceholderValue]()
+}
+
+struct PlaceholderView: View {
+    let Element: [String: PlaceholderValue].Element
+    var EditorName = ""
+    @State var EditorValue = ""
+    
+    init(_ element: [String: PlaceholderValue].Element) {
+        Element = element
+        let start = element.key.index(element.key.startIndex, offsetBy: 2)
+        let end = element.key.index(element.key.endIndex, offsetBy: -3)
+        EditorName = String(element.key[start...end]);
+        EditorValue = element.value.Value
+    }
+    
+    var body: some View {
+        if #available(macOS 13.0, *) {
+            HStack {
+                Text(EditorName)
+                    .frame(minWidth: 200)
+                TextField(
+                    "leave blade to remove placeholder",
+                    text: $EditorValue.onChange(editorValueChanged)
+                )
+                .frame(minWidth: 320)
+                .padding(.all, 2)
+#if os(iOS)
+                .textInputAutocapitalization(.never)
+#endif
+                Spacer()
+                    .background(Color.yellow)
+            }
+            .frame(maxWidth: .infinity)
+            .listRowSeparator(.hidden)
+        } else {
+            HStack {
+                Text(Element.key)
+                    .frame(minWidth: 200)
+                TextField(
+                    "leave blade to remove placeholder",
+                    text: $EditorValue.onChange(editorValueChanged)
+                )
+                .frame(minWidth: 320)
+                .padding(.all, 2)
+#if os(iOS)
+                .textInputAutocapitalization(.never)
+#endif
+                Spacer()
+                    .background(Color.yellow)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+    
+    func editorValueChanged(to: String) {
+        Element.value.Value = EditorValue
+    }
+}
+
 struct ContentView: View {
     @State var Membership: MembershipCase = MembershipCase.none
     @State var UserName: String = ""
@@ -114,9 +179,19 @@ struct ContentView: View {
     @State var AlertTitle: String = ""
     @State var AlertMessage: String = ""
     @State var TerminalAlert = false
+    @State var ShowingPopup = false
     @State var WaitingForCatalog: Bool = true
     @State var HubsCatalog = HubCatalog(hubs: [])
-    
+    @ObservedObject var Placeholders = PlaceholderList()
+    @State var ScriptWithPlaceholdersUntouched = ""
+    @State var ScriptWithPlaceholders = ""
+    @State var lastMembership = MembershipCase.none
+    @State var lastUserName = ""
+    @State var lastYourName = ""
+    @State var lastPage = ""
+    @State var lastPageName = ""
+    @State var lastPageStaffLevel = StaffLevelCase.mod
+
     @Environment(\.colorScheme) var ColorScheme
 
     var body: some View {
@@ -234,14 +309,20 @@ struct ContentView: View {
                 HStack {
                     Text("Feature script:")
                     Button(action: {
+                        ScriptWithPlaceholders = FeatureScript
+                        ScriptWithPlaceholdersUntouched = FeatureScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders, CommentScript, OriginalPostScript]) {
 #if os(iOS)
-                        UIPasteboard.general.string = FeatureScript
+                            UIPasteboard.general.string = ScriptWithPlaceholders
 #else
-                        let pasteBoard = NSPasteboard.general
-                        pasteBoard.clearContents()
-                        pasteBoard.writeObjects([FeatureScript as NSString])
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
 #endif
-                        checkForPlaceholders(in: FeatureScript)
+                        }
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -264,14 +345,20 @@ struct ContentView: View {
                 HStack {
                     Text("Comment script:")
                     Button(action: {
+                        ScriptWithPlaceholders = CommentScript
+                        ScriptWithPlaceholdersUntouched = CommentScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [FeatureScript, ScriptWithPlaceholders, OriginalPostScript]) {
 #if os(iOS)
-                        UIPasteboard.general.string = CommentScript
+                            UIPasteboard.general.string = ScriptWithPlaceholders
 #else
-                        let pasteBoard = NSPasteboard.general
-                        pasteBoard.clearContents()
-                        pasteBoard.writeObjects([CommentScript as NSString])
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
 #endif
-                        checkForPlaceholders(in: CommentScript)
+                        }
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -295,14 +382,20 @@ struct ContentView: View {
                 HStack {
                     Text("Original post script:")
                     Button(action: {
+                        ScriptWithPlaceholders = OriginalPostScript
+                        ScriptWithPlaceholdersUntouched = OriginalPostScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [FeatureScript, CommentScript, ScriptWithPlaceholders]) {
 #if os(iOS)
-                        UIPasteboard.general.string = OriginalPostScript
+                            UIPasteboard.general.string = ScriptWithPlaceholders
 #else
-                        let pasteBoard = NSPasteboard.general
-                        pasteBoard.clearContents()
-                        pasteBoard.writeObjects([OriginalPostScript as NSString])
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
 #endif
-                        checkForPlaceholders(in: OriginalPostScript)
+                        }
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -381,6 +474,53 @@ struct ContentView: View {
             message: {
                 Text(AlertMessage)
             })
+        .popover(isPresented: $ShowingPopup) {
+            ZStack {
+                VStack {
+                    Text("There are manual placeholders that need to be filled out:")
+                    List() {
+                        ForEach(Placeholders.PlaceholderDict.sorted(by: { entry1, entry2 in entry1.key < entry2.key}), id: \.key) { entry in
+                            PlaceholderView(entry)
+                        }
+                    }
+                    .listStyle(.plain)
+                    .frame(width: .infinity)
+                    HStack {
+                        Button(action: {
+                            Placeholders.PlaceholderDict.forEach({ placeholder in
+                                ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                            })
+#if os(iOS)
+                            UIPasteboard.general.string = ScriptWithPlaceholders
+#else
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
+#endif
+                            ShowingPopup.toggle()
+                        }, label: {
+                            Text("Copy")
+                                .padding(.horizontal, 20)
+                        })
+                        Button(action: {
+#if os(iOS)
+                            UIPasteboard.general.string = ScriptWithPlaceholdersUntouched
+#else
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholdersUntouched as NSString])
+#endif
+                            ShowingPopup.toggle()
+                        }, label: {
+                            Text("Copy with Placeholders Unfilled")
+                                .padding(.horizontal, 20)
+                        })
+                    }
+                }
+            }
+            .frame(width: 600, height: 400)
+            .padding()
+        }
         .disabled(WaitingForCatalog)
         .task {
             do {
@@ -397,32 +537,56 @@ struct ContentView: View {
     }
 
     func membershipChanged(to value: MembershipCase) {
-        updateScripts()
+        if value != lastMembership {
+            Placeholders.PlaceholderDict.removeAll()
+            updateScripts()
+            lastMembership = value
+        }
     }
 
     func userNameChanged(to value: String) {
-        updateScripts()
-        updateNewMembershipScripts()
+        if value != lastUserName {
+            Placeholders.PlaceholderDict.removeAll()
+            updateScripts()
+            updateNewMembershipScripts()
+            lastUserName = value
+        }
     }
 
     func yourNameChanged(to value: String) {
-        UserDefaults.standard.set(YourName, forKey: "YourName")
-        updateScripts()
+        if value != lastYourName {
+            Placeholders.PlaceholderDict.removeAll()
+            UserDefaults.standard.set(YourName, forKey: "YourName")
+            updateScripts()
+            lastYourName = value
+        }
     }
 
     func pageChanged(to value: String) {
-        UserDefaults.standard.set(Page, forKey: "Page")
-        updateScripts()
+        if value != lastPage {
+            Placeholders.PlaceholderDict.removeAll()
+            UserDefaults.standard.set(Page, forKey: "Page")
+            updateScripts()
+            lastPage = value
+        }
     }
 
     func pageNameChanged(to value: String) {
-        UserDefaults.standard.set(PageName, forKey: "PageName")
-        updateScripts()
+        if value != lastPageName {
+            Placeholders.PlaceholderDict.removeAll()
+            UserDefaults.standard.set(PageName, forKey: "PageName")
+            updateScripts()
+            lastPageName = value
+        }
     }
     
     func pageStaffLevelChanged(to value: StaffLevelCase) {
-        UserDefaults.standard.set(PageStaffLevel.rawValue, forKey: "StaffLevel")
-        updateScripts()
+        if value != lastPageStaffLevel {
+            Placeholders.PlaceholderDict.removeAll()
+            UserDefaults.standard.set(PageStaffLevel.rawValue, forKey: "StaffLevel")
+            updateScripts()
+            lastPageStaffLevel = value
+        }
     }
     
     func firstForPageChanged(to value: Bool) {
@@ -435,6 +599,26 @@ struct ContentView: View {
 
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
+    }
+    
+    func checkForPlaceholders(scripts: [String]) -> Bool {
+        var placeholders: [String] = [];
+        scripts.forEach({ script in placeholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
+        if placeholders.count != 0 {
+            var needEditor: Bool = false
+            for placeholder in placeholders {
+                let placeholderEntry = Placeholders.PlaceholderDict[placeholder]
+                if placeholderEntry == nil {
+                    needEditor = true
+                    Placeholders.PlaceholderDict[placeholder] = PlaceholderValue()
+                }
+            }
+            if needEditor && !ShowingPopup {
+                ShowingPopup.toggle()
+                return true
+            }
+        }
+        return false
     }
 
     func checkForPlaceholders(in value: String) {
