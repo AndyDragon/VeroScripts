@@ -107,7 +107,7 @@ final class PlaceholderList: ObservableObject {
 struct PlaceholderView: View {
     let Element: [String: PlaceholderValue].Element
     var EditorName = ""
-    @State var EditorValue = ""
+    @State var EditorValue: String
     
     init(_ element: [String: PlaceholderValue].Element) {
         Element = element
@@ -123,7 +123,7 @@ struct PlaceholderView: View {
                 Text(EditorName)
                     .frame(minWidth: 200)
                 TextField(
-                    "leave blade to remove placeholder",
+                    "leave blank to remove placeholder",
                     text: $EditorValue.onChange(editorValueChanged)
                 )
                 .frame(minWidth: 320)
@@ -141,7 +141,7 @@ struct PlaceholderView: View {
                 Text(Element.key)
                     .frame(minWidth: 200)
                 TextField(
-                    "leave blade to remove placeholder",
+                    "leave blank to remove placeholder",
                     text: $EditorValue.onChange(editorValueChanged)
                 )
                 .frame(minWidth: 320)
@@ -165,6 +165,7 @@ struct ContentView: View {
     @State var Membership: MembershipCase = MembershipCase.none
     @State var UserName: String = ""
     @State var YourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State var YourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
     @State var Page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
     @State var PageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
     @State var PageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
@@ -188,6 +189,7 @@ struct ContentView: View {
     @State var lastMembership = MembershipCase.none
     @State var lastUserName = ""
     @State var lastYourName = ""
+    @State var lastYourFirstName = ""
     @State var lastPage = ""
     @State var lastPageName = ""
     @State var lastPageStaffLevel = StaffLevelCase.mod
@@ -240,6 +242,14 @@ struct ContentView: View {
                     TextField(
                         "Enter your name:",
                         text: $YourName.onChange(yourNameChanged)
+                    )
+#if os(iOS)
+                    .textInputAutocapitalization(.never)
+#endif
+                    Text("Your first naem: ")
+                    TextField(
+                        "Enter your first name:",
+                        text: $YourFirstName.onChange(yourFirstNameChanged)
                     )
 #if os(iOS)
                     .textInputAutocapitalization(.never)
@@ -327,6 +337,25 @@ struct ContentView: View {
                         Text("Copy")
                             .padding(.horizontal, 20)
                     })
+                    Button(action: {
+                        ScriptWithPlaceholders = FeatureScript
+                        ScriptWithPlaceholdersUntouched = FeatureScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders, CommentScript, OriginalPostScript], force: true) {
+#if os(iOS)
+                            UIPasteboard.general.string = ScriptWithPlaceholders
+#else
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
+#endif
+                        }
+                    }, label: {
+                        Text("Copy (edit Placeholders)")
+                            .padding(.horizontal, 20)
+                    })
                     Spacer()
                 }
                 .frame(alignment: .leading)
@@ -361,6 +390,25 @@ struct ContentView: View {
                         }
                     }, label: {
                         Text("Copy")
+                            .padding(.horizontal, 20)
+                    })
+                    Button(action: {
+                        ScriptWithPlaceholders = CommentScript
+                        ScriptWithPlaceholdersUntouched = CommentScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [FeatureScript, ScriptWithPlaceholders, OriginalPostScript], force: true) {
+#if os(iOS)
+                            UIPasteboard.general.string = ScriptWithPlaceholders
+#else
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
+#endif
+                        }
+                    }, label: {
+                        Text("Copy (edit Placeholders)")
                             .padding(.horizontal, 20)
                     })
                     Spacer()
@@ -400,6 +448,25 @@ struct ContentView: View {
                         Text("Copy")
                             .padding(.horizontal, 20)
                     })
+                    Button(action: {
+                        ScriptWithPlaceholders = OriginalPostScript
+                        ScriptWithPlaceholdersUntouched = OriginalPostScript
+                        Placeholders.PlaceholderDict.forEach({ placeholder in
+                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+                        })
+                        if !checkForPlaceholders(scripts: [FeatureScript, CommentScript, ScriptWithPlaceholders], force: true) {
+#if os(iOS)
+                            UIPasteboard.general.string = ScriptWithPlaceholders
+#else
+                            let pasteBoard = NSPasteboard.general
+                            pasteBoard.clearContents()
+                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
+#endif
+                        }
+                    }, label: {
+                        Text("Copy (edit Placeholders)")
+                            .padding(.horizontal, 20)
+                    })
                     Spacer()
                 }
                 .frame(alignment: .leading)
@@ -435,7 +502,6 @@ struct ContentView: View {
                         pasteBoard.clearContents()
                         pasteBoard.writeObjects([NewMembershipScript as NSString])
 #endif
-                        checkForPlaceholders(in: NewMembershipScript)
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -487,6 +553,7 @@ struct ContentView: View {
                     .frame(width: .infinity)
                     HStack {
                         Button(action: {
+                            ScriptWithPlaceholders = ScriptWithPlaceholdersUntouched
                             Placeholders.PlaceholderDict.forEach({ placeholder in
                                 ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
                             })
@@ -561,6 +628,15 @@ struct ContentView: View {
             lastYourName = value
         }
     }
+    
+    func yourFirstNameChanged(to value: String) {
+        if value != lastYourFirstName {
+            Placeholders.PlaceholderDict.removeAll()
+            UserDefaults.standard.set(YourFirstName, forKey: "YourFirstName")
+            updateScripts()
+            lastYourFirstName = value
+        }
+    }
 
     func pageChanged(to value: String) {
         if value != lastPage {
@@ -601,7 +677,7 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
     
-    func checkForPlaceholders(scripts: [String]) -> Bool {
+    func checkForPlaceholders(scripts: [String], force: Bool = false) -> Bool {
         var placeholders: [String] = [];
         scripts.forEach({ script in placeholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
         if placeholders.count != 0 {
@@ -613,7 +689,7 @@ struct ContentView: View {
                     Placeholders.PlaceholderDict[placeholder] = PlaceholderValue()
                 }
             }
-            if needEditor && !ShowingPopup {
+            if (force || needEditor) && !ShowingPopup {
                 ShowingPopup.toggle()
                 return true
             }
@@ -621,23 +697,12 @@ struct ContentView: View {
         return false
     }
 
-    func checkForPlaceholders(in value: String) {
-        let placeholders = matches(of: "\\[\\[([^\\]]*)\\]\\]", in: value)
-        if placeholders.count != 0 {
-            var placeholdersList = ""
-            for placeholder in placeholders {
-                placeholdersList += placeholder + "\n"
-            }
-            if !ShowingAlert {
-                AlertTitle = "Remember to fill in the placeholders:"
-                AlertMessage = placeholdersList
-                ShowingAlert = true
-            }
-        }
-    }
-    
     func updateScripts() -> Void {
-        if Membership == MembershipCase.none || UserName.isEmpty || YourName.isEmpty || (Page == "default" && PageName.isEmpty) {
+        if Membership == MembershipCase.none 
+            || UserName.isEmpty
+            || YourName.isEmpty
+            || YourFirstName.isEmpty
+            || (Page == "default" && PageName.isEmpty) {
             FeatureScript = ""
             OriginalPostScript = ""
             CommentScript = ""
@@ -663,18 +728,27 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
             OriginalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
             CommentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
         }
     }
