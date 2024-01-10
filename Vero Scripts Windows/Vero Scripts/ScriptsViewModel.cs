@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Vero_Scripts.Properties;
 
 namespace Vero_Scripts
@@ -43,8 +45,45 @@ namespace Vero_Scripts
         public string Template { get; set; }
     }
 
+    public class Placeholder : INotifyPropertyChanged
+    {
+        public Placeholder(string name)
+        {
+            Name = name;
+        }
 
-    public class ScriptsViewModel : INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private string name = "";
+        public string Name
+        {
+            get { return name; }
+            set
+            {
+                if (value != name)
+                {
+                    name = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                }
+            }
+        }
+
+        private string value = "";
+        public string Value
+        {
+            get { return value; }
+            set
+            {
+                if (value != this.value)
+                {
+                    this.value = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                }
+            }
+        }
+    }
+
+    public partial class ScriptsViewModel : INotifyPropertyChanged
     {
         private readonly HttpClient httpClient = new();
 
@@ -52,6 +91,7 @@ namespace Vero_Scripts
         {
             Hubs = new HubsPackage();
             _ = LoadHubs();
+            Placeholders = new ObservableCollection<Placeholder>();
         }
 
         private async Task LoadHubs()
@@ -98,6 +138,7 @@ namespace Vero_Scripts
                 {
                     userName = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserName)));
+                    Placeholders.Clear();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
                 }
@@ -134,6 +175,7 @@ namespace Vero_Scripts
                 {
                     membership = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Membership)));
+                    Placeholders.Clear();
                     UpdateScripts();
                 }
             }
@@ -152,6 +194,26 @@ namespace Vero_Scripts
                     Settings.Default.YourName = YourName;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourName)));
+                    Placeholders.Clear();
+                    UpdateScripts();
+                }
+            }
+        }
+
+        private string yourFirstName = Settings.Default.YourFirstName ?? "";
+
+        public string YourFirstName
+        {
+            get { return yourFirstName; }
+            set
+            {
+                if (yourFirstName != value)
+                {
+                    yourFirstName = value;
+                    Settings.Default.YourFirstName = YourFirstName;
+                    Settings.Default.Save();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourFirstName)));
+                    Placeholders.Clear();
                     UpdateScripts();
                 }
             }
@@ -187,6 +249,7 @@ namespace Vero_Scripts
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Page)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameEnabled)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameDisabled)));
+                    Placeholders.Clear();
                     UpdateScripts();
                 }
             }
@@ -214,6 +277,7 @@ namespace Vero_Scripts
                     Settings.Default.PageName = PageName;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageName)));
+                    Placeholders.Clear();
                     UpdateScripts();
                 }
             }
@@ -244,6 +308,7 @@ namespace Vero_Scripts
                     Settings.Default.StaffLevel = StaffLevel;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StaffLevel)));
+                    Placeholders.Clear();
                     UpdateScripts();
                 }
             }
@@ -370,14 +435,54 @@ namespace Vero_Scripts
             }
         }
 
+        public ObservableCollection<Placeholder> Placeholders { get; private set; }
+
+        public bool CheckForPlaceholders(string[] scripts, bool force = false)
+        {
+            var placeholders = new List<string>();
+            foreach (var script in scripts)
+            {
+                var matches = PlaceholderRegex().Matches(script);
+                foreach (Match match in matches.Cast<Match>())
+                {
+                    placeholders.Add(match.Captures.First().Value);
+                }
+            }
+            if (placeholders.Count != 0)
+            {
+                var needEditor = false;
+                foreach (var placeholderName in placeholders)
+                {
+                    if (Placeholders.FirstOrDefault(placeholder => placeholder.Name == placeholderName) == null)
+                    {
+                        needEditor = true;
+                        Placeholders.Add(new Placeholder(placeholderName));
+                    }
+                }
+                return needEditor || force;
+            }
+            return false;
+        }
+
+        public string ProcessPlaceholders(string script)
+        {
+            var result = script;
+            foreach (var placeholder in Placeholders)
+            {
+                result = result.Replace(placeholder.Name, placeholder.Value);
+            }
+            return result;
+        }
+
         private void UpdateScripts()
         {
             if (string.IsNullOrEmpty(UserName)
                 || string.IsNullOrEmpty(Membership)
                 || Membership == "None"
                 || string.IsNullOrEmpty(YourName)
+                || string.IsNullOrEmpty(YourFirstName)
                 || string.IsNullOrEmpty(Page)
-                || (Page == "default" && string.IsNullOrEmpty(PageName)))
+                || Page == "default" && string.IsNullOrEmpty(PageName))
             {
                 FeatureScript = "";
                 CommentScript = "";
@@ -385,7 +490,7 @@ namespace Vero_Scripts
             }
             else
             {
-                var pageName = (Page == "default" || string.IsNullOrEmpty(Page)) ? PageName : Page;
+                var pageName = Page == "default" || string.IsNullOrEmpty(Page) ? PageName : Page;
                 var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, CommunityTag);
                 var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, CommunityTag);
                 var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, CommunityTag);
@@ -394,18 +499,27 @@ namespace Vero_Scripts
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
+                    .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 CommentScript = commentScriptTemplate
                     .Replace("%%PAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
+                    .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 OriginalPostScript = originalPostScriptTemplate
                     .Replace("%%PAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
+                    .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
             }
         }
@@ -463,5 +577,8 @@ namespace Vero_Scripts
                     "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.";
         }
         }
+
+        [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
+        private static partial Regex PlaceholderRegex();
     }
 }

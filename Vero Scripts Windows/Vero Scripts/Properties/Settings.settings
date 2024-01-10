@@ -14,5 +14,8 @@
     <Setting Name="StaffLevel" Type="System.String" Scope="User">
       <Value Profile="(Default)">Mod</Value>
     </Setting>
+    <Setting Name="YourFirstName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

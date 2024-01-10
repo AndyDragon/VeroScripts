@@ -70,5 +70,17 @@ namespace Vero_Scripts.Properties {
                 this["StaffLevel"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string YourFirstName {
+            get {
+                return ((string)(this["YourFirstName"]));
+            }
+            set {
+                this["YourFirstName"] = value;
+            }
+        }
     }
 }
