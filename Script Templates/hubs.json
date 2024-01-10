@@ -39,7 +39,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🥳🐘🦛🦒 Congratulations [[USER NAME]] such a beautiful photo in [[LOCATION]] thank you for always tagging and sharing your beautiful photos with Snap [[HUB NAME]]. 🥳🦒🐘🦛 @%%USERNAME%%\n"
+          "template": "🥳🐘🦛🦒 Congratulations [[USER'S FIRST NAME]] such a beautiful photo in [[LOCATION]] thank you for always tagging and sharing your beautiful photos with Snap Africa. 🥳🦒🐘🦛 @%%USERNAME%%\n"
         },
         {
           "name": "feature",
@@ -56,15 +56,15 @@
       "templates": [
         {
           "name": "comment",
-          "template": "💥🏆Heartfelt congratulations, [[USER FIRST NAME]] @%%USERNAME%% on your feature with us🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
+          "template": "💥🏆Heartfelt congratulations, [[USER'S FIRST NAME]] @%%USERNAME%% on your feature with us🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n✨Featured Community %%MEMBERLEVEL%%: [[USER FIRST NAME]] @%%USERNAME%% ✨\n.\n___________________________________\n✨CONGRATULATIONS ✨.\n___________________________________\n.\nSelected by: [[YOUR FIRST NAME]] @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero, Instagram and Tumblr\nPlease follow @snap_community .\n\n.\nCC Snap Community Owner Jane @snap_owner .\n.\nPlease check out @snap_kingdom for more of our @snap_community pages\n•\n#snap_featured #snap_community #vero #verofamily #verofriends .\n#ai_generated\n#ai_art_community\n#Ai\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#vero_ai_creators\n#vero\n#picsta\n.\nTRACKING TAGS FOR INTERNAL USE.\nSnap_community admin and mod use only. Thank you:\n#snap_featured\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n✨Featured Community %%MEMBERLEVEL%%: [[USER'S FIRST NAME]] @%%USERNAME%% ✨\n.\n___________________________________\n✨CONGRATULATIONS ✨.\n___________________________________\n.\nSelected by: [[YOUR FIRST NAME]] @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero, Instagram and Tumblr\nPlease follow @snap_community .\n\n.\nCC Snap Community Owner Jane @snap_owner .\n.\nPlease check out @snap_kingdom for more of our @snap_community pages\n•\n#snap_featured #snap_community #vero #verofamily #verofriends .\n#ai_generated\n#ai_art_community\n#Ai\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#vero_ai_creators\n#vero\n#picsta\n.\nTRACKING TAGS FOR INTERNAL USE.\nSnap_community admin and mod use only. Thank you:\n#snap_featured\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n.\n"
         },
         {
           "name": "first comment",
-          "template": "💥🏆Heartfelt congratulations, [[USER FIRST NAME]] @%%USERNAME%% on your FIRST feature with us 🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
+          "template": "💥🏆Heartfelt congratulations, [[USER'S FIRST NAME]] @%%USERNAME%% on your FIRST feature with us 🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
         },
         {
           "name": "original post",
@@ -153,7 +153,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🤍🤍💫 Congratulations💫🤍🤍 [[USER FIRST NAME]] @%%USERNAME%% on your beautiful feature 🤍 Thank you for tagging #snap_%%PAGENAME%% 🤍💫🤍\n"
+          "template": "🤍🤍💫 Congratulations💫🤍🤍 [[USER'S FIRST NAME]] @%%USERNAME%% on your beautiful feature 🤍 Thank you for tagging #snap_%%PAGENAME%% 🤍💫🤍\n"
         },
         {
           "name": "feature",
@@ -208,7 +208,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "[[USER NAME]] @%%USERNAME%%. Thank you for sharing your [[SPECIES]] image with us. Congratulations on your feature ! \n🕊️💯🕊️💯💯♥️🕊️\n"
+          "template": "[[USER'S FIRST NAME]] @%%USERNAME%%. Thank you for sharing your [[SPECIES]] image with us. Congratulations on your feature !\n🕊️💯🕊️💯💯♥️🕊️\n"
         },
         {
           "name": "feature",
@@ -479,7 +479,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "@%%USERNAME%% ✨🌟🌟✨      \nCONGRATULATIONS on your feature today with @snap_%%PAGENAME%%, [[USER NAME]]! ✨🏆✨ Thank you for sharing your wonderful image, and please continue tagging us at #snap_%%PAGENAME%% for the chance of more features! 🌟👍🙏😻🌟\n"
+          "template": "@%%USERNAME%% ✨🌟🌟✨\nCONGRATULATIONS on your feature today with @snap_%%PAGENAME%%, [[USER'S FIRST NAME]]! ✨🏆✨ Thank you for sharing your wonderful image, and please continue tagging us at #snap_%%PAGENAME%% for the chance of more features! 🌟👍🙏😻🌟\n"
         },
         {
           "name": "feature",
@@ -487,7 +487,7 @@
         },
         {
           "name": "original post",
-          "template": "Congratulations on your feature, [[USER NAME]]! \nLighting, colors, and details are amazing in this composition! Wonderful capture! 🏆\n"
+          "template": "Congratulations on your feature, [[USER'S FIRST NAME]]!\nLighting, colors, and details are amazing in this composition! Wonderful capture! 🏆\n"
         }
       ]
     },
@@ -799,7 +799,7 @@
         },
         {
           "name": "first comment",
-          "template": "✨✨Congratulations [[USER's FIRST NAME]] @%%USERNAME%% on your first feature with @snap_%%PAGENAME%% today! ✨✨. Love this amazing shot ! Thanks for sharing your photo with us and tagging @snap_%%PAGENAME%%  ✨📱✨\n"
+          "template": "✨✨Congratulations [[USER'S FIRST NAME]] @%%USERNAME%% on your first feature with @snap_%%PAGENAME%% today! ✨✨. Love this amazing shot ! Thanks for sharing your photo with us and tagging @snap_%%PAGENAME%%  ✨📱✨\n"
         },
         {
           "name": "original post",
@@ -926,7 +926,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured as part of the @snap_community \n[[write individual comment to represent photo featured]]\nThank you for tagging this great photo with #snap_%%PAGENAME%%\n"
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured as part of the @snap_community\n[[PERSONALIZED MESSAGE]]\nThank you for tagging this great photo with #snap_%%PAGENAME%%\n"
         },
         {
           "name": "feature",
@@ -1065,7 +1065,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "💫💫CONGRATULATIONS [[USER FIRST NAMR]] @%%USERNAME%% your feature with #snap_%%PAGENAME%% today!!!.🏆\n😍 Thank you for sharing this, [[PERSONALIZED MESSAGE]] 👌👌👌👌\nKeep tagging #snap_%%PAGENAME%% for a chance of more features💫💫\n"
+          "template": "💫💫CONGRATULATIONS [[USER'S FIRST NAMR]] @%%USERNAME%% your feature with #snap_%%PAGENAME%% today!!!.🏆\n😍 Thank you for sharing this, [[PERSONALIZED MESSAGE]] 👌👌👌👌\nKeep tagging #snap_%%PAGENAME%% for a chance of more features💫💫\n"
         },
         {
           "name": "feature",
@@ -1073,11 +1073,11 @@
         },
         {
           "name": "first comment",
-          "template": "💫💫CONGRATULATIONS [[USER FIRST NAME]] @%%USERNAME%% your first feature with #snap_%%PAGENAME%% today!!!.🏆\n😍 Thank you for sharing this, [[PERSONALIZED MESSAGE]] 👌👌👌👌\nKeep tagging #snap_%%PAGENAME%% for a chance of more features💫💫\n"
+          "template": "💫💫CONGRATULATIONS [[USER'S FIRST NAME]] @%%USERNAME%% your first feature with #snap_%%PAGENAME%% today!!!.🏆\n😍 Thank you for sharing this, [[PERSONALIZED MESSAGE]] 👌👌👌👌\nKeep tagging #snap_%%PAGENAME%% for a chance of more features💫💫\n"
         },
         {
           "name": "original post",
-          "template": "💫💫 Featured, congratulations [[USER FIRST NAME]] 💫💫\n"
+          "template": "💫💫 Featured, congratulations [[USER'S FIRST NAME]] 💫💫\n"
         }
       ]
     },
@@ -1107,7 +1107,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n.\n✨️ [[LOCATION IF GIVEN]] ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%%⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%% \n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community \n.\nCC Snap Community Owner Jane\n@snap_owner \n.\nPlease check out @snap_kingdom for more of our Snap_community pages\n\n\n•\n#snap_community\n#vero \n#verofamily \n#verofriends \n.\n#water_photography \n#water_captures #water_addicts\n#water_brilliance #water_droplets\n#ByTheWater #water_and_land \n#bestofthe_world #amazing_adventure #tranquil_captures #momo #bnw4vero \n(ADD APPROPRIATE GENERIC HASHTAGS HERE)\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n✨️ [[LOCATION]] ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%%⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages\n\n\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#water_photography\n#water_captures #water_addicts\n#water_brilliance #water_droplets\n#ByTheWater #water_and_land\n#bestofthe_world #amazing_adventure #tranquil_captures #momo #bnw4vero\n(ADD APPROPRIATE GENERIC HASHTAGS HERE)\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
