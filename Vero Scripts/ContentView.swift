@@ -319,39 +319,13 @@ struct ContentView: View {
                 HStack {
                     Text("Feature script:")
                     Button(action: {
-                        ScriptWithPlaceholders = FeatureScript
-                        ScriptWithPlaceholdersUntouched = FeatureScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders, CommentScript, OriginalPostScript]) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(FeatureScript, [CommentScript, OriginalPostScript])
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
                     })
                     Button(action: {
-                        ScriptWithPlaceholders = FeatureScript
-                        ScriptWithPlaceholdersUntouched = FeatureScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders, CommentScript, OriginalPostScript], force: true) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(FeatureScript, [CommentScript, OriginalPostScript], force: true)
                     }, label: {
                         Text("Copy (edit Placeholders)")
                             .padding(.horizontal, 20)
@@ -374,39 +348,13 @@ struct ContentView: View {
                 HStack {
                     Text("Comment script:")
                     Button(action: {
-                        ScriptWithPlaceholders = CommentScript
-                        ScriptWithPlaceholdersUntouched = CommentScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [FeatureScript, ScriptWithPlaceholders, OriginalPostScript]) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(CommentScript, [FeatureScript, OriginalPostScript])
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
                     })
                     Button(action: {
-                        ScriptWithPlaceholders = CommentScript
-                        ScriptWithPlaceholdersUntouched = CommentScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [FeatureScript, ScriptWithPlaceholders, OriginalPostScript], force: true) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(CommentScript, [FeatureScript, OriginalPostScript], force: true)
                     }, label: {
                         Text("Copy (edit Placeholders)")
                             .padding(.horizontal, 20)
@@ -430,39 +378,13 @@ struct ContentView: View {
                 HStack {
                     Text("Original post script:")
                     Button(action: {
-                        ScriptWithPlaceholders = OriginalPostScript
-                        ScriptWithPlaceholdersUntouched = OriginalPostScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [FeatureScript, CommentScript, ScriptWithPlaceholders]) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(OriginalPostScript, [FeatureScript, CommentScript])
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
                     })
                     Button(action: {
-                        ScriptWithPlaceholders = OriginalPostScript
-                        ScriptWithPlaceholdersUntouched = OriginalPostScript
-                        Placeholders.PlaceholderDict.forEach({ placeholder in
-                            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                        })
-                        if !checkForPlaceholders(scripts: [FeatureScript, CommentScript, ScriptWithPlaceholders], force: true) {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
-                            let pasteBoard = NSPasteboard.general
-                            pasteBoard.clearContents()
-                            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
-                        }
+                        copyScript(OriginalPostScript, [FeatureScript, CommentScript], force: true)
                     }, label: {
                         Text("Copy (edit Placeholders)")
                             .padding(.horizontal, 20)
@@ -675,6 +597,23 @@ struct ContentView: View {
 
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
+    }
+    
+    func copyScript(_ script: String, _ otherScripts: [String], force: Bool = false) -> Void {
+        ScriptWithPlaceholders = script
+        ScriptWithPlaceholdersUntouched = script
+        Placeholders.PlaceholderDict.forEach({ placeholder in
+            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+        })
+        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders] + otherScripts, force: force) {
+#if os(iOS)
+            UIPasteboard.general.string = ScriptWithPlaceholders
+#else
+            let pasteBoard = NSPasteboard.general
+            pasteBoard.clearContents()
+            pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
+#endif
+        }
     }
     
     func checkForPlaceholders(scripts: [String], force: Bool = false) -> Bool {
