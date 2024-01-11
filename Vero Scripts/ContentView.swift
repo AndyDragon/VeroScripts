@@ -29,6 +29,7 @@ enum NewMembershipCase: String, CaseIterable, Identifiable {
 
 enum StaffLevelCase: String, CaseIterable, Identifiable {
     case mod = "Mod",
+         coadmin = "Co-Admin",
          admin = "Admin"
     var id: Self { self }
 }
@@ -246,7 +247,7 @@ struct ContentView: View {
 #if os(iOS)
                     .textInputAutocapitalization(.never)
 #endif
-                    Text("Your first naem: ")
+                    Text("Your first name: ")
                     TextField(
                         "Enter your first name:",
                         text: $YourFirstName.onChange(yourFirstNameChanged)
@@ -472,7 +473,7 @@ struct ContentView: View {
                         }
                     }
                     .listStyle(.plain)
-                    .frame(width: .infinity)
+                    //.frame(width: .infinity)
                     HStack {
                         Button(action: {
                             ScriptWithPlaceholders = ScriptWithPlaceholdersUntouched
@@ -605,7 +606,7 @@ struct ContentView: View {
         Placeholders.PlaceholderDict.forEach({ placeholder in
             ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
         })
-        if !checkForPlaceholders(scripts: [ScriptWithPlaceholders] + otherScripts, force: force) {
+        if !checkForPlaceholders(scripts: [ScriptWithPlaceholdersUntouched] + otherScripts, force: force) {
 #if os(iOS)
             UIPasteboard.general.string = ScriptWithPlaceholders
 #else

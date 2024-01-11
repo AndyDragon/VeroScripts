@@ -420,7 +420,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🌟@%%USERNAME%% 🌟 [[PERSONALIZED MESSAGE]].  Congratulations on your new feature with @snap_%%PAGENAME%% today.  Thank you so very much for tagging us and remember to keep using our #snap_%%PAGENAME%% for more features ✴️🌟✨\n"
+          "template": "🌟@%%USERNAME%% 🌟 [[PERSONALIZED MESSAGE]]  Congratulations on your new feature with @snap_%%PAGENAME%% today.  Thank you so very much for tagging us and remember to keep using our #snap_%%PAGENAME%% for more features ✴️🌟✨\n"
         },
         {
           "name": "feature",
@@ -428,7 +428,7 @@
         },
         {
           "name": "first comment",
-          "template": "🌟 @%%USERNAME%% 🌟👍 [[PERSONALIZED MESSAGE]]. Congratulations on your first feature with @snap_%%PAGENAME%% today. Thank you very much for tagging us. Keep using our hashtag #snap_%%PAGENAME%% for a chance of more features.  👏❤️🌟"
+          "template": "🌟 @%%USERNAME%% 🌟👍 [[PERSONALIZED MESSAGE]] Congratulations on your first feature with @snap_%%PAGENAME%% today. Thank you very much for tagging us. Keep using our hashtag #snap_%%PAGENAME%% for a chance of more features.  👏❤️🌟"
         },
         {
           "name": "original post",
@@ -441,7 +441,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "Congratulations Jacki @jackisteelphotos ! [[PERSONALIZED MESSAGE]]. 🥂 Cheers!\n"
+          "template": "Congratulations Jacki @jackisteelphotos ! [[PERSONALIZED MESSAGE]] 🥂 Cheers!\n"
         },
         {
           "name": "feature",
@@ -475,7 +475,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🌟📸 [[PERSONALIZED INTRO]], [[USER'S FIRST NAME]]! [[PERSONALIZED MESSAGE]]! @%%USERNAME%%  👏✨📸\nHuge congratulations on your beautiful feature with @snap_%%PAGENAME%% 👏📸🌟\nThank you very much for sharing your wonderful photography with #snap_%%PAGENAME%%! 🌟📸\n"
+          "template": "🌟📸 [[PERSONALIZED INTRO]], [[USER'S FIRST NAME]]! [[PERSONALIZED MESSAGE]] @%%USERNAME%%  👏✨📸\nHuge congratulations on your beautiful feature with @snap_%%PAGENAME%% 👏📸🌟\nThank you very much for sharing your wonderful photography with #snap_%%PAGENAME%%! 🌟📸\n"
         },
         {
           "name": "feature",
@@ -496,7 +496,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🌟Congratulations [[USER'S FIRST NAME]], [[PERSONALIZED MESSAGE]], thanks for tagging us this beauty 🌟 @%%USERNAME%%\n"
+          "template": "🌟Congratulations [[USER'S FIRST NAME]], [[PERSONALIZED MESSAGE]] Thanks for tagging us this beauty 🌟 @%%USERNAME%%\n"
         },
         {
           "name": "feature",
@@ -568,7 +568,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🎆🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]].  Congratulations on your feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% for a chance of more features.🎉🎆🎊\n"
+          "template": "🎆🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]]  Congratulations on your feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% for a chance of more features.🎉🎆🎊\n"
         },
         {
           "name": "feature",
@@ -576,7 +576,7 @@
         },
         {
           "name": "first comment",
-          "template": "🎆🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]].  Congratulations on your first feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% for a chance of more features.🎉🎆🎊\n"
+          "template": "🎆🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]]  Congratulations on your first feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% for a chance of more features.🎉🎆🎊\n"
         },
         {
           "name": "original post",
@@ -775,7 +775,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]]. Congratulations on your feature with #snap_%%PAGENAME%% today, [[USER'S FIRST NAME]], and thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
+          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]] Congratulations on your feature with #snap_%%PAGENAME%% today, [[USER'S FIRST NAME]], and thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
         },
         {
           "name": "feature",
@@ -783,7 +783,7 @@
         },
         {
           "name": "first comment",
-          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]]. Congratulations on your first feature with #snap_%%PAGENAME%% today, and a warm welcome to our gallery. Thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
+          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]] Congratulations on your first feature with #snap_%%PAGENAME%% today, and a warm welcome to our gallery. Thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
         },
         {
           "name": "original post",
@@ -1353,7 +1353,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "👏🎉 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]]. Congratulations on your feature with @snap_%%PAGENAME%% today, and thank you for using our hashtag. Keep tagging #snap_%%PAGENAME%% or #snap_street_art for a chance of more features. 👍💙🎉\n"
+          "template": "👏🎉 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]] Congratulations on your feature with @snap_%%PAGENAME%% today, and thank you for using our hashtag. Keep tagging #snap_%%PAGENAME%% or #snap_street_art for a chance of more features. 👍💙🎉\n"
         },
         {
           "name": "feature",
@@ -1361,7 +1361,7 @@
         },
         {
           "name": "first comment",
-          "template": "👏🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]]. Congratulations on your first feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% or #snap_street_art for a chance of more features. 👍💙🎉\n"
+          "template": "👏🎉 @%%USERNAME%% ⭐️ [[PERSONALIZED MESSAGE]] Congratulations on your first feature with @snap_%%PAGENAME%% today, and a very warm welcome to our gallery. Thank you for tagging us in this brilliant capture. Keep tagging #snap_%%PAGENAME%% or #snap_street_art for a chance of more features. 👍💙🎉\n"
         },
         {
           "name": "original post",
@@ -1619,7 +1619,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "👍💫🌷 @%%USERNAME%% ✨[[PERSONALIZED MESSAGE]]. Congratulations on your feature with @snap_%%PAGENAME%% today. Keep tagging us for a chance of more features.👏💛🎉❤️\n"
+          "template": "👍💫🌷 @%%USERNAME%% ✨[[PERSONALIZED MESSAGE]] Congratulations on your feature with @snap_%%PAGENAME%% today. Keep tagging us for a chance of more features.👏💛🎉❤️\n"
         },
         {
           "name": "feature",
@@ -1627,7 +1627,7 @@
         },
         {
           "name": "first comment",
-          "template": "👍💫🌷 @%%USERNAME%% ✨[[PERSONALIZED MESSAGE]]. Congratulations on your first feature with @snap_%%PAGENAME%% today, and a warm welcome to our gallery. Thank you for using our hashtag #snap_%%PAGENAME%%. Keep tagging us for a chance of more features.👏💛🎉❤️\n"
+          "template": "👍💫🌷 @%%USERNAME%% ✨[[PERSONALIZED MESSAGE]] Congratulations on your first feature with @snap_%%PAGENAME%% today, and a warm welcome to our gallery. Thank you for using our hashtag #snap_%%PAGENAME%%. Keep tagging us for a chance of more features.👏💛🎉❤️\n"
         },
         {
           "name": "original post",
