@@ -290,6 +290,7 @@ namespace Vero_Scripts
                 return new[]
                 {
                     "Mod",
+                    "Co-Admin",
                     "Admin",
                 };
             }

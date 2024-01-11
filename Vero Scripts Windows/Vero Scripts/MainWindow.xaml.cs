@@ -30,23 +30,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedFeatureScript = viewModel.ProcessPlaceholders(viewModel.FeatureScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    processedFeatureScript, viewModel.CommentScript, viewModel.OriginalPostScript }))
-                {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.FeatureScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
-                {
-                    Clipboard.SetText(processedFeatureScript);
-                }
+                CopyScript(viewModel, viewModel.FeatureScript, new[] { viewModel.CommentScript, viewModel.OriginalPostScript });
             }
         }
 
@@ -54,23 +38,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedFeatureScript = viewModel.ProcessPlaceholders(viewModel.FeatureScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    processedFeatureScript, viewModel.CommentScript, viewModel.OriginalPostScript }, true))
-                {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.FeatureScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
-                {
-                    Clipboard.SetText(processedFeatureScript);
-                }
+                CopyScript(viewModel, viewModel.FeatureScript, new[] { viewModel.CommentScript, viewModel.OriginalPostScript}, true);
             }
         }
 
@@ -78,23 +46,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedCommentScript = viewModel.ProcessPlaceholders(viewModel.CommentScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    viewModel.FeatureScript, processedCommentScript, viewModel.OriginalPostScript }))
-                {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.CommentScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
-                {
-                    Clipboard.SetText(processedCommentScript);
-                }
+                CopyScript(viewModel, viewModel.CommentScript, new[] { viewModel.FeatureScript, viewModel.OriginalPostScript });
             }
         }
 
@@ -102,23 +54,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedCommentScript = viewModel.ProcessPlaceholders(viewModel.CommentScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    viewModel.FeatureScript, processedCommentScript, viewModel.OriginalPostScript }, true))
-                {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.CommentScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
-                {
-                    Clipboard.SetText(processedCommentScript);
-                }
+                CopyScript(viewModel, viewModel.CommentScript, new[] { viewModel.FeatureScript, viewModel.OriginalPostScript }, true);
             }
         }
 
@@ -126,23 +62,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedOriginalPostScript = viewModel.ProcessPlaceholders(viewModel.OriginalPostScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    viewModel.FeatureScript, viewModel.CommentScript, processedOriginalPostScript }))
-                {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.OriginalPostScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
-                {
-                    Clipboard.SetText(processedOriginalPostScript);
-                }
+                CopyScript(viewModel, viewModel.OriginalPostScript, new[] { viewModel.FeatureScript, viewModel.CommentScript });
             }
         }
 
@@ -150,23 +70,28 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                var processedOriginalPostScript = viewModel.ProcessPlaceholders(viewModel.OriginalPostScript);
-                if (viewModel.CheckForPlaceholders(new[] {
-                    viewModel.FeatureScript, viewModel.CommentScript, processedOriginalPostScript }, true))
+                CopyScript(viewModel, viewModel.OriginalPostScript, new[] { viewModel.FeatureScript, viewModel.CommentScript }, true);
+            }
+        }
+
+        private void CopyScript(ScriptsViewModel viewModel, string script, string[] otherScripts, bool force = false)
+        {
+            var allScripts = (new[] { script }).Concat(otherScripts).ToArray();
+            if (viewModel.CheckForPlaceholders(allScripts, force))
+            {
+                var editor = new PlaceholderEditor(viewModel, script)
                 {
-                    var editor = new PlaceholderEditor(viewModel, viewModel.OriginalPostScript)
-                    {
-                        Owner = this
-                    };
-                    if (!(editor.ShowDialog() ?? false))
-                    {
-                        viewModel.Placeholders.Clear();
-                    }
-                }
-                else
+                    Owner = this
+                };
+                if (!(editor.ShowDialog() ?? false))
                 {
-                    Clipboard.SetText(processedOriginalPostScript);
+                    viewModel.Placeholders.Clear();
                 }
+            }
+            else
+            {
+                var processedFeatureScript = viewModel.ProcessPlaceholders(script);
+                Clipboard.SetText(processedFeatureScript);
             }
         }
 
