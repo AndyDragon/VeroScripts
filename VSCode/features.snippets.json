@@ -1,0 +1,30 @@
+{
+    "Entry for feature candidate": {
+        "scope": "features",
+        "prefix": "entry",
+        "body": [
+            "$CLIPBOARD - ${1:user name}",
+            "member level - ${2:level} ([n] features)",
+            "last feature - [date] (this photo feature: [yes/no])",
+            "first in insects - [yes/no]",
+            "tineye - [results]",
+            "aiornot - [results]",
+            ""
+        ],
+        "description": "Entry for feature candidate"
+    },
+    "RAW Entry for feature candidate": {
+        "scope": "features",
+        "prefix": "rawentry",
+        "body": [
+            "**RAW** $CLIPBOARD - ${1:user name}",
+            "member level - ${2:level} ([n] features)",
+            "last feature - [date] (this photo feature: [yes/no])",
+            "first in insects - [yes/no]",
+            "tineye - [results]",
+            "aiornot - [results]",
+            ""
+        ],
+        "description": "Entry for feature candidate with #raw_xxx hastag"
+    }
+}

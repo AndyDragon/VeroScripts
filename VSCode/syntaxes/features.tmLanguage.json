@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "features",
+    "patterns": [{ "include": "#root" }],
+    "fileTypes": [".features"],
+    "repository": {
+        "root" : {
+            "patterns": [{ "include" : "#manualfields" }]
+        },
+        "manualfields": {
+            "begin": "\\[",
+            "beginCaptures": {
+                "0": { "name": "punctuation.bracket.open"}
+            },
+            "end": "\\]",
+            "endCaptures": {
+                "0": { "name": "punctuation.bracket.close"}
+            },
+            "name": "meta.features.variable",
+            "patterns": [{
+                "match": "[^\\]]+",
+                "captures": {
+                    "0": { "name"  : "entity.name.class" }
+                }
+            }]
+        }
+    },
+    "scopeName"	: "source.features"
+}

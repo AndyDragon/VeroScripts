@@ -1,5 +1,5 @@
 {
-    "name": "scriptTemplate-vscode",
+    "name": "veroscriptsandfeatures",
     "publisher": "AndyDragon",
     "author": {
         "name": "AndyDragon",
@@ -15,14 +15,16 @@
         "url": "https://github.com/andydragon/VeroScripts/issues",
         "email": "andydragon@live.com"
       },
-    "displayName": "Script Template for VSCode",
-    "description": "VSCode language support for VERO Script Templates",
-    "version": "0.1.0",
+    "displayName": "VERO support for VSCode",
+    "description": "VSCode language support for VERO script templates and feature lists",
+    "version": "0.1.1",
     "engines": {
         "vscode": "^1.30.0"
     },
     "categories": [
-        "File Formats"
+        "Programming Languages",
+        "Themes",
+        "Snippets"
     ],
     "keywords": [
         "VERO"
@@ -38,7 +40,17 @@
                 "extensions": [
                     ".template"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./scriptTemplate.language-configuration.json"
+            },
+            {
+                "id": "features",
+                "aliases": [
+                    "features"
+                ],
+                "extensions": [
+                    ".features"
+                ],
+                "configuration": "./features.language-configuration.json"
             }
         ],
         "grammars": [
@@ -46,12 +58,21 @@
                 "language": "scriptTemplate",
                 "scopeName": "source.scriptTemplate",
                 "path": "./syntaxes/scriptTemplate.tmLanguage.json"
+            },
+            {
+                "language": "features",
+                "scopeName": "source.features",
+                "path": "./syntaxes/features.tmLanguage.json"
             }
         ],
         "snippets": [
             {
-                "language": "wla-dx-asm",
-                "path": "./snippets.json"
+                "language": "scriptTemplate",
+                "path": "./scriptTemplate.snippets.json"
+            },
+            {
+                "language": "features",
+                "path": "./features.snippets.json"
             }
         ]
     }
