@@ -5,7 +5,7 @@
         "body": [
             "$CLIPBOARD - ${1:user name}",
             "member level - ${2:level} ([n] features)",
-            "last feature - [date] (this photo feature: [yes/no])",
+            "last feature - [date] (this photo featured: [yes/no])",
             "first in insects - [yes/no]",
             "tineye - [results]",
             "aiornot - [results]",
@@ -17,9 +17,9 @@
         "scope": "features",
         "prefix": "rawentry",
         "body": [
-            "**RAW** $CLIPBOARD - ${1:user name}",
+            "[RAW] $CLIPBOARD - ${1:user name}",
             "member level - ${2:level} ([n] features)",
-            "last feature - [date] (this photo feature: [yes/no])",
+            "last feature - [date] (this photo featured: [yes/no])",
             "first in insects - [yes/no]",
             "tineye - [results]",
             "aiornot - [results]",
