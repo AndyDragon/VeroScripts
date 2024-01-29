@@ -223,26 +223,27 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-              style={{ width: "60px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
               User:
             </Label>
             <TextField
               value={userName}
               onChange={(_, newValue) => setUserName(newValue)}
-              style={{ width: "400px" }}
+              style={{ width: "200px" }}
+              autoCapitalize="off"
             />
           </Stack>
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-              style={{ width: "60px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
               Level:
             </Label>
@@ -252,16 +253,16 @@ function App() {
               onChange={(_, item) =>
                 setSelectedLevel((item?.key as string) || "none")
               }
-              style={{ width: "400px" }}
+              style={{ width: "200px" }}
             />
           </Stack>
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-              style={{ width: "60px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
               You:
             </Label>
@@ -269,11 +270,18 @@ function App() {
               value={yourName}
               onChange={(_, newValue) => setYourName(newValue)}
               style={{ width: "200px" }}
+              autoCapitalize="off"
             />
+          </Stack>
+          <Stack
+            horizontal
+            style={{ width: "100%" }}
+            tokens={{ childrenGap: "8px" }}
+          >
             <Label
-              style={{ width: "80px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
-              First name:
+              Your first name:
             </Label>
             <TextField
               value={firstName}
@@ -284,10 +292,10 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-              style={{ width: "60px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
               Page:
             </Label>
@@ -297,16 +305,23 @@ function App() {
               onChange={(_, item) =>
                 setSelectedPage((item?.key as string) || "default")
               }
-              style={{ width: "400px" }}
+              style={{ width: "160px" }}
             />
             <TextField
               value={customPage}
               onChange={(_, newValue) => setCustomPage(newValue)}
-              style={{ width: "200px" }}
+              style={{ width: "100px" }}
+              autoCapitalize="off"
               disabled={(selectedPage || "default") !== "default"}
             />
+          </Stack>
+          <Stack
+            horizontal
+            style={{ width: "100%" }}
+            tokens={{ childrenGap: "8px" }}
+          >
             <Label
-              style={{ width: "80px", margin: "4px 8px", textAlign: "right" }}
+              style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
             >
               Staff level:
             </Label>
@@ -316,8 +331,14 @@ function App() {
               onChange={(_, item) =>
                 setSelectedStaffLevel((item?.key as string) || "mod")
               }
-              style={{ width: "400px" }}
+              style={{ width: "200px" }}
             />
+          </Stack>
+          <Stack
+            horizontal
+            style={{ width: "100%" }}
+            tokens={{ childrenGap: "8px" }}
+          >
             <Checkbox
               label="First feature on page"
               checked={isFirstFeature}
@@ -333,10 +354,10 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-                style={{ width: "auto", margin: "4px 8px", textAlign: "right" }}
+                style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
               >
               Feature script:
             </Label>
@@ -357,10 +378,10 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-                style={{ width: "auto", margin: "4px 8px", textAlign: "right" }}
+                style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
               >
               Comment script:
             </Label>
@@ -381,10 +402,10 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-                style={{ width: "auto", margin: "4px 8px", textAlign: "right" }}
+                style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
               >
               Original post script:
             </Label>
@@ -405,13 +426,19 @@ function App() {
           <Stack
             horizontal
             style={{ width: "100%" }}
-            tokens={{ childrenGap: "16px" }}
+            tokens={{ childrenGap: "8px" }}
           >
             <Label
-                style={{ width: "auto", margin: "4px 8px", textAlign: "right" }}
+                style={{ width: "auto", margin: "4px 8px", textAlign: "right", whiteSpace: "nowrap" }}
               >
               New membership:
             </Label>
+          </Stack>
+          <Stack
+            horizontal
+            style={{ width: "100%" }}
+            tokens={{ childrenGap: "8px" }}
+          >
             <Dropdown
               options={newLevelOptions}
               selectedKey={selectedNewLevel || "none"}
