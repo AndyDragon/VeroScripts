@@ -7,7 +7,7 @@ class Program
         var cwd = Directory.GetCurrentDirectory();
         var templateCatalog = new HubsCatalogg();
         var warnings = new List<string>();
-        foreach (var folder in Directory.EnumerateDirectories(cwd).Order())
+        foreach (var folder in Directory.EnumerateDirectories(cwd).OrderBy(dir => dir, HubDirectoryComparer.Default))
         {
             var hubName = folder[(cwd.Length + 1)..];
             var templates = new Dictionary<string, string>();
@@ -116,4 +116,26 @@ class Template
 
     [Newtonsoft.Json.JsonProperty(propertyName: "template")]
     public string Script { get; }
+}
+
+class HubDirectoryComparer : IComparer<string>
+{
+    public int Compare(string? x, string? y)
+    {
+        if ((x ?? "").StartsWith("_") && (y ?? "").StartsWith("_"))
+        {
+            return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+        }
+        if ((x ?? "").StartsWith("_"))
+        {
+            return 1;
+        }
+        if ((y ?? "").StartsWith("_"))
+        {
+            return -1;
+        }
+        return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static readonly HubDirectoryComparer Default = new();
 }

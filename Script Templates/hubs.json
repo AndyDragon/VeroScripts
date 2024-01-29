@@ -1634,6 +1634,23 @@
           "template": "💫 Snap Community %%MEMBERLEVEL%% feature 💫"
         }
       ]
+    },
+    {
+      "name": "_sat_door_day",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "Congratulations @%%USERNAME%%. Your amazing door has been featured\non @Sat_door_day  🚪👏💫✨\n"
+        },
+        {
+          "name": "feature",
+          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @sat_door_day  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #Sat_door_day 🚪 😃 💖\n\nFor Admin Use Only\n#sat_door_day_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "original post",
+          "template": "Your Won-Door-Ful image has been featured on @Sat_Door_Day ⭐️🚪💫. Congratulations 👏"
+        }
+      ]
     }
   ]
 }
