@@ -129,9 +129,9 @@ struct PlaceholderView: View {
                 )
                 .frame(minWidth: 320)
                 .padding(.all, 2)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
+//#if os(iOS)
+//                .textInputAutocapitalization(.never)
+//#endif
                 Spacer()
                     .background(Color.yellow)
             }
@@ -147,9 +147,9 @@ struct PlaceholderView: View {
                 )
                 .frame(minWidth: 320)
                 .padding(.all, 2)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
+//#if os(iOS)
+//                .textInputAutocapitalization(.never)
+//#endif
                 Spacer()
                     .background(Color.yellow)
             }
@@ -203,27 +203,31 @@ struct ContentView: View {
                 // User name editor
                 HStack {
                     Text("User: ")
-#if os(iOS)
-                        .frame(width: 60, alignment: .leading)
-#else
-                        .frame(width: 38, alignment: .leading)
-#endif
+                        .foregroundColor(UserName.count != 0 ? Color(.textColor) : Color(.red))
+//#if os(iOS)
+//                        .frame(width: 60, alignment: .leading)
+//#else
+                        .frame(width: 42, alignment: .leading)
+//#endif
                     TextField(
                         "Enter user name",
                         text: $UserName.onChange(userNameChanged)
                     )
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
+//#if os(iOS)
+//                    .textInputAutocapitalization(.never)
+//#endif
                 }
                 
                 // User level picker
                 HStack {
-#if os(iOS)
                     Text("Level: ")
-                        .frame(width: 60, alignment: .leading)
-#endif
-                    Picker("Level: ", selection: $Membership.onChange(membershipChanged)) {
+                        .foregroundColor(Membership != MembershipCase.none ? Color(.textColor) : Color(.red))
+//#if os(iOS)
+//                        .frame(width: 60, alignment: .leading)
+//#else
+                        .frame(width: 36, alignment: .leading)
+//#endif
+                    Picker("", selection: $Membership.onChange(membershipChanged)) {
                         ForEach(MembershipCase.allCases) { level in
                             Text(level.rawValue).tag(level)
                         }
@@ -235,34 +239,40 @@ struct ContentView: View {
                 // Your name editor
                 HStack {
                     Text("You: ")
-#if os(iOS)
-                        .frame(width: 60, alignment: .leading)
-#else
-                        .frame(width: 38, alignment: .leading)
-#endif
+                        .foregroundColor(YourName.count != 0 ? Color(.textColor) : Color(.red))
+//#if os(iOS)
+//                        .frame(width: 60, alignment: .leading)
+//#else
+                        .frame(width: 42, alignment: .leading)
+//#endif
                     TextField(
                         "Enter your name:",
                         text: $YourName.onChange(yourNameChanged)
                     )
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
+//#if os(iOS)
+//                    .textInputAutocapitalization(.never)
+//#endif
                     Text("Your first name: ")
+                        .foregroundColor(YourFirstName.count != 0 ? Color(.textColor) : Color(.red))
                     TextField(
                         "Enter your first name:",
                         text: $YourFirstName.onChange(yourFirstNameChanged)
                     )
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
+//#if os(iOS)
+//                    .textInputAutocapitalization(.never)
+//#endif
                 }
                 
                 // Page name editor
                 HStack {
-#if os(iOS)
                     Text("Page: ")
-#endif
-                    Picker("Page: ", selection: $Page.onChange(pageChanged)) {
+                        .foregroundColor((Page != "default" || PageName.count != 0) ? Color(.textColor) : Color(.red))
+//#if os(iOS)
+//                        .frame(width: 60, alignment: .leading)
+//#else
+                        .frame(width: 36, alignment: .leading)
+//#endif
+                    Picker("", selection: $Page.onChange(pageChanged)) {
                         ForEach(HubsCatalog.hubs) { hub in
                             Text(hub.name).tag(hub.name)
                         }
@@ -274,19 +284,19 @@ struct ContentView: View {
                     )
                     .disabled(Page != "default")
                     .focusable(Page == "default")
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
-#if os(iOS)
-                    Text("Page staff level: ")
-#endif
+//#if os(iOS)
+//                    .textInputAutocapitalization(.never)
+//#endif
+//#if os(iOS)
+//                    Text("Page staff level: ")
+//#endif
                     Picker("Page staff level: ", selection: $PageStaffLevel.onChange(pageStaffLevelChanged)) {
                         ForEach(StaffLevelCase.allCases) { staffLevelCase in
                             Text(staffLevelCase.rawValue).tag(staffLevelCase)
                         }
                     }
                     .focusable()
-#if !os(iOS)
+//#if !os(iOS)
                     Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
                         Text("First feature on page")
                     }
@@ -295,25 +305,25 @@ struct ContentView: View {
                         Text("From community tag")
                     }
                     .focusable()
-#else
-                    Spacer()
-#endif
+//#else
+//                    Spacer()
+//#endif
                 }
             }
             
-#if os(iOS)
-            HStack {
-                Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
-                    Text("First feature on page")
-                }
-                .focusable()
-                Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
-                    Text("From community tag")
-                }
-                .focusable()
-                Spacer()
-            }
-#endif
+//#if os(iOS)
+//            HStack {
+//                Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
+//                    Text("First feature on page")
+//                }
+//                .focusable()
+//                Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
+//                    Text("From community tag")
+//                }
+//                .focusable()
+//                Spacer()
+//            }
+//#endif
             
             Group {
                 // Feature script output
@@ -335,16 +345,16 @@ struct ContentView: View {
                 }
                 .frame(alignment: .leading)
                 TextEditor(text: $FeatureScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 100)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
+//#if os(iOS)
+//                    .frame(maxWidth: .infinity, minHeight: 100)
+//                    .colorMultiply(Color(
+//                        red: ColorScheme == .dark ? 1.05 : 0.95,
+//                        green: ColorScheme == .dark ? 1.05 : 0.95,
+//                        blue: ColorScheme == .dark ? 1.05 : 0.95))
+//                    .border(.gray)
+//#else
                     .frame(minWidth: 400, maxWidth: .infinity, minHeight: 200)
-#endif
+//#endif
                 // Comment script output
                 HStack {
                     Text("Comment script:")
@@ -364,16 +374,16 @@ struct ContentView: View {
                 }
                 .frame(alignment: .leading)
                 TextEditor(text: $CommentScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
+//#if os(iOS)
+//                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
+//                    .colorMultiply(Color(
+//                        red: ColorScheme == .dark ? 1.05 : 0.95,
+//                        green: ColorScheme == .dark ? 1.05 : 0.95,
+//                        blue: ColorScheme == .dark ? 1.05 : 0.95))
+//                    .border(.gray)
+//#else
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
-#endif
+//#endif
                 
                 // Original post script output
                 HStack {
@@ -394,37 +404,37 @@ struct ContentView: View {
                 }
                 .frame(alignment: .leading)
                 TextEditor(text: $OriginalPostScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 40, maxHeight: 60)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
+//#if os(iOS)
+//                    .frame(maxWidth: .infinity, minHeight: 40, maxHeight: 60)
+//                    .colorMultiply(Color(
+//                        red: ColorScheme == .dark ? 1.05 : 0.95,
+//                        green: ColorScheme == .dark ? 1.05 : 0.95,
+//                        blue: ColorScheme == .dark ? 1.05 : 0.95))
+//                    .border(.gray)
+//#else
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 40, maxHeight: 80)
-#endif
+//#endif
             }
             
             Group {
                 // New membership picker and script output
                 HStack {
-#if os(iOS)
-                    Text("New membership: ")
-#endif
+//#if os(iOS)
+//                    Text("New membership: ")
+//#endif
                     Picker("New membership: ", selection: $NewMembership.onChange(newMembershipChanged)) {
                         ForEach(NewMembershipCase.allCases) { level in
                             Text(level.rawValue).tag(level)
                         }
                     }
                     Button(action: {
-#if os(iOS)
-                        UIPasteboard.general.string = NewMembershipScript
-#else
+//#if os(iOS)
+//                        UIPasteboard.general.string = NewMembershipScript
+//#else
                         let pasteBoard = NSPasteboard.general
                         pasteBoard.clearContents()
                         pasteBoard.writeObjects([NewMembershipScript as NSString])
-#endif
+//#endif
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -433,16 +443,16 @@ struct ContentView: View {
                 }
                 .frame(alignment: .leading)
                 TextEditor(text: $NewMembershipScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
+//#if os(iOS)
+//                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
+//                    .colorMultiply(Color(
+//                        red: ColorScheme == .dark ? 1.05 : 0.95,
+//                        green: ColorScheme == .dark ? 1.05 : 0.95,
+//                        blue: ColorScheme == .dark ? 1.05 : 0.95))
+//                    .border(.gray)
+//#else
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
-#endif
+//#endif
             }
         }
         .padding()
@@ -453,10 +463,10 @@ struct ContentView: View {
             actions: {
                 Button("OK", action: {
                     if TerminalAlert {
-#if os(iOS)
-#else
+//#if os(iOS)
+//#else
                         NSApplication.shared.terminate(nil)
-#endif
+//#endif
                     }
                 })
             },
@@ -480,26 +490,26 @@ struct ContentView: View {
                             Placeholders.PlaceholderDict.forEach({ placeholder in
                                 ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
                             })
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
+//#if os(iOS)
+//                            UIPasteboard.general.string = ScriptWithPlaceholders
+//#else
                             let pasteBoard = NSPasteboard.general
                             pasteBoard.clearContents()
                             pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
+//#endif
                             ShowingPopup.toggle()
                         }, label: {
                             Text("Copy")
                                 .padding(.horizontal, 20)
                         })
                         Button(action: {
-#if os(iOS)
-                            UIPasteboard.general.string = ScriptWithPlaceholdersUntouched
-#else
+//#if os(iOS)
+//                            UIPasteboard.general.string = ScriptWithPlaceholdersUntouched
+//#else
                             let pasteBoard = NSPasteboard.general
                             pasteBoard.clearContents()
                             pasteBoard.writeObjects([ScriptWithPlaceholdersUntouched as NSString])
-#endif
+//#endif
                             ShowingPopup.toggle()
                         }, label: {
                             Text("Copy with Placeholders Unfilled")
@@ -513,6 +523,7 @@ struct ContentView: View {
         }
         .disabled(WaitingForCatalog)
         .task {
+            lastPageStaffLevel = PageStaffLevel
             do {
                 let hubsUrl = URL(string: "https://andydragon.com/depot/VERO/hubs.json")!
                 HubsCatalog = try await URLSession.shared.decode(HubCatalog.self, from: hubsUrl)
@@ -607,13 +618,13 @@ struct ContentView: View {
             ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
         })
         if !checkForPlaceholders(scripts: [ScriptWithPlaceholdersUntouched] + otherScripts, force: force) {
-#if os(iOS)
-            UIPasteboard.general.string = ScriptWithPlaceholders
-#else
+//#if os(iOS)
+//            UIPasteboard.general.string = ScriptWithPlaceholders
+//#else
             let pasteBoard = NSPasteboard.general
             pasteBoard.clearContents()
             pasteBoard.writeObjects([ScriptWithPlaceholders as NSString])
-#endif
+//#endif
         }
     }
     
