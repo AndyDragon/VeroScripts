@@ -12,6 +12,11 @@
     <Window.DataContext>
         <local:ScriptsViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <local:ValidateEmptyConverter x:Key="validateEmptyConverter"></local:ValidateEmptyConverter>
+        <local:ValidateNotEqualConverter x:Key="validateNotEqualConverter"></local:ValidateNotEqualConverter>
+        <local:ValidateNotEqualAndNotEmptyConverter x:Key="validateNotEqualAndNotEmptyConverter"></local:ValidateNotEqualAndNotEmptyConverter>
+    </Window.Resources>
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /> <!-- User -->
@@ -32,7 +37,9 @@
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="User:" Grid.Column="0" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="User:" Foreground="{Binding UserName, Converter={StaticResource validateEmptyConverter}}"/>
+            </Label>
             <TextBox Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Height="20"  />
         </Grid>
         <Grid Margin="0,0,0,8" Grid.Row="1">
@@ -40,7 +47,9 @@
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="Level:" Grid.Column="0" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="Level:" Foreground="{Binding Membership, Converter={StaticResource validateNotEqualConverter}, ConverterParameter='None'}" />
+            </Label>
             <ComboBox ItemsSource="{Binding Memberships}" SelectedItem="{Binding Membership, Mode=TwoWay}" Grid.Column="1" />
         </Grid>
         <Grid Margin="0,0,0,8" Grid.Row="2">
@@ -50,9 +59,13 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="You:" Grid.Column="0" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="You:" Foreground="{Binding YourName, Converter={StaticResource validateEmptyConverter}}" />
+            </Label>
             <TextBox Text="{Binding YourName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Height="20" />
-            <Label Content="Your first name:" Grid.Column="2" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="2" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="Your first name:" Foreground="{Binding YourFirstName, Converter={StaticResource validateEmptyConverter}}" />
+            </Label>
             <TextBox Text="{Binding YourFirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Height="20" />
         </Grid>
         <Grid Margin="0,0,0,8" Grid.Row="3">
@@ -65,10 +78,21 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Label Content="Page:" Grid.Column="0" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="Page:">
+                    <TextBlock.Foreground>
+                        <MultiBinding Converter="{StaticResource validateNotEqualAndNotEmptyConverter}" ConverterParameter="default">
+                            <Binding Path="Page" />
+                            <Binding Path="PageName" />
+                        </MultiBinding>
+                    </TextBlock.Foreground>
+                </TextBlock>
+            </Label>
             <ComboBox ItemsSource="{Binding Pages}" SelectedItem="{Binding Page, Mode=TwoWay}" Grid.Column="1" />
             <TextBox Text="{Binding PageName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding PageNameEnabled, Mode=OneWay}" IsReadOnly="{Binding PageNameDisabled, Mode=OneWay}" Grid.Column="2" Margin="8,0,0,0" Height="20" />
-            <Label Content="Page staff level:" Grid.Column="3" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11" />
+            <Label Grid.Column="3" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11">
+                <TextBlock Text="Page staff level:" Foreground="{Binding StaffLevel, Converter={StaticResource validateEmptyConverter}}" />
+            </Label>
             <ComboBox ItemsSource="{Binding StaffLevels}" SelectedItem="{Binding StaffLevel, Mode=TwoWay}" Grid.Column="4" />
             <CheckBox IsChecked="{Binding FirstForPage}" Content="First feature on page" Grid.Column="5" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11" />
             <CheckBox IsChecked="{Binding CommunityTag}" Content="From community tag" Grid.Column="6" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11" />
