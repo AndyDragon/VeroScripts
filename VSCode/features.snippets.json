@@ -4,9 +4,9 @@
         "prefix": "entry",
         "body": [
             "$CLIPBOARD - ${1:user name}",
-            "member level - ${2:level} ([n] features)",
+            "member level - ${2:level} ([n] Snap + [n] RAW features)",
             "last feature - [date] (this photo featured: [yes/no])",
-            "first in insects - [yes/no]",
+            "first on page - [yes/no]",
             "tineye - [results]",
             "aiornot - [results]",
             ""
@@ -18,13 +18,13 @@
         "prefix": "rawentry",
         "body": [
             "[RAW] $CLIPBOARD - ${1:user name}",
-            "member level - ${2:level} ([n] features)",
+            "member level - ${2:level} ([n] Snap + [n] RAW features)",
             "last feature - [date] (this photo featured: [yes/no])",
-            "first in insects - [yes/no]",
+            "first on page - [yes/no]",
             "tineye - [results]",
             "aiornot - [results]",
             ""
         ],
-        "description": "Entry for feature candidate with #raw_xxx hastag"
+        "description": "Entry for feature candidate with #raw_ hastag"
     }
 }

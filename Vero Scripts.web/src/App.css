@@ -1,3 +1,8 @@
+.App {
+  background-color: #20242c;
+  width: 100%;
+}
+
 .App-header {
   min-height: 100vh;
   display: flex;
@@ -6,4 +11,5 @@
   font-size: calc(10px + 2vmin);
   margin: 20px;
   font-weight: bold;
+  background-color: #20242c;
 }
