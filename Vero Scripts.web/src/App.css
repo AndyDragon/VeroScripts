@@ -1,0 +1,9 @@
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size: calc(10px + 2vmin);
+  margin: 20px;
+  font-weight: bold;
+}
