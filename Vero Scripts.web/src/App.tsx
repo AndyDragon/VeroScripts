@@ -238,7 +238,7 @@ function App() {
         "\n" +
         "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
         "\n" +
-        "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.\n");
+        "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n");
     } else if (selectedNewLevel === "vip") {
       setNewLevelScript(
         "Congratulations @" + userName + " on your 15th feature!\n" +
@@ -247,7 +247,7 @@ function App() {
         "\n" +
         "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
         "\n" +
-        "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.");
+        "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.");
     }
   }, [
     userName,

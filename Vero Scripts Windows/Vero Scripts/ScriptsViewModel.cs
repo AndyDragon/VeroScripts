@@ -11,7 +11,7 @@ namespace Vero_Scripts
 {
     public class HubsPackage
     {
-        public HubsPackage() 
+        public HubsPackage()
         {
             Hubs = Array.Empty<HubPackage>();
         }
@@ -28,7 +28,7 @@ namespace Vero_Scripts
         }
 
         public string Name { get; set; }
-        
+
         public TemplatePackage[] Templates { get; set; }
     }
 
@@ -41,7 +41,7 @@ namespace Vero_Scripts
         }
 
         public string Name { get; set; }
-        
+
         public string Template { get; set; }
     }
 
@@ -526,9 +526,9 @@ namespace Vero_Scripts
         }
 
         private string GetTemplate(
-            string templateName, 
-            string pageName, 
-            bool firstForPage, 
+            string templateName,
+            string pageName,
+            bool firstForPage,
             bool communityTag)
         {
             TemplatePackage? template = null;
@@ -538,7 +538,7 @@ namespace Vero_Scripts
             {
                 template = hub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
                 template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
-            } 
+            }
             else if (firstForPage)
             {
                 template = hub?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
@@ -551,11 +551,11 @@ namespace Vero_Scripts
 
         private void UpdateNewMembershipScripts()
         {
-            if (NewMembership == "None" || string.IsNullOrEmpty(UserName)) 
+            if (NewMembership == "None" || string.IsNullOrEmpty(UserName))
             {
                 NewMembershipScript = "";
             }
-            else if (NewMembership == "Member") 
+            else if (NewMembership == "Member")
             {
                 NewMembershipScript =
                     "Congratulations @" + UserName + " on your 5th feature!\n" +
@@ -564,9 +564,9 @@ namespace Vero_Scripts
                     "\n" +
                     "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
                     "\n" +
-                    "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.\n";
+                    "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n";
         }
-            else if (NewMembership == "VIP Member") 
+            else if (NewMembership == "VIP Member")
             {
                 NewMembershipScript =
                     "Congratulations @" + UserName + " on your 15th feature!\n" +
@@ -575,7 +575,7 @@ namespace Vero_Scripts
                     "\n" +
                     "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
                     "\n" +
-                    "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.";
+                    "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.";
         }
         }
 

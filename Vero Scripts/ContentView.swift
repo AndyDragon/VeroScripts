@@ -109,7 +109,7 @@ struct PlaceholderView: View {
     let Element: [String: PlaceholderValue].Element
     var EditorName = ""
     @State var EditorValue: String
-    
+
     init(_ element: [String: PlaceholderValue].Element) {
         Element = element
         let start = element.key.index(element.key.startIndex, offsetBy: 2)
@@ -117,7 +117,7 @@ struct PlaceholderView: View {
         EditorName = String(element.key[start...end]);
         EditorValue = element.value.Value
     }
-    
+
     var body: some View {
         if #available(macOS 13.0, *) {
             HStack {
@@ -156,7 +156,7 @@ struct PlaceholderView: View {
             .frame(maxWidth: .infinity)
         }
     }
-    
+
     func editorValueChanged(to: String) {
         Element.value.Value = EditorValue
     }
@@ -217,7 +217,7 @@ struct ContentView: View {
 //                    .textInputAutocapitalization(.never)
 //#endif
                 }
-                
+
                 // User level picker
                 HStack {
                     Text("Level: ")
@@ -262,7 +262,7 @@ struct ContentView: View {
 //                    .textInputAutocapitalization(.never)
 //#endif
                 }
-                
+
                 // Page name editor
                 HStack {
                     Text("Page: ")
@@ -310,7 +310,7 @@ struct ContentView: View {
 //#endif
                 }
             }
-            
+
 //#if os(iOS)
 //            HStack {
 //                Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
@@ -324,7 +324,7 @@ struct ContentView: View {
 //                Spacer()
 //            }
 //#endif
-            
+
             Group {
                 // Feature script output
                 HStack {
@@ -384,7 +384,7 @@ struct ContentView: View {
 //#else
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
 //#endif
-                
+
                 // Original post script output
                 HStack {
                     Text("Original post script:")
@@ -415,7 +415,7 @@ struct ContentView: View {
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 40, maxHeight: 80)
 //#endif
             }
-            
+
             Group {
                 // New membership picker and script output
                 HStack {
@@ -562,7 +562,7 @@ struct ContentView: View {
             lastYourName = value
         }
     }
-    
+
     func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
             Placeholders.PlaceholderDict.removeAll()
@@ -589,7 +589,7 @@ struct ContentView: View {
             lastPageName = value
         }
     }
-    
+
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
             Placeholders.PlaceholderDict.removeAll()
@@ -598,11 +598,11 @@ struct ContentView: View {
             lastPageStaffLevel = value
         }
     }
-    
+
     func firstForPageChanged(to value: Bool) {
         updateScripts()
     }
-    
+
     func communityTagChanged(to value: Bool) {
         updateScripts()
     }
@@ -610,7 +610,7 @@ struct ContentView: View {
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
-    
+
     func copyScript(_ script: String, _ otherScripts: [String], force: Bool = false) -> Void {
         ScriptWithPlaceholders = script
         ScriptWithPlaceholdersUntouched = script
@@ -627,7 +627,7 @@ struct ContentView: View {
 //#endif
         }
     }
-    
+
     func checkForPlaceholders(scripts: [String], force: Bool = false) -> Bool {
         var placeholders: [String] = [];
         scripts.forEach({ script in placeholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
@@ -649,7 +649,7 @@ struct ContentView: View {
     }
 
     func updateScripts() -> Void {
-        if Membership == MembershipCase.none 
+        if Membership == MembershipCase.none
             || UserName.isEmpty
             || YourName.isEmpty
             || YourFirstName.isEmpty
@@ -703,7 +703,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
         }
     }
-    
+
     func getTemplateFromHubs(_ templateName: String, from hubName: String, firstFeature: Bool, communityTag: Bool) -> String! {
         var template: Template!
         let defaultHub = HubsCatalog.hubs.first(where: { hub in hub.name == "default" });
@@ -739,7 +739,7 @@ struct ContentView: View {
                 "\n" +
                 "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
                 "\n" +
-                "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag.\n"
+                "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
         } else if NewMembership == NewMembershipCase.vipMember {
             NewMembershipScript =
                 "Congratulations @" + UserName + " on your 15th feature!\n" +
@@ -748,7 +748,7 @@ struct ContentView: View {
                 "\n" +
                 "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
                 "\n" +
-                "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any raw page using only the membership tag."
+                "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag."
         }
     }
 }
