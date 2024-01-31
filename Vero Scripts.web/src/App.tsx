@@ -4,14 +4,20 @@ import "./App.css";
 import {
   Checkbox,
   CommandButton,
+  DefaultButton,
+  Dialog,
+  DialogFooter,
+  DialogType,
   Dropdown,
   IDropdownOption,
   Label,
+  PrimaryButton,
   Separator,
   Stack,
   Text,
   TextField,
 } from "@fluentui/react";
+import { useBoolean } from '@fluentui/react-hooks';
 import axios from "axios";
 import { initializeIcons } from '@fluentui/font-icons-mdl2';
 
@@ -31,6 +37,8 @@ interface Pages {
   hubs: Page[];
 }
 
+const modalPropsStyles = { main: { maxWidth: 450 } };
+
 function App() {
   const [userName, setUserName] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("none");
@@ -47,7 +55,11 @@ function App() {
   const [originalPostScript, setOriginalPostScript] = useState<string>("");
   const [selectedNewLevel, setSelectedNewLevel] = useState<string>("none");
   const [newLevelScript, setNewLevelScript] = useState<string>("");
+  const [hideDialog, { toggle: toggleHideDialog }] = useBoolean(true);
+  const [placeholders, setPlaceholders] = useState<Record<string, string>>({});
   const pages = useRef<Pages>();
+  const scriptWithPlaceholders = useRef<string>("");
+  const scriptWithPlaceholdersUntouched = useRef<string>("");
 
   const levelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
@@ -99,6 +111,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    setPlaceholders({});
     if (
       !pages.current ||
       !userName ||
@@ -170,6 +183,42 @@ function App() {
     isCommunityTag,
   ]);
 
+  function checkForPlaceholders(scripts: string[], forceEdit?: boolean) {
+    const placeholdersFound: string[] = [];
+    scripts.forEach(script => {
+      const matches = script.matchAll(/\[\[([^\]]*)\]\]/g);
+      [...matches].forEach(match => {
+        placeholdersFound.push(match[1]);
+      });
+    });
+    if (placeholdersFound.length) {
+      let needEditor = false;
+      placeholdersFound.forEach(placeholderFound => {
+        if (!Object.keys(placeholders).includes(placeholderFound)) {
+          needEditor = true;
+          placeholders[placeholderFound] = "";
+        }
+      });
+      if (needEditor || forceEdit) {
+        toggleHideDialog();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function copyScript(script: string, additionalScripts: string[], forceEdit?: boolean) {
+    scriptWithPlaceholders.current = script;
+    scriptWithPlaceholdersUntouched.current = script;
+    Object.keys(placeholders).forEach(placeholder => {
+      const placeholderRegEx = new RegExp("\\[\\[" + placeholder + "\\]\\]", "g");
+      scriptWithPlaceholders.current = scriptWithPlaceholders.current.replaceAll(placeholderRegEx, placeholders[placeholder]);
+    });
+    if (!checkForPlaceholders([scriptWithPlaceholders.current, ...additionalScripts], forceEdit)) {
+      await navigator.clipboard.writeText(scriptWithPlaceholders.current);
+    }
+  }
+
   useEffect(() => {
     localStorage.setItem("yourname", yourName);
     localStorage.setItem("firstname", firstName);
@@ -206,412 +255,506 @@ function App() {
   ]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <Stack>
-          {/* Title */}
-          <Text
-            variant="large"
-            style={{
-              color: "cornflowerblue",
-              marginBottom: "10px",
-            }}
-          >
-            VERO Scripts
-          </Text>
-
-          {/* User name editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
+    <>
+      <div className="App">
+        <header className="App-header">
+          <Stack>
+            {/* Title */}
+            <Text
+              variant="large"
               style={{
-                width: "auto",
-                minWidth: "40px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: !userName ? "red" : "white",
+                color: "cornflowerblue",
+                marginBottom: "10px",
               }}
             >
-              User:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
-              <TextField
-                value={userName}
-                onChange={(_, newValue) => setUserName(newValue || "")}
-                style={{ minWidth: "200px" }}
-                autoCapitalize="off"
-                placeholder="Enter the user name"
+              VERO Scripts
+            </Text>
+
+            {/* User name editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "40px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !userName ? "red" : "white",
+                }}
+              >
+                User:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <TextField
+                  value={userName}
+                  onChange={(_, newValue) => setUserName(newValue || "")}
+                  style={{ minWidth: "200px" }}
+                  autoCapitalize="off"
+                  placeholder="Enter the user name"
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* User level editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "40px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: ((selectedLevel || "none") === "none") ? "red" : "white",
+                }}
+              >
+                Level:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <Dropdown
+                  options={levelOptions}
+                  selectedKey={selectedLevel || "none"}
+                  onChange={(_, item) =>
+                    setSelectedLevel((item?.key as string) || "none")
+                  }
+                  style={{ minWidth: "200px" }}
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Your name editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "40px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !yourName ? "red" : "white",
+                }}
+              >
+                You:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <TextField
+                  value={yourName}
+                  onChange={(_, newValue) => setYourName(newValue || "")}
+                  style={{ minWidth: "200px" }}
+                  autoCapitalize="off"
+                  placeholder="Enter your user name"
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Your first name editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "92px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !firstName ? "red" : "white",
+                }}
+              >
+                Your first name:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <TextField
+                  value={firstName}
+                  onChange={(_, newValue) => setFirstName(newValue || "")}
+                  style={{ minWidth: "200px" }}
+                  placeholder="Enter your first name"
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Page editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "40px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: ((selectedPage || "default") === "default") ? (!customPage ? "red" : undefined) : "white",
+                }}
+              >
+                Page:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <Dropdown
+                  options={pageOptions}
+                  selectedKey={selectedPage || "default"}
+                  onChange={(_, item) =>
+                    setSelectedPage((item?.key as string) || "default")
+                  }
+                  style={{ minWidth: "160px" }}
+                />
+              </Stack.Item>
+              <Stack.Item grow={1} shrink={1}>
+                <TextField
+                  value={customPage}
+                  onChange={(_, newValue) => setCustomPage(newValue || "")}
+                  style={{ minWidth: "80px" }}
+                  autoCapitalize="off"
+                  disabled={(selectedPage || "default") !== "default"}
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Page staff level editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "60px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !selectedStaffLevel ? "red" : "white",
+                }}
+              >
+                Staff level:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <Dropdown
+                  options={staffLevelOptions}
+                  selectedKey={selectedStaffLevel || "mod"}
+                  onChange={(_, item) =>
+                    setSelectedStaffLevel((item?.key as string) || "mod")
+                  }
+                  style={{ minWidth: "200px" }}
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Options */}
+            <Stack
+              horizontal
+              style={{ width: "100%", paddingLeft: "8px" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Checkbox
+                label="First feature on page"
+                checked={isFirstFeature}
+                onChange={(_, newValue) => setIsFirstFeature(!!newValue)}
+                styles={{
+                  checkbox: { borderColor: "white !important" },
+                  checkmark: { color: "white !important" },
+                  text: { color: "white !important" },
+                }}
               />
-            </Stack.Item>
-          </Stack>
+              <Checkbox
+                label="Community tag"
+                checked={isCommunityTag}
+                onChange={(_, newValue) => setIsCommunityTag(!!newValue)}
+                styles={{
+                  checkbox: { borderColor: "white !important" },
+                  checkmark: { color: "white !important" },
+                  text: { color: "white !important" },
+                }}
+              />
+            </Stack>
 
-          {/* User level editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                minWidth: "40px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: ((selectedLevel || "none") === "none") ? "red" : "white",
-              }}
+            <Separator />
+
+            {/* Feature script editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
             >
-              Level:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
+              <Label
+                style={{
+                  width: "auto",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  color: "white",
+                }}
+              >
+                Feature script:
+              </Label>
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy"
+                onClick={async () => {
+                  await copyScript(featureScript, [commentScript, originalPostScript]);
+                }}
+                disabled={!featureScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy (edit placeholders)"
+                onClick={async () => {
+                  await copyScript(featureScript, [commentScript, originalPostScript], true);
+                }}
+                disabled={!featureScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+            </Stack>
+            <TextField
+              multiline
+              rows={12}
+              value={featureScript}
+              onChange={(_, newValue) => setFeatureScript(newValue || "")}
+            />
+
+            <Separator />
+
+            {/* Comment script editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  color: "white",
+                }}
+              >
+                Comment script:
+              </Label>
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy"
+                onClick={async () => {
+                  await copyScript(commentScript, [featureScript, originalPostScript]);
+                }}
+                disabled={!commentScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy (edit placeholders)"
+                onClick={async () => {
+                  await copyScript(commentScript, [featureScript, originalPostScript], true);
+                }}
+                disabled={!commentScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+            </Stack>
+            <TextField
+              multiline
+              rows={6}
+              value={commentScript}
+              onChange={(_, newValue) => setCommentScript(newValue || "")}
+            />
+
+            <Separator />
+
+            {/* Original post script editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  color: "white",
+                }}
+              >
+                Original post script:
+              </Label>
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy"
+                onClick={async () => {
+                  await copyScript(originalPostScript, [featureScript, commentScript]);
+                }}
+                disabled={!originalPostScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy (edit placeholders)"
+                onClick={async () => {
+                  await copyScript(originalPostScript, [featureScript, commentScript], true);
+                }}
+                disabled={!originalPostScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
+              />
+            </Stack>
+            <TextField
+              multiline
+              rows={3}
+              value={originalPostScript}
+              onChange={(_, newValue) => setOriginalPostScript(newValue || "")}
+            />
+
+            <Separator />
+
+            {/* New membership level script editor */}
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
+              <Label
+                style={{
+                  width: "auto",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  color: "white",
+                }}
+              >
+                New membership:
+              </Label>
+            </Stack>
+            <Stack
+              horizontal
+              style={{ width: "100%" }}
+              tokens={{ childrenGap: "8px" }}
+            >
               <Dropdown
-                options={levelOptions}
-                selectedKey={selectedLevel || "none"}
+                options={newLevelOptions}
+                selectedKey={selectedNewLevel || "none"}
                 onChange={(_, item) =>
-                  setSelectedLevel((item?.key as string) || "none")
+                  setSelectedNewLevel((item?.key as string) || "mod")
                 }
-                style={{ minWidth: "200px" }}
+                style={{ width: "200px" }}
               />
-            </Stack.Item>
-          </Stack>
-
-          {/* Your name editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                minWidth: "40px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: !yourName ? "red" : "white",
-              }}
-            >
-              You:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
-              <TextField
-                value={yourName}
-                onChange={(_, newValue) => setYourName(newValue || "")}
-                style={{ minWidth: "200px" }}
-                autoCapitalize="off"
-                placeholder="Enter your user name"
+              <CommandButton
+                iconProps={{ iconName: "Copy" }}
+                text="Copy"
+                onClick={async () => await navigator.clipboard.writeText(newLevelScript)}
+                disabled={!newLevelScript}
+                styles={{
+                  label: { color: "white" },
+                  labelHovered: { color: "cornflowerblue" },
+                  labelDisabled: { color: "#606060" },
+                  iconDisabled: { color: "#606060" },
+                }}
               />
-            </Stack.Item>
+            </Stack>
+            <TextField
+              multiline
+              rows={6}
+              value={newLevelScript}
+              onChange={(_, newValue) => setNewLevelScript(newValue || "")}
+            />
+            <Separator />
           </Stack>
-
-          {/* Your first name editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                minWidth: "92px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: !firstName ? "red" : "white",
-              }}
-            >
-              Your first name:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
-              <TextField
-                value={firstName}
-                onChange={(_, newValue) => setFirstName(newValue || "")}
-                style={{ minWidth: "200px" }}
-                placeholder="Enter your first name"
-              />
-            </Stack.Item>
-          </Stack>
-
-          {/* Page editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                minWidth: "40px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: ((selectedPage || "default") === "default") ? (!customPage ? "red" : undefined) : "white",
-              }}
-            >
-              Page:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
-              <Dropdown
-                options={pageOptions}
-                selectedKey={selectedPage || "default"}
-                onChange={(_, item) =>
-                  setSelectedPage((item?.key as string) || "default")
-                }
-                style={{ minWidth: "160px" }}
-              />
-            </Stack.Item>
-            <Stack.Item grow={1} shrink={1}>
-              <TextField
-                value={customPage}
-                onChange={(_, newValue) => setCustomPage(newValue || "")}
-                style={{ minWidth: "80px" }}
-                autoCapitalize="off"
-                disabled={(selectedPage || "default") !== "default"}
-              />
-            </Stack.Item>
-          </Stack>
-
-          {/* Page staff level editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                minWidth: "60px",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                color: !selectedStaffLevel ? "red" : "white",
-              }}
-            >
-              Staff level:
-            </Label>
-            <Stack.Item grow={1} shrink={1}>
-              <Dropdown
-                options={staffLevelOptions}
-                selectedKey={selectedStaffLevel || "mod"}
-                onChange={(_, item) =>
-                  setSelectedStaffLevel((item?.key as string) || "mod")
-                }
-                style={{ minWidth: "200px" }}
-              />
-            </Stack.Item>
-          </Stack>
-
-          {/* Options */}
-          <Stack
-            horizontal
-            style={{ width: "100%", paddingLeft: "8px" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Checkbox
-              label="First feature on page"
-              checked={isFirstFeature}
-              onChange={(_, newValue) => setIsFirstFeature(!!newValue)}
-              styles={{
-                checkbox: { borderColor: "white !important" },
-                checkmark: { color: "white !important" },
-                text: { color: "white !important" },
+        </header>
+      </div>
+      <Dialog
+        hidden={hideDialog}
+        onDismiss={toggleHideDialog}
+        dialogContentProps={{
+          type: DialogType.close,
+          title: "Manual placeholders",
+          subText: "There are manual placeholders that need to be filled out:",
+        }}
+        modalProps={{
+          isBlocking: true,
+          styles: modalPropsStyles,
+        }}
+      >
+        {
+          Object.keys(placeholders).map(key => (
+            <TextField
+              key={key}
+              label={key}
+              value={placeholders[key]}
+              onChange={(_, newValue) => {
+                const newPlaceholders: Record<string, string> = { ...placeholders };
+                newPlaceholders[key] = newValue || "";
+                setPlaceholders(newPlaceholders);
               }}
             />
-            <Checkbox
-              label="Community tag"
-              checked={isCommunityTag}
-              onChange={(_, newValue) => setIsCommunityTag(!!newValue)}
-              styles={{
-                checkbox: { borderColor: "white !important" },
-                checkmark: { color: "white !important" },
-                text: { color: "white !important" },
-              }}
-            />
-          </Stack>
-
-          <Separator />
-
-          {/* Feature script editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                color: "white",
-              }}
-            >
-              Feature script:
-            </Label>
-            <CommandButton
-              iconProps={{ iconName: "Copy" }}
-              text="Copy"
-              onClick={async () => await navigator.clipboard.writeText(featureScript)}
-              disabled={!featureScript}
-              styles={{
-                label: { color: "white" },
-                labelHovered: { color: "cornflowerblue" },
-                labelDisabled: { color: "#606060" },
-                iconDisabled: { color: "#606060" },
-              }}
-            />
-          </Stack>
-          <TextField
-            multiline
-            rows={12}
-            value={featureScript}
-            onChange={(_, newValue) => setFeatureScript(newValue || "")}
-          />
-
-          <Separator />
-
-          {/* Comment script editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                color: "white",
-              }}
-            >
-              Comment script:
-            </Label>
-            <CommandButton
-              iconProps={{ iconName: "Copy" }}
-              text="Copy"
-              onClick={async () => await navigator.clipboard.writeText(commentScript)}
-              disabled={!commentScript}
-              styles={{
-                label: { color: "white" },
-                labelHovered: { color: "cornflowerblue" },
-                labelDisabled: { color: "#606060" },
-                iconDisabled: { color: "#606060" },
-              }}
-            />
-          </Stack>
-          <TextField
-            multiline
-            rows={6}
-            value={commentScript}
-            onChange={(_, newValue) => setCommentScript(newValue || "")}
-          />
-
-          <Separator />
-
-          {/* Original post script editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                color: "white",
-              }}
-            >
-              Original post script:
-            </Label>
-            <CommandButton
-              iconProps={{ iconName: "Copy" }}
-              text="Copy"
-              onClick={async () => await navigator.clipboard.writeText(originalPostScript)}
-              disabled={!originalPostScript}
-              styles={{
-                label: { color: "white" },
-                labelHovered: { color: "cornflowerblue" },
-                labelDisabled: { color: "#606060" },
-                iconDisabled: { color: "#606060" },
-              }}
-            />
-          </Stack>
-          <TextField
-            multiline
-            rows={3}
-            value={originalPostScript}
-            onChange={(_, newValue) => setOriginalPostScript(newValue || "")}
-          />
-
-          <Separator />
-
-          {/* New membership level script editor */}
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Label
-              style={{
-                width: "auto",
-                margin: "4px 8px",
-                textAlign: "left",
-                whiteSpace: "nowrap",
-                color: "white",
-              }}
-            >
-              New membership:
-            </Label>
-          </Stack>
-          <Stack
-            horizontal
-            style={{ width: "100%" }}
-            tokens={{ childrenGap: "8px" }}
-          >
-            <Dropdown
-              options={newLevelOptions}
-              selectedKey={selectedNewLevel || "none"}
-              onChange={(_, item) =>
-                setSelectedNewLevel((item?.key as string) || "mod")
-              }
-              style={{ width: "200px" }}
-            />
-            <CommandButton
-              iconProps={{ iconName: "Copy" }}
-              text="Copy"
-              onClick={async () => await navigator.clipboard.writeText(newLevelScript)}
-              disabled={!newLevelScript}
-              styles={{
-                label: { color: "white" },
-                labelHovered: { color: "cornflowerblue" },
-                labelDisabled: { color: "#606060" },
-                iconDisabled: { color: "#606060" },
-              }}
-            />
-          </Stack>
-          <TextField
-            multiline
-            rows={6}
-            value={newLevelScript}
-            onChange={(_, newValue) => setNewLevelScript(newValue || "")}
-          />
-          <Separator />
-        </Stack>
-      </header>
-    </div>
+          ))
+        }
+        <hr/>
+        <DialogFooter>
+          <PrimaryButton onClick={async () => {
+            let scriptToCopy = scriptWithPlaceholdersUntouched.current;
+            Object.keys(placeholders).forEach(placeholder => {
+              const placeholderRegEx = new RegExp("\\[\\[" + placeholder + "\\]\\]", "g");
+              scriptToCopy = scriptToCopy.replaceAll(placeholderRegEx, placeholders[placeholder]);
+            });
+            await navigator.clipboard.writeText(scriptToCopy);
+            toggleHideDialog();
+          }} text="Copy" />
+          <DefaultButton onClick={async () => {
+            await navigator.clipboard.writeText(scriptWithPlaceholdersUntouched.current);
+            toggleHideDialog();
+          }} text="Copy with placeholders" />
+        </DialogFooter>
+      </Dialog>
+    </>
   );
 }
 
