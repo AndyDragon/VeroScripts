@@ -9,32 +9,55 @@ using Vero_Scripts.Properties;
 
 namespace Vero_Scripts
 {
-    public class HubsPackage
+    public class PagesCatalog
     {
-        public HubsPackage()
+        public PagesCatalog()
         {
-            Hubs = Array.Empty<HubPackage>();
+            Pages = Array.Empty<PageEntry>();
         }
 
-        public HubPackage[] Hubs { get; set; }
+        public PageEntry[] Pages { get; set; }
     }
 
-    public class HubPackage
+    public class PageEntry
     {
-        public HubPackage()
+        public PageEntry()
         {
             Name = string.Empty;
-            Templates = Array.Empty<TemplatePackage>();
+        }
+
+        public string Name { get; set; }
+    }
+
+    public class TemplatesCatalog
+    {
+        public TemplatesCatalog()
+        {
+            Pages = Array.Empty<TemplatePageEntry>();
+            SpecialTemplates = Array.Empty<TemplateEntry>();
+        }
+
+        public TemplatePageEntry[] Pages { get; set; }
+
+        public TemplateEntry[] SpecialTemplates { get; set; }
+    }
+
+    public class TemplatePageEntry
+    {
+        public TemplatePageEntry()
+        {
+            Name = string.Empty;
+            Templates = Array.Empty<TemplateEntry>();
         }
 
         public string Name { get; set; }
 
-        public TemplatePackage[] Templates { get; set; }
+        public TemplateEntry[] Templates { get; set; }
     }
 
-    public class TemplatePackage
+    public class TemplateEntry
     {
-        public TemplatePackage()
+        public TemplateEntry()
         {
             Name = string.Empty;
             Template = string.Empty;
@@ -89,12 +112,13 @@ namespace Vero_Scripts
 
         public ScriptsViewModel()
         {
-            Hubs = new HubsPackage();
-            _ = LoadHubs();
+            PagesCatalog = new PagesCatalog();
+            _ = LoadPages();
+            TemplatesCatalog = new TemplatesCatalog();
             Placeholders = new ObservableCollection<Placeholder>();
         }
 
-        private async Task LoadHubs()
+        private async Task LoadPages()
         {
             try
             {
@@ -103,8 +127,8 @@ namespace Vero_Scripts
                 {
                     NoCache = true
                 };
-                var hubsUri = new Uri("https://andydragon.com/depot/VERO/hubs.json");
-                var content = await httpClient.GetStringAsync(hubsUri);
+                var pagesUri = new Uri("https://vero.andydragon.com/static/data/pages.json");
+                var content = await httpClient.GetStringAsync(pagesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
                     var serializerOptions = new JsonSerializerOptions
@@ -112,8 +136,39 @@ namespace Vero_Scripts
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         WriteIndented = true,
                     };
-                    Hubs = JsonSerializer.Deserialize<HubsPackage>(content, serializerOptions) ?? new HubsPackage();
-                    Pages = Hubs.Hubs.Select(hub => hub.Name).ToArray();
+                    PagesCatalog = JsonSerializer.Deserialize<PagesCatalog>(content, serializerOptions) ?? new PagesCatalog();
+                    Pages = PagesCatalog.Pages.Select(page => page.Name).ToArray();
+                }
+                _ = LoadTemplates();
+            }
+            catch (Exception ex)
+            {
+                // TODO andydragon : handle errors
+                Console.WriteLine("Error occurred: {0}", ex.Message);
+            }
+        }
+
+        private async Task LoadTemplates()
+        {
+            try
+            {
+                // Disable client-side caching.
+                httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+                {
+                    NoCache = true
+                };
+                var templatesUri = new Uri("https://vero.andydragon.com/static/data/templates.json");
+                var content = await httpClient.GetStringAsync(templatesUri);
+                if (!string.IsNullOrEmpty(content))
+                {
+                    var serializerOptions = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        WriteIndented = true,
+                    };
+                    TemplatesCatalog = JsonSerializer.Deserialize<TemplatesCatalog>(content, serializerOptions) ?? new TemplatesCatalog();
+                    UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
             catch (Exception ex)
@@ -125,7 +180,8 @@ namespace Vero_Scripts
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public HubsPackage Hubs { get; private set; }
+        public PagesCatalog PagesCatalog { get; private set; }
+        public TemplatesCatalog TemplatesCatalog { get; private set; }
 
         private string userName = "";
 
@@ -531,21 +587,21 @@ namespace Vero_Scripts
             bool firstForPage,
             bool communityTag)
         {
-            TemplatePackage? template = null;
-            var defaultHub = Hubs.Hubs.FirstOrDefault(hub => hub.Name == "default");
-            var hub = Hubs.Hubs.FirstOrDefault(hub => hub.Name == pageName);
+            TemplateEntry? template = null;
+            var defaultTemplatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == "default");
+            var templatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == pageName);
             if (communityTag)
             {
-                template = hub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
-                template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+                template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
             }
             else if (firstForPage)
             {
-                template = hub?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
-                template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
+                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
+                template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
             }
-            template ??= hub?.Templates.FirstOrDefault(template => template.Name == templateName);
-            template ??= defaultHub?.Templates.FirstOrDefault(template => template.Name == templateName);
+            template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
+            template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
             return template?.Template ?? "";
         }
 
@@ -557,26 +613,20 @@ namespace Vero_Scripts
             }
             else if (NewMembership == "Member")
             {
-                NewMembershipScript =
-                    "Congratulations @" + UserName + " on your 5th feature!\n" +
-                    "\n" +
-                    "I took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n" +
-                    "\n" +
-                    "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-                    "\n" +
-                    "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n";
-        }
+                TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new member");
+                NewMembershipScript = (template?.Template ?? "")
+                    .Replace("%%USERNAME%%", UserName)
+                    .Replace("%%YOURNAME%%", YourName)
+                    .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+            }
             else if (NewMembership == "VIP Member")
             {
-                NewMembershipScript =
-                    "Congratulations @" + UserName + " on your 15th feature!\n" +
-                    "\n" +
-                    "I took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n" +
-                    "\n" +
-                    "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-                    "\n" +
-                    "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.";
-        }
+                TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new vip member");
+                NewMembershipScript = (template?.Template ?? "")
+                    .Replace("%%USERNAME%%", UserName)
+                    .Replace("%%YOURNAME%%", YourName)
+                    .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+            }
         }
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
