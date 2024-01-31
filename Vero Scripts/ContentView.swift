@@ -60,6 +60,26 @@ func matches(of regex: String, in text: String) -> [String] {
     }
 }
 
+struct PageCatalog: Codable {
+    let pages: [Page]
+}
+
+struct Page: Codable, Identifiable {
+    var id: String { self.name }
+    let name: String
+}
+
+struct TemplateCatalog: Codable {
+    let pages: [TemplatePage]
+    let specialTemplates: [Template]
+}
+
+struct TemplatePage: Codable, Identifiable {
+    var id: String { self.name }
+    let name: String
+    let templates: [Template]
+}
+
 struct HubCatalog: Codable {
     let hubs: [Hub]
 }
@@ -83,7 +103,7 @@ extension URLSession {
         keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
         dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .deferredToData,
         dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate
-    ) async throws  -> T {
+    ) async throws -> T {
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         let (data, _) = try await data(for: request)
 
@@ -182,8 +202,10 @@ struct ContentView: View {
     @State var AlertMessage: String = ""
     @State var TerminalAlert = false
     @State var ShowingPopup = false
-    @State var WaitingForCatalog: Bool = true
-    @State var HubsCatalog = HubCatalog(hubs: [])
+    @State var WaitingForPages: Bool = true
+    @State var PagesCatalog = PageCatalog(pages: [])
+    @State var WaitingForTemplates: Bool = true
+    @State var TemplatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
     @ObservedObject var Placeholders = PlaceholderList()
     @State var ScriptWithPlaceholdersUntouched = ""
     @State var ScriptWithPlaceholders = ""
@@ -194,6 +216,11 @@ struct ContentView: View {
     @State var lastPage = ""
     @State var lastPageName = ""
     @State var lastPageStaffLevel = StaffLevelCase.mod
+    @FocusState var focusedField: FocusedField?
+    
+    enum FocusedField {
+        case userName
+    }
 
     @Environment(\.colorScheme) var ColorScheme
 
@@ -213,11 +240,12 @@ struct ContentView: View {
                         "Enter user name",
                         text: $UserName.onChange(userNameChanged)
                     )
+                    .focused($focusedField, equals: .userName)
 //#if os(iOS)
 //                    .textInputAutocapitalization(.never)
 //#endif
                 }
-
+                
                 // User level picker
                 HStack {
                     Text("Level: ")
@@ -235,7 +263,7 @@ struct ContentView: View {
                     .focusable()
                     Spacer()
                 }
-
+                
                 // Your name editor
                 HStack {
                     Text("You: ")
@@ -262,7 +290,7 @@ struct ContentView: View {
 //                    .textInputAutocapitalization(.never)
 //#endif
                 }
-
+                
                 // Page name editor
                 HStack {
                     Text("Page: ")
@@ -273,8 +301,8 @@ struct ContentView: View {
                         .frame(width: 36, alignment: .leading)
 //#endif
                     Picker("", selection: $Page.onChange(pageChanged)) {
-                        ForEach(HubsCatalog.hubs) { hub in
-                            Text(hub.name).tag(hub.name)
+                        ForEach(PagesCatalog.pages) { page in
+                            Text(page.name).tag(page.name)
                         }
                     }
                     .focusable()
@@ -310,7 +338,7 @@ struct ContentView: View {
 //#endif
                 }
             }
-
+            
 //#if os(iOS)
 //            HStack {
 //                Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
@@ -324,7 +352,7 @@ struct ContentView: View {
 //                Spacer()
 //            }
 //#endif
-
+            
             Group {
                 // Feature script output
                 HStack {
@@ -384,7 +412,7 @@ struct ContentView: View {
 //#else
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
 //#endif
-
+                
                 // Original post script output
                 HStack {
                     Text("Original post script:")
@@ -415,7 +443,7 @@ struct ContentView: View {
                     .frame(minWidth: 200, maxWidth: .infinity, minHeight: 40, maxHeight: 80)
 //#endif
             }
-
+            
             Group {
                 // New membership picker and script output
                 HStack {
@@ -457,6 +485,9 @@ struct ContentView: View {
         }
         .padding()
         .textFieldStyle(.roundedBorder)
+        .onAppear {
+            focusedField = .userName
+        }
         .alert(
             AlertTitle,
             isPresented: $ShowingAlert,
@@ -483,7 +514,6 @@ struct ContentView: View {
                         }
                     }
                     .listStyle(.plain)
-                    //.frame(width: .infinity)
                     HStack {
                         Button(action: {
                             ScriptWithPlaceholders = ScriptWithPlaceholdersUntouched
@@ -521,15 +551,25 @@ struct ContentView: View {
             .frame(width: 600, height: 400)
             .padding()
         }
-        .disabled(WaitingForCatalog)
+        .disabled(WaitingForPages)
         .task {
             lastPageStaffLevel = PageStaffLevel
+            
             do {
-                let hubsUrl = URL(string: "https://andydragon.com/depot/VERO/hubs.json")!
-                HubsCatalog = try await URLSession.shared.decode(HubCatalog.self, from: hubsUrl)
-                WaitingForCatalog = false;
+                let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
+                PagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
+                WaitingForPages = false
+                
+                // Delay the start of the templates download so the window can be ready faster
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+                
+                let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
+                TemplatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
+                WaitingForTemplates = false
+                updateScripts()
+                updateNewMembershipScripts()
             } catch {
-                AlertTitle = "Could not load the hubs catalog from the server"
+                AlertTitle = "Could not load the page catalog from the server"
                 AlertMessage = "The application requires the catalog to perform its operations"
                 TerminalAlert = true
                 ShowingAlert = true
@@ -659,17 +699,17 @@ struct ContentView: View {
             CommentScript = ""
         } else {
             let pageName = Page == "default" ? PageName : Page
-            let featureScriptTemplate = getTemplateFromHubs(
+            let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
                 from: pageName,
                 firstFeature: FirstForPage,
                 communityTag: CommunityTag) ?? ""
-            let commentScriptTemplate = getTemplateFromHubs(
+            let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
                 from: pageName,
                 firstFeature: FirstForPage,
                 communityTag: CommunityTag) ?? ""
-            let originalPostScriptTemplate = getTemplateFromHubs(
+            let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
                 from: pageName,
                 firstFeature: FirstForPage,
@@ -704,51 +744,60 @@ struct ContentView: View {
         }
     }
 
-    func getTemplateFromHubs(_ templateName: String, from hubName: String, firstFeature: Bool, communityTag: Bool) -> String! {
+    func getTemplateFromCatalog(_ templateName: String, from pageName: String, firstFeature: Bool, communityTag: Bool) -> String! {
         var template: Template!
-        let defaultHub = HubsCatalog.hubs.first(where: { hub in hub.name == "default" });
-        let hub = HubsCatalog.hubs.first(where: { hub in hub.name == hubName});
+        if WaitingForTemplates {
+            return "";
+        }
+        let defaultTemplatePage = TemplatesCatalog.pages.first(where: { page in page.name == "default" });
+        let templatePage = TemplatesCatalog.pages.first(where: { page in page.name == pageName});
         if communityTag {
-            template = hub?.templates.first(where: { template in template.name == "community " + templateName})
+            template = templatePage?.templates.first(where: { template in template.name == "community " + templateName })
             if template == nil {
-                template = defaultHub?.templates.first(where: { template in template.name == "community " + templateName})
+                template = defaultTemplatePage?.templates.first(where: { template in template.name == "community " + templateName })
             }
         } else if firstFeature {
-            template = hub?.templates.first(where: { template in template.name == "first " + templateName})
+            template = templatePage?.templates.first(where: { template in template.name == "first " + templateName })
             if template == nil {
-                template = defaultHub?.templates.first(where: { template in template.name == "first " + templateName})
+                template = defaultTemplatePage?.templates.first(where: { template in template.name == "first " + templateName })
             }
         }
         if template == nil {
-            template = hub?.templates.first(where: { template in template.name == templateName})
+            template = templatePage?.templates.first(where: { template in template.name == templateName })
         }
         if template == nil {
-            template = defaultHub?.templates.first(where: { template in template.name == templateName})
+            template = defaultTemplatePage?.templates.first(where: { template in template.name == templateName })
         }
         return template?.template
     }
 
     func updateNewMembershipScripts() -> Void {
+        if WaitingForTemplates {
+            NewMembershipScript = ""
+            return
+        }
         if NewMembership == NewMembershipCase.none || UserName == "" {
             NewMembershipScript = ""
         } else if NewMembership == NewMembershipCase.member {
-            NewMembershipScript =
-                "Congratulations @" + UserName + " on your 5th feature!\n" +
-                "\n" +
-                "I took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n" +
-                "\n" +
-                "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-                "\n" +
-                "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+            let template = TemplatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })
+            if template == nil {
+                NewMembershipScript = ""
+                return
+            }
+            NewMembershipScript = template!.template
+                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
         } else if NewMembership == NewMembershipCase.vipMember {
-            NewMembershipScript =
-                "Congratulations @" + UserName + " on your 15th feature!\n" +
-                "\n" +
-                "I took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n" +
-                "\n" +
-                "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-                "\n" +
-                "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag."
+            let template = TemplatesCatalog.specialTemplates.first(where: { template in template.name == "new vip member" })
+            if template == nil {
+                NewMembershipScript = ""
+                return
+            }
+            NewMembershipScript = template!.template
+                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
         }
     }
 }
