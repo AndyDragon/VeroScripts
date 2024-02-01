@@ -599,6 +599,7 @@ struct ContentView: View {
             Placeholders.PlaceholderDict.removeAll()
             UserDefaults.standard.set(YourName, forKey: "YourName")
             updateScripts()
+            updateNewMembershipScripts()
             lastYourName = value
         }
     }
@@ -608,6 +609,7 @@ struct ContentView: View {
             Placeholders.PlaceholderDict.removeAll()
             UserDefaults.standard.set(YourFirstName, forKey: "YourFirstName")
             updateScripts()
+            updateNewMembershipScripts()
             lastYourFirstName = value
         }
     }
