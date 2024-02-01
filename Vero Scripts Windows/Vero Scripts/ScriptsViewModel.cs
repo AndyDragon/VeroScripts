@@ -252,6 +252,7 @@ namespace Vero_Scripts
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourName)));
                     Placeholders.Clear();
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -271,6 +272,7 @@ namespace Vero_Scripts
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourFirstName)));
                     Placeholders.Clear();
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
