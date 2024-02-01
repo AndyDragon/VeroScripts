@@ -28,13 +28,22 @@ interface Template {
   template: string;
 }
 
-interface Page {
+interface TemplatePage {
   name: string;
   templates: Template[];
 }
 
-interface Pages {
-  hubs: Page[];
+interface TemplateCatalog {
+  pages: TemplatePage[];
+  specialTemplates: Template[];
+}
+
+interface Page {
+  name: string;
+}
+
+interface PageCatalog {
+  pages: Page[];
 }
 
 const modalPropsStyles = { main: { maxWidth: 450 } };
@@ -42,10 +51,10 @@ const modalPropsStyles = { main: { maxWidth: 450 } };
 function App() {
   const [userName, setUserName] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("none");
-  const [yourName, setYourName] = useState<string>("andydragon");
-  const [firstName, setFirstName] = useState<string>("Andy");
+  const [yourName, setYourName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
   const [pageOptions, setPageOptions] = useState<IDropdownOption[]>([]);
-  const [selectedPage, setSelectedPage] = useState<string>("longexposure");
+  const [selectedPage, setSelectedPage] = useState<string>("default");
   const [customPage, setCustomPage] = useState<string>("");
   const [selectedStaffLevel, setSelectedStaffLevel] = useState<string>("mod");
   const [isFirstFeature, setIsFirstFeature] = useState<boolean>(false);
@@ -57,7 +66,8 @@ function App() {
   const [newLevelScript, setNewLevelScript] = useState<string>("");
   const [hideDialog, { toggle: toggleHideDialog }] = useBoolean(true);
   const [placeholders, setPlaceholders] = useState<Record<string, string>>({});
-  const pages = useRef<Pages>();
+  const pageCatalog = useRef<PageCatalog>({ pages: [] });
+  const templateCatalog = useRef<TemplateCatalog>({ pages: [], specialTemplates: [] });
   const scriptWithPlaceholders = useRef<string>("");
   const scriptWithPlaceholdersUntouched = useRef<string>("");
 
@@ -94,16 +104,27 @@ function App() {
     setCustomPage(localStorage.getItem("custompage") || "");
     setSelectedStaffLevel(localStorage.getItem("stafflevel") || "mod");
 
+    // get the page catalog
     axios
-      .get("https://andydragon.com/depot/VERO/hubs.json")
+      .get("https://vero.andydragon.com/static/data/pages.json")
       .then((result) => {
-        pages.current = result.data as Pages;
+        pageCatalog.current = result.data as PageCatalog;
         setPageOptions([
-          ...pages.current.hubs.map((hub) => ({
-            key: hub.name,
-            text: hub.name,
+          ...pageCatalog.current.pages.map(page => ({
+            key: page.name,
+            text: page.name,
           })),
         ]);
+
+        // get the templates catalog
+        axios
+          .get("https://vero.andydragon.com/static/data/templates.json")
+          .then((result) => {
+            templateCatalog.current = result.data as TemplateCatalog;
+          })
+          .catch((error) =>
+            console.error("Failed to get the templates: " + JSON.stringify(error))
+          );
       })
       .catch((error) =>
         console.error("Failed to get the pages: " + JSON.stringify(error))
@@ -113,7 +134,7 @@ function App() {
   useEffect(() => {
     setPlaceholders({});
     if (
-      !pages.current ||
+      !pageCatalog.current ||
       !userName ||
       (selectedLevel || "none") === "none" ||
       !yourName ||
@@ -125,13 +146,13 @@ function App() {
       setOriginalPostScript("");
     } else {
       const pageName = (((selectedPage || "default") === "default") ? customPage : selectedPage) || "";
-      const page = pages.current.hubs.find(
-        (hub) => hub.name === (selectedPage || "default")
+      const templatePage = templateCatalog.current.pages.find(
+        page => page.name === (selectedPage || "default")
       );
-      if (page) {
-        setFeatureScript(prepareTemplate(getTemplate(page, "feature"), pageName));
-        setCommentScript(prepareTemplate(getTemplate(page, "comment"), pageName));
-        setOriginalPostScript(prepareTemplate(getTemplate(page, "original post"), pageName));
+      if (templatePage) {
+        setFeatureScript(prepareTemplate(getTemplate(templatePage, "feature"), pageName));
+        setCommentScript(prepareTemplate(getTemplate(templatePage, "comment"), pageName));
+        setOriginalPostScript(prepareTemplate(getTemplate(templatePage, "original post"), pageName));
       } else {
         setFeatureScript("");
         setCommentScript("");
@@ -139,7 +160,7 @@ function App() {
       }
     }
 
-    function getTemplate(page: Page, templateName: string) {
+    function getTemplate(page: TemplatePage, templateName: string) {
       if (isCommunityTag) {
         const communityTagTemplate = page.templates.find((template) => template.name === "community " + templateName)?.template;
         if (communityTagTemplate) {
@@ -162,8 +183,8 @@ function App() {
     function prepareTemplate(template: string, pageName: string) {
       return template
         .replaceAll("%%PAGENAME%%", pageName)
-        .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%MEMBERLEVEL%%", levelOptions.find((option) => option.key === selectedLevel)?.text || "")
+        .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
         .replaceAll("%%YOURFIRSTNAME%%", firstName)
         // Special case for 'YOUR FIRST NAME' since it's now autofilled.
@@ -231,26 +252,24 @@ function App() {
     if (selectedNewLevel === "none" || !userName) {
       setNewLevelScript("");
     } else if (selectedNewLevel === "member") {
-      setNewLevelScript(
-        "Congratulations @" + userName + " on your 5th feature!\n" +
-        "\n" +
-        "I took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n" +
-        "\n" +
-        "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-        "\n" +
-        "Please consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n");
+      const template = templateCatalog.current.specialTemplates.find(template => template.name === "new member");
+      const script = (template?.template || "")
+        .replaceAll("%%USERNAME%%", userName)
+        .replaceAll("%%YOURNAME%%", yourName)
+        .replaceAll("%%YOURFIRSTNAME%%", firstName);
+      setNewLevelScript(script);
     } else if (selectedNewLevel === "vip") {
-      setNewLevelScript(
-        "Congratulations @" + userName + " on your 15th feature!\n" +
-        "\n" +
-        "I took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n" +
-        "\n" +
-        "That's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n" +
-        "\n" +
-        "Please consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.");
+      const template = templateCatalog.current.specialTemplates.find(template => template.name === "new vip member");
+      const script = (template?.template || "")
+        .replaceAll("%%USERNAME%%", userName)
+        .replaceAll("%%YOURNAME%%", yourName)
+        .replaceAll("%%YOURFIRSTNAME%%", firstName);
+      setNewLevelScript(script);
     }
   }, [
     userName,
+    yourName,
+    firstName,
     selectedNewLevel,
   ]);
 
@@ -737,7 +756,7 @@ function App() {
             />
           ))
         }
-        <hr/>
+        <hr />
         <DialogFooter>
           <PrimaryButton onClick={async () => {
             let scriptToCopy = scriptWithPlaceholdersUntouched.current;
