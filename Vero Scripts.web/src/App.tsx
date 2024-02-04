@@ -40,6 +40,7 @@ interface TemplateCatalog {
 
 interface Page {
   name: string;
+  pageName?: string;
 }
 
 interface PageCatalog {
@@ -181,8 +182,11 @@ function App() {
     }
 
     function prepareTemplate(template: string, pageName: string) {
+      const page = pageCatalog.find((page) => page.name === pageName);
+      const scriptPageName = page?.pageName || pageName;
       return template
-        .replaceAll("%%PAGENAME%%", pageName)
+        .replaceAll("%%PAGENAME%%", scriptPageName)
+        .replaceAll("%%FULLPAGENAME%%", pageName)
         .replaceAll("%%MEMBERLEVEL%%", levelOptions.find((option) => option.key === selectedLevel)?.text || "")
         .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
