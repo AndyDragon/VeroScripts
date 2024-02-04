@@ -39,7 +39,13 @@ class Program
                 else
                 {
                     // Add page to all the catalogs.
-                    pageCatalog.Pages.Add(new Page(pageName));
+                    var page = new Page(pageName);
+                    if (File.Exists(Path.Combine(folder, "manifest.json")))
+                    {
+                        var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
+                        page.PageName = Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile)?.PageName;
+                    }
+                    pageCatalog.Pages.Add(page);
                     templateCatalog.Pages.Add(new TemplatePage(pageName, templates));
                     hubCatalog.Hubs.Add(new Hub(pageName, templates));
                 }
@@ -122,6 +128,20 @@ class Page
 
     [Newtonsoft.Json.JsonProperty(propertyName: "name")]
     public string Name { get; }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "pageName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    public string? PageName { get; set; }
+}
+
+class Manifest
+{
+    public Manifest(string pageName)
+    {
+        PageName = pageName;
+    }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "pageName")]
+    public string PageName { get; set; }
 }
 
 class HubCatalog

@@ -3,10 +3,11 @@
         "scope": "features",
         "prefix": "entry",
         "body": [
-            "$CLIPBOARD - ${1:user name}",
-            "member level - ${2:level} ([n] Snap + [n] RAW features)",
+            "${CLIPBOARD:[link to post]} - ${1:[user name + alias]}",
+            "hashtag - #snap_${2:[hashtag]}",
+            "member level - ${3:[member level]} (featured [n] Snap + [n] RAW)",
             "last feature - [date] (this photo featured: [yes/no])",
-            "first on page - [yes/no]",
+            "first on page - [yes/no] (featured on page [n] Snap + [n] RAW)",
             "tineye - [results]",
             "aiornot - [results]",
             ""
@@ -17,10 +18,11 @@
         "scope": "features",
         "prefix": "rawentry",
         "body": [
-            "[RAW] $CLIPBOARD - ${1:user name}",
-            "member level - ${2:level} ([n] Snap + [n] RAW features)",
+            "[RAW] ${CLIPBOARD:[link to post]} - ${1:[user name + alias]}",
+            "hashtag - #raw_${2:[hashtag]}",
+            "member level - ${3:[member level]} (featured [n] Snap + [n] RAW)",
             "last feature - [date] (this photo featured: [yes/no])",
-            "first on page - [yes/no]",
+            "first on page - [yes/no] (featured on page [n] Snap + [n] RAW)",
             "tineye - [results]",
             "aiornot - [results]",
             ""
