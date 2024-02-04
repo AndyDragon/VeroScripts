@@ -67,6 +67,7 @@ struct PageCatalog: Codable {
 struct Page: Codable, Identifiable {
     var id: String { self.name }
     let name: String
+    let pageName: String?
 }
 
 struct TemplateCatalog: Codable {
@@ -701,6 +702,13 @@ struct ContentView: View {
             CommentScript = ""
         } else {
             let pageName = Page == "default" ? PageName : Page
+            var scriptPageName = pageName
+            if pageName != "default" {
+                let pageSource = PagesCatalog.pages.first(where: { page in page.name == Page })
+                if pageSource != nil && pageSource?.pageName != nil {
+                    scriptPageName = (pageSource?.pageName)!
+                }
+            }
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
                 from: pageName,
@@ -717,7 +725,8 @@ struct ContentView: View {
                 firstFeature: FirstForPage,
                 communityTag: CommunityTag) ?? ""
             FeatureScript = featureScriptTemplate
-                .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
+                .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
@@ -726,7 +735,8 @@ struct ContentView: View {
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
             OriginalPostScript = originalPostScriptTemplate
-                .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
+                .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
@@ -735,7 +745,8 @@ struct ContentView: View {
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
             CommentScript = commentScriptTemplate
-                .replacingOccurrences(of: "%%PAGENAME%%", with: pageName)
+                .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)

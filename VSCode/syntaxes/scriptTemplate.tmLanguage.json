@@ -16,7 +16,7 @@
         "autofields": {
             "patterns": [{
                 "name"          : "meta.tag.auto.scriptTemplate",
-                "match"         : "\\%\\%(PAGENAME|USERNAME|MEMBERLEVEL|YOURNAME|YOURFIRSTNAME|STAFFLEVEL)\\%\\%",
+                "match"         : "\\%\\%(PAGENAME|FULLPAGENAME|USERNAME|MEMBERLEVEL|YOURNAME|YOURFIRSTNAME|STAFFLEVEL)\\%\\%",
                 "captures"	    : {
                     "1"         : { "name"  : "variable.other.constant" }
                 }

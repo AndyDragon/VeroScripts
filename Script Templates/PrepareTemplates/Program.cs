@@ -40,14 +40,20 @@ class Program
                 {
                     // Add page to all the catalogs.
                     var page = new Page(pageName);
+                    var foundManifest = false;
                     if (File.Exists(Path.Combine(folder, "manifest.json")))
                     {
                         var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
                         page.PageName = Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile)?.PageName;
+                        foundManifest = true;
                     }
                     pageCatalog.Pages.Add(page);
                     templateCatalog.Pages.Add(new TemplatePage(pageName, templates));
-                    hubCatalog.Hubs.Add(new Hub(pageName, templates));
+                    if (!foundManifest)
+                    {
+                        // Hub file (old style) does not include pages with a manifest.
+                        hubCatalog.Hubs.Add(new Hub(pageName, templates));
+                    }
                 }
             }
         }
@@ -92,6 +98,7 @@ class Program
         var result = template
             .Replace("%%USERNAME%%", "aabbcc")
             .Replace("%%PAGENAME%%", "somepage")
+            .Replace("%%FULLPAGENAME%%", "somepage")
             .Replace("%%YOURNAME%%", "ddeeff")
             .Replace("%%YOURFIRSTNAME%%", "Gghhii")
             .Replace("%%MEMBERLEVEL%%", "VIP Gold member")
