@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Vero_Scripts.Properties;
@@ -27,6 +28,7 @@ namespace Vero_Scripts
         }
 
         public string Name { get; set; }
+        public string? PageName { get; set; }
     }
 
     public class TemplatesCatalog
@@ -116,6 +118,7 @@ namespace Vero_Scripts
             _ = LoadPages();
             TemplatesCatalog = new TemplatesCatalog();
             Placeholders = new ObservableCollection<Placeholder>();
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "---";
         }
 
         private async Task LoadPages()
@@ -182,6 +185,8 @@ namespace Vero_Scripts
 
         public PagesCatalog PagesCatalog { get; private set; }
         public TemplatesCatalog TemplatesCatalog { get; private set; }
+
+        public string Version { get; set; }
 
         private string userName = "";
 
@@ -550,11 +555,21 @@ namespace Vero_Scripts
             else
             {
                 var pageName = Page == "default" || string.IsNullOrEmpty(Page) ? PageName : Page;
+                var scriptPageName = pageName;
+                if (Page != "default")
+                {
+                    var sourcePage = PagesCatalog.Pages.FirstOrDefault(page => page.Name == Page);
+                    if (sourcePage != null && sourcePage.PageName != null)
+                    {
+                        scriptPageName = sourcePage.PageName;
+                    }
+                }
                 var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, CommunityTag);
                 var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, CommunityTag);
                 var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, CommunityTag);
                 FeatureScript = featureScriptTemplate
-                    .Replace("%%PAGENAME%%", pageName)
+                    .Replace("%%PAGENAME%%", scriptPageName)
+                    .Replace("%%FULLPAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
@@ -563,7 +578,8 @@ namespace Vero_Scripts
                     .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 CommentScript = commentScriptTemplate
-                    .Replace("%%PAGENAME%%", pageName)
+                    .Replace("%%PAGENAME%%", scriptPageName)
+                    .Replace("%%FULLPAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
@@ -572,7 +588,8 @@ namespace Vero_Scripts
                     .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 OriginalPostScript = originalPostScriptTemplate
-                    .Replace("%%PAGENAME%%", pageName)
+                    .Replace("%%PAGENAME%%", scriptPageName)
+                    .Replace("%%FULLPAGENAME%%", pageName)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)

@@ -7,6 +7,7 @@
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         mc:Ignorable="d"        
         Title="VERO Scripts" 
+        Icon="pack://application:,,,/Vero Scripts;component/App.ico"
         Height="800" Width="1200" MinHeight="720" MinWidth="960"
         Style="{StaticResource CustomWindowStyle}">
     <Window.DataContext>
@@ -17,7 +18,7 @@
         <local:ValidateNotEqualConverter x:Key="validateNotEqualConverter"></local:ValidateNotEqualConverter>
         <local:ValidateNotEqualAndNotEmptyConverter x:Key="validateNotEqualAndNotEmptyConverter"></local:ValidateNotEqualAndNotEmptyConverter>
     </Window.Resources>
-    <Grid Margin="16">
+    <Grid Margin="16,16,16,8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /> <!-- User -->
             <RowDefinition Height="Auto" /> <!-- Level -->
@@ -31,6 +32,7 @@
             <RowDefinition Height="2*" /> <!-- Original post script -->
             <RowDefinition Height="Auto" /> <!-- New membership script header -->
             <RowDefinition Height="3*" /> <!-- New membership script -->
+            <RowDefinition Height="Auto" /> <!-- Version -->
         </Grid.RowDefinitions>
         <Grid Margin="0,0,0,8" Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -149,5 +151,14 @@
             <Button Content="Copy" Grid.Column="3" VerticalAlignment="Center" Margin="8,0,0,0" Click="OnCopyNewMembershipScriptClick" />
         </Grid>
         <emoji:RichTextBox Text="{Binding NewMembershipScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="Auto" Grid.Row="11" />
+        <Grid Margin="0,8,0,0" Grid.Row="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Version:" Grid.Column="1" Margin="0,0,8,0" />
+            <TextBlock Text="{Binding Version}" Grid.Column="2" />
+        </Grid>
     </Grid>
 </Window>
