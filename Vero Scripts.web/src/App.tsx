@@ -182,7 +182,7 @@ function App() {
     }
 
     function prepareTemplate(template: string, pageName: string) {
-      const page = pageCatalog.find((page) => page.name === pageName);
+      const page = pageCatalog.current.pages.find((page) => page.name === pageName);
       const scriptPageName = page?.pageName || pageName;
       return template
         .replaceAll("%%PAGENAME%%", scriptPageName)
