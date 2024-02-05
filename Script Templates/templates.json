@@ -1306,7 +1306,7 @@
         },
         {
           "name": "first comment",
-          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]]! Welcome to #snap_reflection!  Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nContinue sharing with us using the hashtag, so we won't miss any of your updates @%%USERNAME%%! Cheers!\n✨✨\n"
+          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]]! Welcome to @snap_%%PAGENAME%%, Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful photography with us using #snap_%%PAGENAME%%!\n"
         },
         {
           "name": "original post",
@@ -1323,11 +1323,11 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%FULLPAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Instagram. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#reflections #reflectionphoto #reflectionphotos #reflectionperfection #reflection_addict #mirror #beautifulphotography #beautifulphoto #photooftheday #bestofthe_world #amazingshot #worthafollow #verofriends #verotography #reflections_in_water #reflections_masters #reflection_landscape #reflection_lake #reflection2024 #vero_reflection\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%.\n.\n"
+          "template": "• #snap_%%FULLPAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%% @%%USERNAME%%  ⭐️\n.\n _________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\nModerator on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#reflections #reflectionphoto #reflectionphotos\n\n#reflectionperfection #reflection_addict #mirror #beautifulphotography #beautifulphoto #photooftheday #bestofthe_world  #amazingshot #worthafollow #verofriends #verotography #bnw2024 #black4vero\n#black__white #blackand_white_photography #MacroPhotography\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n#snap_featured_%%FULLPAGENAME%%\n.\n"
         },
         {
           "name": "first comment",
-          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]]! Welcome to #snap_%%FULLPAGENAME%%!  Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nContinue sharing with us using the hashtag, so we won't miss any of your updates @%%USERNAME%%! Cheers!\n✨✨\n"
+          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]]! Welcome to @snap_%%PAGENAME%%, Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful photography with us using #snap_%%FULLPAGENAME%%!\n"
         },
         {
           "name": "original post",
