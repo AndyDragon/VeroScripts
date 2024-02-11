@@ -9,11 +9,16 @@ import SwiftUI
 
 struct ContentView: View {
     @State var membership: MembershipCase = MembershipCase.none
+    @State var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var userName: String = ""
+    @State var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var yourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+    @State var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
     @State var pageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
+    @State var pageValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
     @State var firstForPage: Bool = false
     @State var fromCommunityTag: Bool = false
@@ -31,6 +36,7 @@ struct ContentView: View {
     @State var pagesCatalog = PageCatalog(pages: [])
     @State var waitingForTemplates: Bool = true
     @State var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
+    @State var disallowList = [String]()
     @ObservedObject var placeholders = PlaceholderList()
     @State var scriptWithPlaceholdersInPlace = ""
     @State var scriptWithPlaceholders = ""
@@ -43,6 +49,14 @@ struct ContentView: View {
     @State var lastPageStaffLevel = StaffLevelCase.mod
     @FocusState var focusedField: FocusedField?
     
+    var canCopyScripts: Bool {
+        return membershipValidation.valid
+        && userNameValidation.valid
+        && yourNameValidation.valid
+        && yourFirstNameValidation.valid
+        && pageValidation.valid
+    }
+    
     enum FocusedField {
         case userName
     }
@@ -54,9 +68,33 @@ struct ContentView: View {
             Group {
                 HStack {
                     // User name editor
-                    FieldEditor(title: "User: ", titleWidth: [42, 60], placeholder: "Enter user name without '@'", field: $userName, fieldChanged: userNameChanged)
+                    FieldEditor(
+                        title: "User: ",
+                        titleWidth: [42, 60], 
+                        placeholder: "Enter user name without '@'",
+                        field: $userName,
+                        fieldChanged: userNameChanged,
+                        fieldValidation: $userNameValidation,
+                        validate: { value in
+                            if value.count == 0 {
+                                return (false, "Required value")
+                            } else if value.first! == "@" {
+                                return (false, "Don't include the '@' in user names")
+                            } else if (disallowList.first { disallow in disallow == value } != nil) {
+                                return (false, "User is on the disallow list")
+                            }
+                            return (true, nil)
+                        }
+                    )
 
                     // User level picker
+                    if !membershipValidation.valid {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red)
+                            .help("Required value")
+                            .imageScale(.small)
+                            .padding([.leading], 8)
+                    }
                     Text("Level: ")
                         .foregroundColor(.labelColor(membership != MembershipCase.none))
 #if os(iOS)
@@ -64,10 +102,24 @@ struct ContentView: View {
 #else
                         .frame(width: 36, alignment: .leading)
 #endif
-                        .padding([.leading], 8)
-                    Picker("", selection: $membership.onChange(membershipChanged)) {
+                        .padding([.leading], membership == MembershipCase.none ? 0 : 8)
+                    Picker("", selection: $membership.onChange { value in
+                        if value == MembershipCase.none {
+                            membershipValidation = (false, "Required value")
+                        } else {
+                            membershipValidation = (true, nil)
+                        }
+                        membershipChanged(to: value)
+                    }) {
                         ForEach(MembershipCase.allCases) { level in
                             Text(level.rawValue).tag(level)
+                        }
+                    }
+                    .onAppear {
+                        if membership == MembershipCase.none {
+                            membershipValidation = (false, "Required value")
+                        } else {
+                            membershipValidation = (true, nil)
                         }
                     }
                     .focusable()
@@ -76,15 +128,41 @@ struct ContentView: View {
                 
                 HStack {
                     // Your name editor
-                    FieldEditor(title: "You:", titleWidth: [42, 60], placeholder: "Enter your user name without '@'", field: $yourName, fieldChanged: yourNameChanged)
+                    FieldEditor(
+                        title: "You:",
+                        titleWidth: [42, 60],
+                        placeholder: "Enter your user name without '@'",
+                        field: $yourName,
+                        fieldChanged: yourNameChanged,
+                        fieldValidation: $yourNameValidation,
+                        validate: { value in
+                            if value.count == 0 {
+                                return (false, "Required value")
+                            } else if value.first! == "@" {
+                                return (false, "Don't include the '@' in user names")
+                            }
+                            return (true, nil)
+                        }
+                    )
 
                     // Your first name editor
-                    FieldEditor(title: "Your first name:", placeholder: "Enter your first name (capitalized)", field: $yourFirstName, fieldChanged: yourFirstNameChanged)
-                        .padding([.leading], 8)
+                    FieldEditor(
+                        title: "Your first name:",
+                        placeholder: "Enter your first name (capitalized)",
+                        field: $yourFirstName,
+                        fieldChanged: yourFirstNameChanged,
+                        fieldValidation: $yourFirstNameValidation
+                    ).padding([.leading], 8)
                 }
                 
                 HStack {
                     // Page picker
+                    if page == "default" && pageName.count == 0 {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red)
+                            .help("Page required")
+                            .imageScale(.small)
+                    }
                     Text("Page: ")
                         .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
 #if os(iOS)
@@ -92,17 +170,38 @@ struct ContentView: View {
 #else
                         .frame(width: 36, alignment: .leading)
 #endif
-                    Picker("", selection: $page.onChange(pageChanged)) {
+                    Picker("", selection: $page.onChange { value in
+                        if page == "default" && pageName.count == 0 {
+                            pageValidation = (false, "Page must not be 'default' or a page name is required")
+                        } else {
+                            pageValidation = (true, nil)
+                        }
+                        pageChanged(to: value)
+                    }) {
                         ForEach(pagesCatalog.pages) { page in
                             Text(page.name).tag(page.name)
                         }
                     }
                     .focusable()
+                    .onAppear {
+                        if page == "default" && pageName.count == 0 {
+                            pageValidation = (false, "Page must not be 'default' or a page name is required")
+                        } else {
+                            pageValidation = (true, nil)
+                        }
+                    }
 
                     // Page name editor
                     TextField(
                         "Enter page name",
-                        text: $pageName.onChange(pageNameChanged)
+                        text: $pageName.onChange { value in
+                            if page == "default" && pageName.count == 0 {
+                                pageValidation = (false, "Page must not be 'default' or a page name is required")
+                            } else {
+                                pageValidation = (true, nil)
+                            }
+                            pageNameChanged(to: value)
+                        }
                     )
                     .disabled(page != "default")
                     .focusable(page == "default")
@@ -156,17 +255,17 @@ struct ContentView: View {
             
             Group {
                 // Feature script output
-                ScriptEditor(title: "Feature script:", script: $featureScript, minHeight: 200, maxHeight: .infinity, copy: { force, withPlaceholders in
+                ScriptEditor(title: "Feature script:", script: $featureScript, minHeight: 200, maxHeight: .infinity, canCopy: canCopyScripts, copy: { force, withPlaceholders in
                     copyScript(featureScript, [commentScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
                 })
                 
                 // Comment script output
-                ScriptEditor(title: "Comment script:", script: $commentScript, minHeight: 80, maxHeight: 160, copy: { force, withPlaceholders in
+                ScriptEditor(title: "Comment script:", script: $commentScript, minHeight: 80, maxHeight: 160, canCopy: canCopyScripts, copy: { force, withPlaceholders in
                     copyScript(commentScript, [featureScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
                 })
                 
                 // Original post script output
-                ScriptEditor(title: "Original post script:", script: $originalPostScript, minHeight: 40, maxHeight: 80, copy: { force, withPlaceholders in
+                ScriptEditor(title: "Original post script:", script: $originalPostScript, minHeight: 40, maxHeight: 80, canCopy: canCopyScripts, copy: { force, withPlaceholders in
                     copyScript(originalPostScript, [featureScript, commentScript], force: force, withPlaceholders: withPlaceholders)
                 })
             }
@@ -211,9 +310,21 @@ struct ContentView: View {
                 waitingForTemplates = false
                 updateScripts()
                 updateNewMembershipScripts()
+
+                do {
+                    // Delay the start of the disallowed list download so the window can be ready faster
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                    
+                    let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
+                    disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
+                    updateScripts()
+                    updateNewMembershipScripts()
+                } catch {
+                    // do nothing, the disallow list is not critical
+                }
             } catch {
                 alertTitle = "Could not load the page catalog from the server"
-                alertMessage = "The application requires the catalog to perform its operations"
+                alertMessage = "The application requires the catalog to perform its operations: " + error.localizedDescription
                 terminalAlert = true
                 showingAlert = true
             }
@@ -326,14 +437,26 @@ struct ContentView: View {
         }
         return false
     }
-
+    
     func updateScripts() -> Void {
-        if membership == MembershipCase.none
-            || userName.isEmpty
-            || yourName.isEmpty
-            || yourFirstName.isEmpty
-            || (page == "default" && pageName.isEmpty) {
-            featureScript = ""
+        if !canCopyScripts {
+            var validationErrors = ""
+            if !userNameValidation.valid {
+                validationErrors += "User: " + userNameValidation.reason! + "\n"
+            }
+            if !membershipValidation.valid {
+                validationErrors += "Level: " + membershipValidation.reason! + "\n"
+            }
+            if !yourNameValidation.valid {
+                validationErrors += "You: " + yourNameValidation.reason! + "\n"
+            }
+            if !yourFirstNameValidation.valid {
+                validationErrors += "Your first name: " + yourFirstNameValidation.reason! + "\n"
+            }
+            if !pageValidation.valid {
+                validationErrors += "Page: " + pageValidation.reason! + "\n"
+            }
+            featureScript = validationErrors
             originalPostScript = ""
             commentScript = ""
         } else {
@@ -425,7 +548,8 @@ struct ContentView: View {
             newMembershipScript = ""
             return
         }
-        if newMembership == NewMembershipCase.none || userName == "" {
+        if newMembership == NewMembershipCase.none 
+            || !userNameValidation.valid {
             newMembershipScript = ""
         } else if newMembership == NewMembershipCase.member {
             let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })

@@ -12,24 +12,30 @@ struct ScriptEditor: View {
     @Binding var script: String
     var minHeight: CGFloat
     var maxHeight: CGFloat
+    var canCopy: Bool
     var copy: (Bool, Bool) -> Void
     
     var body: some View {        
         // Header
         HStack {
             Text(title)
+
             Button(action: {
                 copy(true, false)
             }, label: {
                 Text("Copy")
                     .padding(.horizontal, 20)
             })
+            .disabled(!canCopy)
+
             Button(action: {
                 copy(false, true)
             }, label: {
                 Text("Copy (with Placeholders)")
                     .padding(.horizontal, 20)
             })
+            .disabled(!canCopy)
+
             Spacer()
         }
         .frame(alignment: .leading)
@@ -48,6 +54,7 @@ struct ScriptEditor: View {
 #else
             .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
 #endif
+            .foregroundColor(.labelColor(canCopy))
             .padding([.bottom], 6)
     }
 }

@@ -13,30 +13,50 @@ struct FieldEditor: View {
     var placeholder: String
     @Binding var field: String
     var fieldChanged: (_ to: String) -> Void
-    var validate: (String) -> Bool = { value in value.count != 0 }
+    @Binding var fieldValidation: (valid: Bool, reason: String?)
+    var validate: (String) -> (valid: Bool, reason: String?) = { value in
+        if value.count == 0 {
+            return (false, "Required value")
+        }
+        return (true, nil)
+    }
     
     var body: some View {
-        // Title
-        if titleWidth.isEmpty {
-            Text(title)
-                .foregroundColor(.labelColor(validate(field)))
-        } else {
-            Text(title)
-                .foregroundColor(.labelColor(validate(field)))
+        HStack {
+            // Title validator
+            if !fieldValidation.valid {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.red)
+                    .help(fieldValidation.reason ?? "")
+                    .imageScale(.small)
+            }
+            
+            // Title
+            if title.count != 0 {
+                if titleWidth.isEmpty {
+                    Text(title)
+                        .foregroundColor(.labelColor(fieldValidation.valid))
+                } else {
+                    Text(title)
+                        .foregroundColor(.labelColor(fieldValidation.valid))
 #if os(iOS)
-                .frame(width: titleWidth[1], alignment: .leading)
+                        .frame(width: titleWidth[1], alignment: .leading)
 #else
-                .frame(width: titleWidth[0], alignment: .leading)
+                        .frame(width: titleWidth[0], alignment: .leading)
+#endif
+                }
+            }
+            
+            // Editor
+            TextField(placeholder, text: $field.onChange { value in
+                fieldValidation = validate(value)
+                fieldChanged(value)
+            }).onAppear(perform: {
+                fieldValidation = validate(field)
+            })
+#if os(iOS)
+            .textInputAutocapitalization(.never)
 #endif
         }
-        
-        // Editor
-        TextField(
-            placeholder,
-            text: $field.onChange(fieldChanged)
-        )
-#if os(iOS)
-        .textInputAutocapitalization(.never)
-#endif
     }
 }
