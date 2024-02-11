@@ -57,6 +57,11 @@ struct ContentView: View {
         && pageValidation.valid
     }
     
+    var canCopyNewMembershipScript: Bool {
+        return newMembership != NewMembershipCase.none
+        && userNameValidation.valid
+    }
+    
     enum FocusedField {
         case userName
     }
@@ -70,7 +75,7 @@ struct ContentView: View {
                     // User name editor
                     FieldEditor(
                         title: "User: ",
-                        titleWidth: [42, 60], 
+                        titleWidth: [42, 60],
                         placeholder: "Enter user name without '@'",
                         field: $userName,
                         fieldChanged: userNameChanged,
@@ -86,7 +91,7 @@ struct ContentView: View {
                             return (true, nil)
                         }
                     )
-
+                    
                     // User level picker
                     if !membershipValidation.valid {
                         Image(systemName: "exclamationmark.triangle.fill")
@@ -144,7 +149,7 @@ struct ContentView: View {
                             return (true, nil)
                         }
                     )
-
+                    
                     // Your first name editor
                     FieldEditor(
                         title: "Your first name:",
@@ -190,7 +195,7 @@ struct ContentView: View {
                             pageValidation = (true, nil)
                         }
                     }
-
+                    
                     // Page name editor
                     TextField(
                         "Enter page name",
@@ -226,7 +231,7 @@ struct ContentView: View {
                     }
                     .focusable()
                     .padding([.leading], 8)
-
+                    
                     Toggle(isOn: $fromCommunityTag.onChange(communityTagChanged)) {
                         Text("From community tag")
                     }
@@ -255,26 +260,50 @@ struct ContentView: View {
             
             Group {
                 // Feature script output
-                ScriptEditor(title: "Feature script:", script: $featureScript, minHeight: 200, maxHeight: .infinity, canCopy: canCopyScripts, copy: { force, withPlaceholders in
-                    copyScript(featureScript, [commentScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
-                })
+                ScriptEditor(
+                    title: "Feature script:",
+                    script: $featureScript,
+                    minHeight: 200,
+                    maxHeight: .infinity,
+                    canCopy: canCopyScripts,
+                    copy: { force, withPlaceholders in
+                        copyScript(featureScript, [commentScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                    })
                 
                 // Comment script output
-                ScriptEditor(title: "Comment script:", script: $commentScript, minHeight: 80, maxHeight: 160, canCopy: canCopyScripts, copy: { force, withPlaceholders in
-                    copyScript(commentScript, [featureScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
-                })
+                ScriptEditor(
+                    title: "Comment script:",
+                    script: $commentScript,
+                    minHeight: 80,
+                    maxHeight: 160,
+                    canCopy: canCopyScripts,
+                    copy: { force, withPlaceholders in
+                        copyScript(commentScript, [featureScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                    })
                 
                 // Original post script output
-                ScriptEditor(title: "Original post script:", script: $originalPostScript, minHeight: 40, maxHeight: 80, canCopy: canCopyScripts, copy: { force, withPlaceholders in
-                    copyScript(originalPostScript, [featureScript, commentScript], force: force, withPlaceholders: withPlaceholders)
-                })
+                ScriptEditor(
+                    title: "Original post script:",
+                    script: $originalPostScript,
+                    minHeight: 40,
+                    maxHeight: 80,
+                    canCopy: canCopyScripts,
+                    copy: { force, withPlaceholders in
+                        copyScript(originalPostScript, [featureScript, commentScript], force: force, withPlaceholders: withPlaceholders)
+                    })
             }
             
             Group {
                 // New membership picker and script output
-                NewMembershipEditor(newMembership: $newMembership, script: $newMembershipScript, onChanged: newMembershipChanged, copy: {
-                    copyToClipboard(newMembershipScript)
-                })
+                NewMembershipEditor(
+                    newMembership: $newMembership,
+                    script: $newMembershipScript,
+                    onChanged: newMembershipChanged,
+                    valid: userNameValidation.valid,
+                    canCopy: canCopyNewMembershipScript,
+                    copy: {
+                        copyToClipboard(newMembershipScript)
+                    })
             }
         }
         .padding()
@@ -291,7 +320,11 @@ struct ContentView: View {
                 Text(alertMessage)
             })
         .sheet(isPresented: $showingPlaceholderSheet) {
-            PlaceholderSheet(placeholders: placeholders, scriptWithPlaceholders: $scriptWithPlaceholders, scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace, isPresenting: $showingPlaceholderSheet)
+            PlaceholderSheet(
+                placeholders: placeholders,
+                scriptWithPlaceholders: $scriptWithPlaceholders,
+                scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
+                isPresenting: $showingPlaceholderSheet)
         }
         .disabled(waitingForPages)
         .task {
@@ -548,9 +581,12 @@ struct ContentView: View {
             newMembershipScript = ""
             return
         }
-        if newMembership == NewMembershipCase.none 
-            || !userNameValidation.valid {
-            newMembershipScript = ""
+        if !canCopyNewMembershipScript {
+            var validationErrors = ""
+            if !userNameValidation.valid {
+                validationErrors += "User: " + userNameValidation.reason! + "\n"
+            }
+            newMembershipScript = validationErrors
         } else if newMembership == NewMembershipCase.member {
             let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })
             if template == nil {

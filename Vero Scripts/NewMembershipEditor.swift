@@ -11,6 +11,8 @@ struct NewMembershipEditor: View {
     @Binding var newMembership: NewMembershipCase
     @Binding var script: String
     var onChanged: (NewMembershipCase) -> Void
+    var valid: Bool
+    var canCopy: Bool
     var copy: () -> Void
     
     var body: some View {
@@ -31,6 +33,8 @@ struct NewMembershipEditor: View {
                 Text("Copy")
                     .padding(.horizontal, 20)
             })
+            .disabled(!canCopy)
+            
             Spacer()
         }
         .frame(alignment: .leading)
@@ -47,5 +51,6 @@ struct NewMembershipEditor: View {
 #else
             .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
 #endif
+            .foregroundColor(.labelColor(valid))
     }
 }
