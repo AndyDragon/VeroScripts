@@ -1289,7 +1289,7 @@
         },
         {
           "name": "first comment",
-          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]]! Welcome to @snap_%%PAGENAME%%, Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful photography with us using #snap_%%PAGENAME%%!\n"
+          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]] @%%USERNAME%%! Welcome to @snap_%%PAGENAME%%, Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful photography with us using #snap_%%PAGENAME%%!\n"
         },
         {
           "name": "original post",

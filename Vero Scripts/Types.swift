@@ -32,6 +32,12 @@ enum StaffLevelCase: String, CaseIterable, Identifiable {
     var id: Self { self }
 }
 
+enum PlaceholderSheetCase {
+    case featureScript,
+         commentScript,
+         originalPostScript
+}
+
 struct PageCatalog: Codable {
     let pages: [Page]
 }

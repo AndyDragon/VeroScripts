@@ -31,13 +31,16 @@ struct ContentView: View {
     @State var alertTitle: String = ""
     @State var alertMessage: String = ""
     @State var terminalAlert = false
+    @State var placeholderSheetCase = PlaceholderSheetCase.featureScript
     @State var showingPlaceholderSheet = false
     @State var waitingForPages: Bool = true
     @State var pagesCatalog = PageCatalog(pages: [])
     @State var waitingForTemplates: Bool = true
     @State var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
     @State var disallowList = [String]()
-    @ObservedObject var placeholders = PlaceholderList()
+    @ObservedObject var featureScriptPlaceholders = PlaceholderList()
+    @ObservedObject var commentScriptPlaceholders = PlaceholderList()
+    @ObservedObject var originalPostScriptPlaceholders = PlaceholderList()
     @State var scriptWithPlaceholdersInPlace = ""
     @State var scriptWithPlaceholders = ""
     @State var lastMembership = MembershipCase.none
@@ -266,8 +269,15 @@ struct ContentView: View {
                     minHeight: 200,
                     maxHeight: .infinity,
                     canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(featureScript),
                     copy: { force, withPlaceholders in
-                        copyScript(featureScript, [commentScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                        placeholderSheetCase = .featureScript
+                        copyScript(
+                            featureScript, 
+                            featureScriptPlaceholders,
+                            [commentScriptPlaceholders, originalPostScriptPlaceholders],
+                            force: force,
+                            withPlaceholders: withPlaceholders)
                     })
                 
                 // Comment script output
@@ -277,8 +287,15 @@ struct ContentView: View {
                     minHeight: 80,
                     maxHeight: 160,
                     canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(commentScript),
                     copy: { force, withPlaceholders in
-                        copyScript(commentScript, [featureScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                        placeholderSheetCase = .commentScript
+                        copyScript(
+                            commentScript,
+                            commentScriptPlaceholders,
+                            [featureScriptPlaceholders, originalPostScriptPlaceholders], 
+                            force: force,
+                            withPlaceholders: withPlaceholders)
                     })
                 
                 // Original post script output
@@ -288,8 +305,15 @@ struct ContentView: View {
                     minHeight: 40,
                     maxHeight: 80,
                     canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(originalPostScript),
                     copy: { force, withPlaceholders in
-                        copyScript(originalPostScript, [featureScript, commentScript], force: force, withPlaceholders: withPlaceholders)
+                        placeholderSheetCase = .originalPostScript
+                        copyScript(
+                            originalPostScript,
+                            originalPostScriptPlaceholders,
+                            [featureScriptPlaceholders, commentScriptPlaceholders],
+                            force: force,
+                            withPlaceholders: withPlaceholders)
                     })
             }
             
@@ -321,10 +345,33 @@ struct ContentView: View {
             })
         .sheet(isPresented: $showingPlaceholderSheet) {
             PlaceholderSheet(
-                placeholders: placeholders,
+                placeholders: placeholderSheetCase == .featureScript
+                    ? featureScriptPlaceholders 
+                    : placeholderSheetCase == .commentScript
+                        ? commentScriptPlaceholders
+                        : originalPostScriptPlaceholders,
                 scriptWithPlaceholders: $scriptWithPlaceholders,
                 scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
-                isPresenting: $showingPlaceholderSheet)
+                isPresenting: $showingPlaceholderSheet,
+                transferPlaceholders: {
+                    switch placeholderSheetCase {
+                    case .featureScript:
+                        transferPlaceholderValues(
+                            featureScriptPlaceholders,
+                            [commentScriptPlaceholders, originalPostScriptPlaceholders])
+                        break
+                    case .commentScript:
+                        transferPlaceholderValues(
+                            commentScriptPlaceholders,
+                            [featureScriptPlaceholders, originalPostScriptPlaceholders])
+                        break
+                    case .originalPostScript:
+                        transferPlaceholderValues(
+                            originalPostScriptPlaceholders,
+                            [featureScriptPlaceholders, commentScriptPlaceholders])
+                        break
+                    }
+                })
         }
         .disabled(waitingForPages)
         .task {
@@ -366,7 +413,9 @@ struct ContentView: View {
 
     func membershipChanged(to value: MembershipCase) {
         if value != lastMembership {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             updateScripts()
             lastMembership = value
         }
@@ -374,7 +423,9 @@ struct ContentView: View {
 
     func userNameChanged(to value: String) {
         if value != lastUserName {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             updateScripts()
             updateNewMembershipScripts()
             lastUserName = value
@@ -383,7 +434,9 @@ struct ContentView: View {
 
     func yourNameChanged(to value: String) {
         if value != lastYourName {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             UserDefaults.standard.set(yourName, forKey: "YourName")
             updateScripts()
             updateNewMembershipScripts()
@@ -393,7 +446,9 @@ struct ContentView: View {
 
     func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             UserDefaults.standard.set(yourFirstName, forKey: "YourFirstName")
             updateScripts()
             updateNewMembershipScripts()
@@ -403,7 +458,9 @@ struct ContentView: View {
 
     func pageChanged(to value: String) {
         if value != lastPage {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             UserDefaults.standard.set(page, forKey: "Page")
             updateScripts()
             lastPage = value
@@ -412,7 +469,9 @@ struct ContentView: View {
 
     func pageNameChanged(to value: String) {
         if value != lastPageName {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             UserDefaults.standard.set(pageName, forKey: "PageName")
             updateScripts()
             lastPageName = value
@@ -421,7 +480,9 @@ struct ContentView: View {
 
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
-            placeholders.placeholderDict.removeAll()
+            featureScriptPlaceholders.placeholderDict.removeAll()
+            commentScriptPlaceholders.placeholderDict.removeAll()
+            originalPostScriptPlaceholders.placeholderDict.removeAll()
             UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
             updateScripts()
             lastPageStaffLevel = value
@@ -440,27 +501,54 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    func copyScript(_ script: String, _ otherScripts: [String], force: Bool = false, withPlaceholders: Bool = false) -> Void {
+    func copyScript(_ script: String, _ placeholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList], force: Bool = false, withPlaceholders: Bool = false) -> Void {
         scriptWithPlaceholders = script
         scriptWithPlaceholdersInPlace = script
         placeholders.placeholderDict.forEach({ placeholder in
             scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.value)
         })
-        if withPlaceholders || !checkForPlaceholders(scripts: [scriptWithPlaceholdersInPlace] + otherScripts, force: force) {
-            copyToClipboard(withPlaceholders ? scriptWithPlaceholdersInPlace : scriptWithPlaceholders)
+        if withPlaceholders {
+            copyToClipboard(scriptWithPlaceholdersInPlace)
+        } else if !checkForPlaceholders(scriptWithPlaceholdersInPlace, placeholders, otherPlaceholders, force: force) {
+            copyToClipboard(scriptWithPlaceholders)
         }
     }
     
-    func checkForPlaceholders(scripts: [String], force: Bool = false) -> Bool {
+    func transferPlaceholderValues(_ scriptPlaceholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList]) -> Void {
+        scriptPlaceholders.placeholderDict.forEach { placeholder in
+            otherPlaceholders.forEach { destinationPlaceholders in
+                let destinationPlaceholderEntry = destinationPlaceholders.placeholderDict[placeholder.key]
+                if destinationPlaceholderEntry != nil && (destinationPlaceholderEntry?.value ?? "").isEmpty {
+                    destinationPlaceholderEntry!.value = placeholder.value.value
+                }
+            }
+        }
+    }
+
+    func scriptHasPlaceholders(_ script: String) -> Bool {
+        return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty
+    }
+    
+    func checkForPlaceholders(_ script: String, _ placeholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList], force: Bool = false) -> Bool {
         var foundPlaceholders: [String] = [];
-        scripts.forEach({ script in foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
+        foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))
         if foundPlaceholders.count != 0 {
             var needEditor: Bool = false
             for placeholder in foundPlaceholders {
                 let placeholderEntry = placeholders.placeholderDict[placeholder]
                 if placeholderEntry == nil {
                     needEditor = true
+                    var value: String? = nil
+                    otherPlaceholders.forEach { sourcePlaceholders in
+                        let sourcePlaceholderEntry = sourcePlaceholders.placeholderDict[placeholder]
+                        if (value == nil || value!.isEmpty) && sourcePlaceholderEntry != nil && !(sourcePlaceholderEntry?.value ?? "").isEmpty {
+                            value = sourcePlaceholderEntry?.value
+                        }
+                    }
                     placeholders.placeholderDict[placeholder] = PlaceholderValue()
+                    if value != nil {
+                        placeholders.placeholderDict[placeholder]?.value = value!
+                    }
                 }
             }
             if (force || needEditor) && !showingPlaceholderSheet {

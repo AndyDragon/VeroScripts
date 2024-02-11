@@ -83,6 +83,7 @@ struct PlaceholderSheet: View {
     @Binding var scriptWithPlaceholders: String
     @Binding var scriptWithPlaceholdersInPlace: String
     @Binding var isPresenting: Bool
+    var transferPlaceholders: () -> Void
     
     var body: some View {
         ZStack {
@@ -103,6 +104,7 @@ struct PlaceholderSheet: View {
                         placeholders.placeholderDict.forEach({ placeholder in
                             scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.value)
                         })
+                        transferPlaceholders()
                         copyToClipboard(scriptWithPlaceholders)
                         isPresenting.toggle()
                     }, label: {

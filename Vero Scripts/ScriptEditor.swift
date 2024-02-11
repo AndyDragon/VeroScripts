@@ -13,6 +13,7 @@ struct ScriptEditor: View {
     var minHeight: CGFloat
     var maxHeight: CGFloat
     var canCopy: Bool
+    var hasPlaceholders: Bool
     var copy: (Bool, Bool) -> Void
     
     var body: some View {        
@@ -34,7 +35,7 @@ struct ScriptEditor: View {
                 Text("Copy (with Placeholders)")
                     .padding(.horizontal, 20)
             })
-            .disabled(!canCopy)
+            .disabled(!hasPlaceholders)
 
             Spacer()
         }
