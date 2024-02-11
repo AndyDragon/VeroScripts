@@ -7,228 +7,33 @@
 
 import SwiftUI
 
-enum MembershipCase: String, CaseIterable, Identifiable {
-    case none = "None",
-         artist = "Artist",
-         member = "Member",
-         vipMember = "VIP Member",
-         goldMember = "VIP Gold Member",
-         platinumMember = "Platinum Member",
-         eliteMember = "Elite Member",
-         hallOfFameMember = "Hall of Fame Member",
-         diamondMember = "Diamond Member"
-    var id: Self { self }
-}
-
-enum NewMembershipCase: String, CaseIterable, Identifiable {
-    case none = "None",
-         member = "Member",
-         vipMember = "VIP Member"
-    var id: Self { self }
-}
-
-enum StaffLevelCase: String, CaseIterable, Identifiable {
-    case mod = "Mod",
-         coadmin = "Co-Admin",
-         admin = "Admin"
-    var id: Self { self }
-}
-
-extension Binding {
-    func onChange(_ handler: @escaping (Value) -> Void) -> Binding<Value> {
-        Binding(
-            get: { self.wrappedValue },
-            set: { newValue in
-                self.wrappedValue = newValue
-                handler(newValue)
-            }
-        )
-    }
-}
-
-func matches(of regex: String, in text: String) -> [String] {
-    do {
-        let regex = try NSRegularExpression(pattern: regex)
-        let results = regex.matches(in: text,
-                                    range: NSRange(text.startIndex..., in: text))
-        return results.map {
-            String(text[Range($0.range, in: text)!])
-        }
-    } catch let error {
-        print("invalid regex: \(error.localizedDescription)")
-        return []
-    }
-}
-
-struct PageCatalog: Codable {
-    let pages: [Page]
-}
-
-struct Page: Codable, Identifiable {
-    var id: String { self.name }
-    let name: String
-    let pageName: String?
-}
-
-struct TemplateCatalog: Codable {
-    let pages: [TemplatePage]
-    let specialTemplates: [Template]
-}
-
-struct TemplatePage: Codable, Identifiable {
-    var id: String { self.name }
-    let name: String
-    let templates: [Template]
-}
-
-struct HubCatalog: Codable {
-    let hubs: [Hub]
-}
-
-struct Hub: Codable, Identifiable {
-    var id: String { self.name }
-    let name: String
-    let templates: [Template]
-}
-
-struct Template: Codable, Identifiable {
-    var id: String { self.name }
-    let name: String
-    let template: String
-}
-
-extension URLSession {
-    func decode<T: Decodable>(
-        _ type: T.Type = T.self,
-        from url: URL,
-        keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
-        dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .deferredToData,
-        dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate
-    ) async throws -> T {
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
-        let (data, _) = try await data(for: request)
-
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = keyDecodingStrategy
-        decoder.dataDecodingStrategy = dataDecodingStrategy
-        decoder.dateDecodingStrategy = dateDecodingStrategy
-
-        let decoded = try decoder.decode(T.self, from: data)
-        return decoded
-    }
-}
-
-extension Color {
-#if os(iOS)
-    static let defaultLabel = Color(UIColor.label)
-#else
-    static let defaultLabel = Color(.textColor)
-#endif
-    static let requiredLabel = Color(.red)
-    
-    static func labelColor(_ predicate: Bool) -> Color {
-        return predicate ? .defaultLabel : .requiredLabel
-    }
-}
-
-final class PlaceholderValue: ObservableObject {
-    @Published var Value = ""
-}
-
-final class PlaceholderList: ObservableObject {
-    @Published var PlaceholderDict = [String: PlaceholderValue]()
-}
-
-struct PlaceholderView: View {
-    let Element: [String: PlaceholderValue].Element
-    var EditorName = ""
-    @State var EditorValue: String
-
-    init(_ element: [String: PlaceholderValue].Element) {
-        Element = element
-        let start = element.key.index(element.key.startIndex, offsetBy: 2)
-        let end = element.key.index(element.key.endIndex, offsetBy: -3)
-        EditorName = String(element.key[start...end]);
-        EditorValue = element.value.Value
-    }
-
-    var body: some View {
-        if #available(macOS 13.0, *) {
-            HStack {
-                Text(EditorName.capitalized)
-                    .frame(minWidth: 200)
-                TextField(
-                    "leave blank to remove placeholder",
-                    text: $EditorValue.onChange(editorValueChanged)
-                )
-                .frame(minWidth: 320)
-                .padding(.all, 2)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
-                Spacer()
-                    .background(Color.yellow)
-            }
-            .frame(maxWidth: .infinity)
-#if !os(iOS)
-            .textFieldStyle(.roundedBorder)
-#endif
-            .listRowSeparator(.hidden)
-        } else {
-            HStack {
-                Text(Element.key.capitalized)
-                    .frame(minWidth: 200)
-                TextField(
-                    "leave blank to remove placeholder",
-                    text: $EditorValue.onChange(editorValueChanged)
-                )
-                .frame(minWidth: 320)
-                .padding(.all, 2)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
-                Spacer()
-                    .background(Color.yellow)
-            }
-            .frame(maxWidth: .infinity)
-#if !os(iOS)
-            .textFieldStyle(.roundedBorder)
-#endif
-        }
-    }
-
-    func editorValueChanged(to: String) {
-        Element.value.Value = EditorValue
-    }
-}
-
 struct ContentView: View {
-    @State var Membership: MembershipCase = MembershipCase.none
-    @State var UserName: String = ""
-    @State var YourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
-    @State var YourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
-    @State var Page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
-    @State var PageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
-    @State var PageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
-    @State var FirstForPage: Bool = false
-    @State var CommunityTag: Bool = false
-    @State var FeatureScript: String = ""
-    @State var CommentScript: String = ""
-    @State var OriginalPostScript: String = ""
-    @State var NewMembership: NewMembershipCase = NewMembershipCase.none
-    @State var NewMembershipScript: String = ""
-    @State var ShowingAlert = false
-    @State var AlertTitle: String = ""
-    @State var AlertMessage: String = ""
-    @State var TerminalAlert = false
-    @State var ShowingPopup = false
-    @State var WaitingForPages: Bool = true
-    @State var PagesCatalog = PageCatalog(pages: [])
-    @State var WaitingForTemplates: Bool = true
-    @State var TemplatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
-    @ObservedObject var Placeholders = PlaceholderList()
-    @State var ScriptWithPlaceholdersUntouched = ""
-    @State var ScriptWithPlaceholders = ""
+    @State var membership: MembershipCase = MembershipCase.none
+    @State var userName: String = ""
+    @State var yourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+    @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
+    @State var pageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
+    @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
+    @State var firstForPage: Bool = false
+    @State var fromCommunityTag: Bool = false
+    @State var featureScript: String = ""
+    @State var commentScript: String = ""
+    @State var originalPostScript: String = ""
+    @State var newMembership: NewMembershipCase = NewMembershipCase.none
+    @State var newMembershipScript: String = ""
+    @State var showingAlert = false
+    @State var alertTitle: String = ""
+    @State var alertMessage: String = ""
+    @State var terminalAlert = false
+    @State var showingPlaceholderSheet = false
+    @State var waitingForPages: Bool = true
+    @State var pagesCatalog = PageCatalog(pages: [])
+    @State var waitingForTemplates: Bool = true
+    @State var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
+    @ObservedObject var placeholders = PlaceholderList()
+    @State var scriptWithPlaceholdersInPlace = ""
+    @State var scriptWithPlaceholders = ""
     @State var lastMembership = MembershipCase.none
     @State var lastUserName = ""
     @State var lastYourName = ""
@@ -247,35 +52,20 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Group {
-                // User name editor
                 HStack {
-                    Text("User: ")
-                        .foregroundColor(.labelColor(UserName.count != 0))
-#if os(iOS)
-                        .frame(width: 60, alignment: .leading)
-#else
-                        .frame(width: 42, alignment: .leading)
-#endif
-                    TextField(
-                        "Enter user name",
-                        text: $UserName.onChange(userNameChanged)
-                    )
-                    .focused($focusedField, equals: .userName)
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
-                }
-                
-                // User level picker
-                HStack {
+                    // User name editor
+                    FieldEditor(title: "User: ", titleWidth: [42, 60], placeholder: "Enter user name without '@'", field: $userName, fieldChanged: userNameChanged)
+
+                    // User level picker
                     Text("Level: ")
-                        .foregroundColor(.labelColor(Membership != MembershipCase.none))
+                        .foregroundColor(.labelColor(membership != MembershipCase.none))
 #if os(iOS)
                         .frame(width: 60, alignment: .leading)
 #else
                         .frame(width: 36, alignment: .leading)
 #endif
-                    Picker("", selection: $Membership.onChange(membershipChanged)) {
+                        .padding([.leading], 8)
+                    Picker("", selection: $membership.onChange(membershipChanged)) {
                         ForEach(MembershipCase.allCases) { level in
                             Text(level.rawValue).tag(level)
                         }
@@ -284,75 +74,65 @@ struct ContentView: View {
                     Spacer()
                 }
                 
-                // Your name editor
                 HStack {
-                    Text("You: ")
-                        .foregroundColor(.labelColor(YourName.count != 0))
-#if os(iOS)
-                        .frame(width: 60, alignment: .leading)
-#else
-                        .frame(width: 42, alignment: .leading)
-#endif
-                    TextField(
-                        "Enter your name:",
-                        text: $YourName.onChange(yourNameChanged)
-                    )
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
-                    Text("Your first name: ")
-                        .foregroundColor(.labelColor(YourFirstName.count != 0))
-                    TextField(
-                        "Enter your first name:",
-                        text: $YourFirstName.onChange(yourFirstNameChanged)
-                    )
-#if os(iOS)
-                    .textInputAutocapitalization(.never)
-#endif
+                    // Your name editor
+                    FieldEditor(title: "You:", titleWidth: [42, 60], placeholder: "Enter your user name without '@'", field: $yourName, fieldChanged: yourNameChanged)
+
+                    // Your first name editor
+                    FieldEditor(title: "Your first name:", placeholder: "Enter your first name (capitalized)", field: $yourFirstName, fieldChanged: yourFirstNameChanged)
+                        .padding([.leading], 8)
                 }
                 
-                // Page name editor
                 HStack {
+                    // Page picker
                     Text("Page: ")
-                        .foregroundColor(.labelColor(Page != "default" || PageName.count != 0))
+                        .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
 #if os(iOS)
                         .frame(width: 60, alignment: .leading)
 #else
                         .frame(width: 36, alignment: .leading)
 #endif
-                    Picker("", selection: $Page.onChange(pageChanged)) {
-                        ForEach(PagesCatalog.pages) { page in
+                    Picker("", selection: $page.onChange(pageChanged)) {
+                        ForEach(pagesCatalog.pages) { page in
                             Text(page.name).tag(page.name)
                         }
                     }
                     .focusable()
+
+                    // Page name editor
                     TextField(
                         "Enter page name",
-                        text: $PageName.onChange(pageNameChanged)
+                        text: $pageName.onChange(pageNameChanged)
                     )
-                    .disabled(Page != "default")
-                    .focusable(Page == "default")
+                    .disabled(page != "default")
+                    .focusable(page == "default")
 #if os(iOS)
                     .textInputAutocapitalization(.never)
 #endif
-#if os(iOS)
+                    
+                    // Page staff level picker
                     Text("Page staff level: ")
-#endif
-                    Picker("Page staff level: ", selection: $PageStaffLevel.onChange(pageStaffLevelChanged)) {
+                        .padding([.leading], 8)
+                    Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
                         ForEach(StaffLevelCase.allCases) { staffLevelCase in
                             Text(staffLevelCase.rawValue).tag(staffLevelCase)
                         }
                     }
                     .focusable()
+                    
 #if !os(iOS)
-                    Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
+                    // Options
+                    Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                         Text("First feature on page")
                     }
                     .focusable()
-                    Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
+                    .padding([.leading], 8)
+
+                    Toggle(isOn: $fromCommunityTag.onChange(communityTagChanged)) {
                         Text("From community tag")
                     }
                     .focusable()
+                    .padding([.leading], 8)
 #else
                     Spacer()
 #endif
@@ -361,11 +141,12 @@ struct ContentView: View {
             
 #if os(iOS)
             HStack {
-                Toggle(isOn: $FirstForPage.onChange(firstForPageChanged)) {
+                // Options
+                Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                     Text("First feature on page")
                 }
                 .focusable()
-                Toggle(isOn: $CommunityTag.onChange(communityTagChanged)) {
+                Toggle(isOn: $fromCommunityTag.onChange(communityTagChanged)) {
                     Text("From community tag")
                 }
                 .focusable()
@@ -375,146 +156,26 @@ struct ContentView: View {
             
             Group {
                 // Feature script output
-                HStack {
-                    Text("Feature script:")
-                    Button(action: {
-                        copyScript(FeatureScript, [CommentScript, OriginalPostScript])
-                    }, label: {
-                        Text("Copy")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(FeatureScript, [CommentScript, OriginalPostScript], force: true)
-                    }, label: {
-                        Text("Copy (edit Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(FeatureScript, [CommentScript, OriginalPostScript], withPlaceholders: true)
-                    }, label: {
-                        Text("Copy (with Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Spacer()
-                }
-                .frame(alignment: .leading)
-                TextEditor(text: $FeatureScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 100)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
-                    .frame(minWidth: 400, maxWidth: .infinity, minHeight: 200)
-#endif
+                ScriptEditor(title: "Feature script:", script: $featureScript, minHeight: 200, maxHeight: .infinity, copy: { force, withPlaceholders in
+                    copyScript(featureScript, [commentScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                })
+                
                 // Comment script output
-                HStack {
-                    Text("Comment script:")
-                    Button(action: {
-                        copyScript(CommentScript, [FeatureScript, OriginalPostScript])
-                    }, label: {
-                        Text("Copy")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(CommentScript, [FeatureScript, OriginalPostScript], force: true)
-                    }, label: {
-                        Text("Copy (edit Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(CommentScript, [FeatureScript, OriginalPostScript], withPlaceholders: true)
-                    }, label: {
-                        Text("Copy (with Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Spacer()
-                }
-                .frame(alignment: .leading)
-                TextEditor(text: $CommentScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
-                    .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
-#endif
+                ScriptEditor(title: "Comment script:", script: $commentScript, minHeight: 80, maxHeight: 160, copy: { force, withPlaceholders in
+                    copyScript(commentScript, [featureScript, originalPostScript], force: force, withPlaceholders: withPlaceholders)
+                })
                 
                 // Original post script output
-                HStack {
-                    Text("Original post script:")
-                    Button(action: {
-                        copyScript(OriginalPostScript, [FeatureScript, CommentScript])
-                    }, label: {
-                        Text("Copy")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(OriginalPostScript, [FeatureScript, CommentScript], force: true)
-                    }, label: {
-                        Text("Copy (edit Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Button(action: {
-                        copyScript(OriginalPostScript, [FeatureScript, CommentScript], withPlaceholders: true)
-                    }, label: {
-                        Text("Copy (with Placeholders)")
-                            .padding(.horizontal, 20)
-                    })
-                    Spacer()
-                }
-                .frame(alignment: .leading)
-                TextEditor(text: $OriginalPostScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 40, maxHeight: 60)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
-                    .frame(minWidth: 200, maxWidth: .infinity, minHeight: 40, maxHeight: 80)
-#endif
+                ScriptEditor(title: "Original post script:", script: $originalPostScript, minHeight: 40, maxHeight: 80, copy: { force, withPlaceholders in
+                    copyScript(originalPostScript, [featureScript, commentScript], force: force, withPlaceholders: withPlaceholders)
+                })
             }
             
             Group {
                 // New membership picker and script output
-                HStack {
-#if os(iOS)
-                    Text("New membership: ")
-#endif
-                    Picker("New membership: ", selection: $NewMembership.onChange(newMembershipChanged)) {
-                        ForEach(NewMembershipCase.allCases) { level in
-                            Text(level.rawValue).tag(level)
-                        }
-                    }
-                    .frame(width: 320)
-                    
-                    Button(action: {
-                        copyToClipboard(NewMembershipScript)
-                    }, label: {
-                        Text("Copy")
-                            .padding(.horizontal, 20)
-                    })
-                    Spacer()
-                }
-                .frame(alignment: .leading)
-                TextEditor(text: $NewMembershipScript)
-#if os(iOS)
-                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-                    .colorMultiply(Color(
-                        red: ColorScheme == .dark ? 1.05 : 0.95,
-                        green: ColorScheme == .dark ? 1.05 : 0.95,
-                        blue: ColorScheme == .dark ? 1.05 : 0.95))
-                    .border(.gray)
-#else
-                    .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
-#endif
+                NewMembershipEditor(newMembership: $newMembership, script: $newMembershipScript, onChanged: newMembershipChanged, copy: {
+                    copyToClipboard(newMembershipScript)
+                })
             }
         }
         .padding()
@@ -523,87 +184,45 @@ struct ContentView: View {
             focusedField = .userName
         }
         .alert(
-            AlertTitle,
-            isPresented: $ShowingAlert,
+            alertTitle,
+            isPresented: $showingAlert,
             actions: {
-                Button("OK", action: {
-                    if TerminalAlert {
-#if !os(iOS)
-                        NSApplication.shared.terminate(nil)
-#endif
-                    }
-                })
             },
             message: {
-                Text(AlertMessage)
+                Text(alertMessage)
             })
-        .sheet(isPresented: $ShowingPopup) {
-            ZStack {
-                VStack {
-                    Text("There are manual placeholders that need to be filled out:")
-                    List() {
-                        ForEach(Placeholders.PlaceholderDict.sorted(by: { entry1, entry2 in entry1.key < entry2.key}), id: \.key) { entry in
-                            PlaceholderView(entry)
-#if os(iOS)
-                                .padding(.horizontal, 20)
-#endif
-                        }
-                    }
-                    .listStyle(.plain)
-                    HStack {
-                        Button(action: {
-                            ScriptWithPlaceholders = ScriptWithPlaceholdersUntouched
-                            Placeholders.PlaceholderDict.forEach({ placeholder in
-                                ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
-                            })
-                            copyToClipboard(ScriptWithPlaceholders)
-                            ShowingPopup.toggle()
-                        }, label: {
-                            Text("Copy")
-                                .padding(.horizontal, 20)
-                        })
-                        Button(action: {
-                            copyToClipboard(ScriptWithPlaceholdersUntouched)
-                            ShowingPopup.toggle()
-                        }, label: {
-                            Text("Copy with Placeholders")
-                                .padding(.horizontal, 20)
-                        })
-                    }
-                }
-            }
-            .frame(minWidth: 800, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
-            .padding()
+        .sheet(isPresented: $showingPlaceholderSheet) {
+            PlaceholderSheet(placeholders: placeholders, scriptWithPlaceholders: $scriptWithPlaceholders, scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace, isPresenting: $showingPlaceholderSheet)
         }
-        .disabled(WaitingForPages)
+        .disabled(waitingForPages)
         .task {
-            lastPageStaffLevel = PageStaffLevel
+            lastPageStaffLevel = pageStaffLevel
             
             do {
                 let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
-                PagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
-                WaitingForPages = false
+                pagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
+                waitingForPages = false
                 
                 // Delay the start of the templates download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 1_000_000_000)
                 
                 let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
-                TemplatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
-                WaitingForTemplates = false
+                templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
+                waitingForTemplates = false
                 updateScripts()
                 updateNewMembershipScripts()
             } catch {
-                AlertTitle = "Could not load the page catalog from the server"
-                AlertMessage = "The application requires the catalog to perform its operations"
-                TerminalAlert = true
-                ShowingAlert = true
+                alertTitle = "Could not load the page catalog from the server"
+                alertMessage = "The application requires the catalog to perform its operations"
+                terminalAlert = true
+                showingAlert = true
             }
         }
     }
 
     func membershipChanged(to value: MembershipCase) {
         if value != lastMembership {
-            Placeholders.PlaceholderDict.removeAll()
+            placeholders.placeholderDict.removeAll()
             updateScripts()
             lastMembership = value
         }
@@ -611,7 +230,7 @@ struct ContentView: View {
 
     func userNameChanged(to value: String) {
         if value != lastUserName {
-            Placeholders.PlaceholderDict.removeAll()
+            placeholders.placeholderDict.removeAll()
             updateScripts()
             updateNewMembershipScripts()
             lastUserName = value
@@ -620,8 +239,8 @@ struct ContentView: View {
 
     func yourNameChanged(to value: String) {
         if value != lastYourName {
-            Placeholders.PlaceholderDict.removeAll()
-            UserDefaults.standard.set(YourName, forKey: "YourName")
+            placeholders.placeholderDict.removeAll()
+            UserDefaults.standard.set(yourName, forKey: "YourName")
             updateScripts()
             updateNewMembershipScripts()
             lastYourName = value
@@ -630,8 +249,8 @@ struct ContentView: View {
 
     func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
-            Placeholders.PlaceholderDict.removeAll()
-            UserDefaults.standard.set(YourFirstName, forKey: "YourFirstName")
+            placeholders.placeholderDict.removeAll()
+            UserDefaults.standard.set(yourFirstName, forKey: "YourFirstName")
             updateScripts()
             updateNewMembershipScripts()
             lastYourFirstName = value
@@ -640,8 +259,8 @@ struct ContentView: View {
 
     func pageChanged(to value: String) {
         if value != lastPage {
-            Placeholders.PlaceholderDict.removeAll()
-            UserDefaults.standard.set(Page, forKey: "Page")
+            placeholders.placeholderDict.removeAll()
+            UserDefaults.standard.set(page, forKey: "Page")
             updateScripts()
             lastPage = value
         }
@@ -649,8 +268,8 @@ struct ContentView: View {
 
     func pageNameChanged(to value: String) {
         if value != lastPageName {
-            Placeholders.PlaceholderDict.removeAll()
-            UserDefaults.standard.set(PageName, forKey: "PageName")
+            placeholders.placeholderDict.removeAll()
+            UserDefaults.standard.set(pageName, forKey: "PageName")
             updateScripts()
             lastPageName = value
         }
@@ -658,8 +277,8 @@ struct ContentView: View {
 
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
-            Placeholders.PlaceholderDict.removeAll()
-            UserDefaults.standard.set(PageStaffLevel.rawValue, forKey: "StaffLevel")
+            placeholders.placeholderDict.removeAll()
+            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
             updateScripts()
             lastPageStaffLevel = value
         }
@@ -678,41 +297,30 @@ struct ContentView: View {
     }
 
     func copyScript(_ script: String, _ otherScripts: [String], force: Bool = false, withPlaceholders: Bool = false) -> Void {
-        ScriptWithPlaceholders = script
-        ScriptWithPlaceholdersUntouched = script
-        Placeholders.PlaceholderDict.forEach({ placeholder in
-            ScriptWithPlaceholders = ScriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.Value)
+        scriptWithPlaceholders = script
+        scriptWithPlaceholdersInPlace = script
+        placeholders.placeholderDict.forEach({ placeholder in
+            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.value)
         })
-        if withPlaceholders || !checkForPlaceholders(scripts: [ScriptWithPlaceholdersUntouched] + otherScripts, force: force) {
-            copyToClipboard(ScriptWithPlaceholders)
+        if withPlaceholders || !checkForPlaceholders(scripts: [scriptWithPlaceholdersInPlace] + otherScripts, force: force) {
+            copyToClipboard(withPlaceholders ? scriptWithPlaceholdersInPlace : scriptWithPlaceholders)
         }
     }
     
-    func copyToClipboard(_ text: String) -> Void {
-#if os(iOS)
-            UIPasteboard.general.string = text
-#else
-            let pasteBoard = NSPasteboard.general
-            pasteBoard.clearContents()
-            pasteBoard.writeObjects([text as NSString])
-#endif
-
-    }
-
     func checkForPlaceholders(scripts: [String], force: Bool = false) -> Bool {
-        var placeholders: [String] = [];
-        scripts.forEach({ script in placeholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
-        if placeholders.count != 0 {
+        var foundPlaceholders: [String] = [];
+        scripts.forEach({ script in foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))})
+        if foundPlaceholders.count != 0 {
             var needEditor: Bool = false
-            for placeholder in placeholders {
-                let placeholderEntry = Placeholders.PlaceholderDict[placeholder]
+            for placeholder in foundPlaceholders {
+                let placeholderEntry = placeholders.placeholderDict[placeholder]
                 if placeholderEntry == nil {
                     needEditor = true
-                    Placeholders.PlaceholderDict[placeholder] = PlaceholderValue()
+                    placeholders.placeholderDict[placeholder] = PlaceholderValue()
                 }
             }
-            if (force || needEditor) && !ShowingPopup {
-                ShowingPopup.toggle()
+            if (force || needEditor) && !showingPlaceholderSheet {
+                showingPlaceholderSheet.toggle()
                 return true
             }
         }
@@ -720,78 +328,78 @@ struct ContentView: View {
     }
 
     func updateScripts() -> Void {
-        if Membership == MembershipCase.none
-            || UserName.isEmpty
-            || YourName.isEmpty
-            || YourFirstName.isEmpty
-            || (Page == "default" && PageName.isEmpty) {
-            FeatureScript = ""
-            OriginalPostScript = ""
-            CommentScript = ""
+        if membership == MembershipCase.none
+            || userName.isEmpty
+            || yourName.isEmpty
+            || yourFirstName.isEmpty
+            || (page == "default" && pageName.isEmpty) {
+            featureScript = ""
+            originalPostScript = ""
+            commentScript = ""
         } else {
-            let pageName = Page == "default" ? PageName : Page
-            var scriptPageName = pageName
-            if pageName != "default" {
-                let pageSource = PagesCatalog.pages.first(where: { page in page.name == Page })
+            let currentPageName = page == "default" ? pageName : page
+            var scriptPageName = currentPageName
+            if currentPageName != "default" {
+                let pageSource = pagesCatalog.pages.first(where: { needle in needle.name == page })
                 if pageSource != nil && pageSource?.pageName != nil {
                     scriptPageName = (pageSource?.pageName)!
                 }
             }
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
-                from: pageName,
-                firstFeature: FirstForPage,
-                communityTag: CommunityTag) ?? ""
+                from: currentPageName,
+                firstFeature: firstForPage,
+                communityTag: fromCommunityTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
-                from: pageName,
-                firstFeature: FirstForPage,
-                communityTag: CommunityTag) ?? ""
+                from: currentPageName,
+                firstFeature: firstForPage,
+                communityTag: fromCommunityTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
-                from: pageName,
-                firstFeature: FirstForPage,
-                communityTag: CommunityTag) ?? ""
-            FeatureScript = featureScriptTemplate
+                from: currentPageName,
+                firstFeature: firstForPage,
+                communityTag: fromCommunityTag) ?? ""
+            featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
-                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
-                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
-            OriginalPostScript = originalPostScriptTemplate
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+            originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
-                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
-                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
-            CommentScript = commentScriptTemplate
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+            commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
-                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: pageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: Membership.rawValue)
-                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: YourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: PageStaffLevel.rawValue)
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
     }
 
     func getTemplateFromCatalog(_ templateName: String, from pageName: String, firstFeature: Bool, communityTag: Bool) -> String! {
         var template: Template!
-        if WaitingForTemplates {
+        if waitingForTemplates {
             return "";
         }
-        let defaultTemplatePage = TemplatesCatalog.pages.first(where: { page in page.name == "default" });
-        let templatePage = TemplatesCatalog.pages.first(where: { page in page.name == pageName});
+        let defaultTemplatePage = templatesCatalog.pages.first(where: { page in page.name == "default" });
+        let templatePage = templatesCatalog.pages.first(where: { page in page.name == pageName});
         if communityTag {
             template = templatePage?.templates.first(where: { template in template.name == "community " + templateName })
             if template == nil {
@@ -813,32 +421,32 @@ struct ContentView: View {
     }
 
     func updateNewMembershipScripts() -> Void {
-        if WaitingForTemplates {
-            NewMembershipScript = ""
+        if waitingForTemplates {
+            newMembershipScript = ""
             return
         }
-        if NewMembership == NewMembershipCase.none || UserName == "" {
-            NewMembershipScript = ""
-        } else if NewMembership == NewMembershipCase.member {
-            let template = TemplatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })
+        if newMembership == NewMembershipCase.none || userName == "" {
+            newMembershipScript = ""
+        } else if newMembership == NewMembershipCase.member {
+            let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })
             if template == nil {
-                NewMembershipScript = ""
+                newMembershipScript = ""
                 return
             }
-            NewMembershipScript = template!.template
-                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
-        } else if NewMembership == NewMembershipCase.vipMember {
-            let template = TemplatesCatalog.specialTemplates.first(where: { template in template.name == "new vip member" })
+            newMembershipScript = template!.template
+                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
+        } else if newMembership == NewMembershipCase.vipMember {
+            let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new vip member" })
             if template == nil {
-                NewMembershipScript = ""
+                newMembershipScript = ""
                 return
             }
-            NewMembershipScript = template!.template
-                .replacingOccurrences(of: "%%USERNAME%%", with: UserName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: YourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: YourFirstName)
+            newMembershipScript = template!.template
+                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
         }
     }
 }

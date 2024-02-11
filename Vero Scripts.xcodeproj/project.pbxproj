@@ -8,19 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		4923C2332B4A833F0057D781 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4923C2322B4A833F0057D781 /* Assets.xcassets */; };
-		4923C2352B4A83A50057D781 /* NewAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4923C2342B4A83A50057D781 /* NewAssets.xcassets */; };
 		495CCC4C2B45E3AA00BBA415 /* Vero_ScriptsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495CCC4B2B45E3AA00BBA415 /* Vero_ScriptsApp.swift */; };
 		495CCC4E2B45E3AA00BBA415 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495CCC4D2B45E3AA00BBA415 /* ContentView.swift */; };
+		496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA282B7861A1001D36C1 /* ScriptEditor.swift */; };
+		496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA2A2B78682F001D36C1 /* FieldEditor.swift */; };
+		49C546D42B7874C60048DEDA /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D32B7874C60048DEDA /* Types.swift */; };
+		49C546D62B78750A0048DEDA /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D52B78750A0048DEDA /* Helpers.swift */; };
+		49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D72B7875630048DEDA /* PlaceholderEditor.swift */; };
+		49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D92B787B340048DEDA /* NewMembershipEditor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		4923C2322B4A833F0057D781 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4923C2342B4A83A50057D781 /* NewAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = NewAssets.xcassets; sourceTree = "<group>"; };
-		49475B102B48EFB00053A77E /* Vero-Scripts-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Vero-Scripts-Info.plist"; sourceTree = SOURCE_ROOT; };
 		495CCC482B45E3AA00BBA415 /* Vero Scripts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vero Scripts.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		495CCC4B2B45E3AA00BBA415 /* Vero_ScriptsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vero_ScriptsApp.swift; sourceTree = "<group>"; };
 		495CCC4D2B45E3AA00BBA415 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Vero_Scripts.entitlements; sourceTree = "<group>"; };
+		496BEA282B7861A1001D36C1 /* ScriptEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptEditor.swift; sourceTree = "<group>"; };
+		496BEA2A2B78682F001D36C1 /* FieldEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldEditor.swift; sourceTree = "<group>"; };
+		49C546D32B7874C60048DEDA /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		49C546D52B78750A0048DEDA /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		49C546D72B7875630048DEDA /* PlaceholderEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderEditor.swift; sourceTree = "<group>"; };
+		49C546D92B787B340048DEDA /* NewMembershipEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMembershipEditor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,12 +62,16 @@
 		495CCC4A2B45E3AA00BBA415 /* Vero Scripts */ = {
 			isa = PBXGroup;
 			children = (
-				49475B102B48EFB00053A77E /* Vero-Scripts-Info.plist */,
 				495CCC4B2B45E3AA00BBA415 /* Vero_ScriptsApp.swift */,
 				495CCC4D2B45E3AA00BBA415 /* ContentView.swift */,
-				4923C2322B4A833F0057D781 /* Assets.xcassets */,
-				4923C2342B4A83A50057D781 /* NewAssets.xcassets */,
+				49C546D92B787B340048DEDA /* NewMembershipEditor.swift */,
+				49C546D72B7875630048DEDA /* PlaceholderEditor.swift */,
+				496BEA2A2B78682F001D36C1 /* FieldEditor.swift */,
+				496BEA282B7861A1001D36C1 /* ScriptEditor.swift */,
+				49C546D52B78750A0048DEDA /* Helpers.swift */,
+				49C546D32B7874C60048DEDA /* Types.swift */,
 				495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */,
+				4923C2322B4A833F0057D781 /* Assets.xcassets */,
 			);
 			path = "Vero Scripts";
 			sourceTree = "<group>";
@@ -121,7 +134,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4923C2352B4A83A50057D781 /* NewAssets.xcassets in Resources */,
 				4923C2332B4A833F0057D781 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,7 +146,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				495CCC4E2B45E3AA00BBA415 /* ContentView.swift in Sources */,
+				49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */,
+				49C546D62B78750A0048DEDA /* Helpers.swift in Sources */,
+				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
+				496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */,
 				495CCC4C2B45E3AA00BBA415 /* Vero_ScriptsApp.swift in Sources */,
+				49C546D42B7874C60048DEDA /* Types.swift in Sources */,
+				496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,14 +290,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Vero-Scripts-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Vero Scripts";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -311,14 +329,14 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Vero-Scripts-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Vero Scripts";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
