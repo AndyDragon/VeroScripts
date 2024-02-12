@@ -518,7 +518,7 @@ struct ContentView: View {
         scriptPlaceholders.placeholderDict.forEach { placeholder in
             otherPlaceholders.forEach { destinationPlaceholders in
                 let destinationPlaceholderEntry = destinationPlaceholders.placeholderDict[placeholder.key]
-                if destinationPlaceholderEntry != nil && (destinationPlaceholderEntry?.value ?? "").isEmpty {
+                if destinationPlaceholderEntry != nil {
                     destinationPlaceholderEntry!.value = placeholder.value.value
                 }
             }

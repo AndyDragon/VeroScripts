@@ -2,61 +2,44 @@
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
+using FramePFX.Themes;
 
 namespace Vero_Scripts
 {
-    class ValidateEmptyConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // If the value is empty, fail validation.
-            if (string.IsNullOrEmpty((value ?? "").ToString()))
-            {
-                return new SolidColorBrush(Colors.Red);
-            }
-            return FramePFX.Themes.ThemesController.GetBrush("ControlDefaultForeground");
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class ValidateNotEqualConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // If the value is empty OR it is the default, fail validation.
-            if (string.IsNullOrEmpty((value ?? "").ToString()) 
-                || string.Equals((value ?? "").ToString(), (parameter ?? "").ToString()))
-            {
-                return new SolidColorBrush(Colors.Red);
-            }
-            return FramePFX.Themes.ThemesController.GetBrush("ControlDefaultForeground");
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class ValidateNotEqualAndNotEmptyConverter : IMultiValueConverter
+    class ValidationResultLabelConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Length == 2)
+            if (values.Length > 0)
             {
-                // If the first value is empty OR it is the default AND the second value is empty, fail validation.
-                if ((string.IsNullOrEmpty((values[0] ?? "").ToString()) 
-                    || string.Equals((values[0] ?? "").ToString(), (parameter ?? "").ToString()))
-                    && string.IsNullOrEmpty((values[1] ?? "").ToString()))
+                var validationResult = values[0] as ValidationResult?;
+                if (validationResult == null || !(validationResult?.Valid ?? false))
                 {
                     return new SolidColorBrush(Colors.Red);
                 }
             }
-            return FramePFX.Themes.ThemesController.GetBrush("ControlDefaultForeground");
+            return ThemesController.GetBrush("ABrush.Foreground.Static");
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class BooleanLabelConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length > 0)
+            {
+                var result = (values[0] as Boolean?) ?? false;
+                if (!result)
+                {
+                    return new SolidColorBrush(Colors.Red);
+                }
+            }
+            return ThemesController.GetBrush("ABrush.Foreground.Static");
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

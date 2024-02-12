@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using FramePFX.Themes;
 using Microsoft.Win32;
+using Vero_Scripts.Properties;
 
 namespace Vero_Scripts
 {
@@ -13,9 +15,28 @@ namespace Vero_Scripts
         public MainWindow()
         {
             InitializeComponent();
-            if (IsLightTheme())
+
+            var theme = Settings.Default.Theme;
+            switch (theme)
             {
-                ThemesController.SetTheme(ThemeType.LightTheme);
+                case "SoftDark": ThemesController.SetTheme(ThemeType.SoftDark); break;
+                case "LightTheme": ThemesController.SetTheme(ThemeType.LightTheme); break;
+                case "DeepDark": ThemesController.SetTheme(ThemeType.DeepDark); break;
+                case "DarkGreyTheme": ThemesController.SetTheme(ThemeType.DarkGreyTheme); break;
+                case "GreyTheme": ThemesController.SetTheme(ThemeType.GreyTheme); break;
+                default:
+                    {
+                        if (IsLightTheme())
+                        {
+                            ThemesController.SetTheme(ThemeType.LightTheme);
+                        }
+                        break;
+                    }
+            }
+
+            if (DataContext is ScriptsViewModel viewModel)
+            {
+                viewModel.ThemeName = ThemesController.CurrentTheme.GetName();
             }
         }
 
@@ -26,19 +47,39 @@ namespace Vero_Scripts
             return value is int i && i > 0;
         }
 
+        private void OnThemeClick(object sender, RoutedEventArgs e)
+        {
+            switch (ThemesController.CurrentTheme.GetName())
+            {
+                case "SoftDark": ThemesController.SetTheme(ThemeType.LightTheme); break;
+                case "LightTheme": ThemesController.SetTheme(ThemeType.DeepDark); break;
+                case "DeepDark": ThemesController.SetTheme(ThemeType.DarkGreyTheme); break;
+                case "DarkGreyTheme": ThemesController.SetTheme(ThemeType.GreyTheme); break;
+                case "GreyTheme": ThemesController.SetTheme(ThemeType.SoftDark); break;
+            }
+
+            Settings.Default.Theme = ThemesController.CurrentTheme.GetName();
+            Settings.Default.Save();
+
+            if (DataContext is ScriptsViewModel viewModel)
+            {
+                viewModel.ThemeName = ThemesController.CurrentTheme.GetName();
+            }
+        }
+
         private void OnCopyFeatureScriptClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.FeatureScript, new[] { viewModel.CommentScript, viewModel.OriginalPostScript });
+                CopyScript(viewModel, Script.Feature, force: true);
             }
         }
 
-        private void OnCopyFeatureScriptWithEditClick(object sender, RoutedEventArgs e)
+        private void OnCopyFeatureScriptWithPlaceholdersClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.FeatureScript, new[] { viewModel.CommentScript, viewModel.OriginalPostScript}, true);
+                CopyScript(viewModel, Script.Feature, withPlaceholders: true);
             }
         }
 
@@ -46,15 +87,15 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.CommentScript, new[] { viewModel.FeatureScript, viewModel.OriginalPostScript });
+                CopyScript(viewModel, Script.Comment, force: true);
             }
         }
 
-        private void OnCopyCommentScriptWithEditClick(object sender, RoutedEventArgs e)
+        private void OnCopyCommentScriptWithPlaceholdersClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.CommentScript, new[] { viewModel.FeatureScript, viewModel.OriginalPostScript }, true);
+                CopyScript(viewModel, Script.Comment, withPlaceholders: true);
             }
         }
 
@@ -62,36 +103,38 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.OriginalPostScript, new[] { viewModel.FeatureScript, viewModel.CommentScript });
+                CopyScript(viewModel, Script.OriginalPost, force: true);
             }
         }
 
-        private void OnCopyOriginalPostScriptWithEditClick(object sender, RoutedEventArgs e)
+        private void OnCopyOriginalPostScriptWithPlaceholdersClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, viewModel.OriginalPostScript, new[] { viewModel.FeatureScript, viewModel.CommentScript }, true);
+                CopyScript(viewModel, Script.OriginalPost, withPlaceholders: true);
             }
         }
 
-        private void CopyScript(ScriptsViewModel viewModel, string script, string[] otherScripts, bool force = false)
+        private void CopyScript(ScriptsViewModel viewModel, Script script, bool force = false, bool withPlaceholders = false)
         {
-            var allScripts = (new[] { script }).Concat(otherScripts).ToArray();
-            if (viewModel.CheckForPlaceholders(allScripts, force))
+            if (withPlaceholders)
+            {
+                var unprocessedScript = viewModel.Scripts[script];
+                Clipboard.SetText(unprocessedScript);
+            }
+            else if (viewModel.CheckForPlaceholders(script, force))
             {
                 var editor = new PlaceholderEditor(viewModel, script)
                 {
                     Owner = this
                 };
-                if (!(editor.ShowDialog() ?? false))
-                {
-                    viewModel.Placeholders.Clear();
-                }
+                editor.ShowDialog();
             }
             else
             {
-                var processedFeatureScript = viewModel.ProcessPlaceholders(script);
-                Clipboard.SetText(processedFeatureScript);
+                var processedScript = viewModel.ProcessPlaceholders(script);
+                viewModel.TransferPlaceholders(script);
+                Clipboard.SetText(processedScript);
             }
         }
 

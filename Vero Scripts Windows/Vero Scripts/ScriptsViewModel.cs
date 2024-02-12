@@ -6,7 +6,9 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Windows;
 using Vero_Scripts.Properties;
+using FramePFX.Themes;
 
 namespace Vero_Scripts
 {
@@ -77,6 +79,12 @@ namespace Vero_Scripts
             Name = name;
         }
 
+        public Placeholder(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private string name = "";
@@ -107,9 +115,110 @@ namespace Vero_Scripts
             }
         }
     }
+    public enum Script
+    {
+        Feature = 1,
+        Comment,
+        OriginalPost,
+    }
+
+    public struct ValidationResult
+    {
+        public ValidationResult(bool valid, string? error = null)
+        {
+            Valid = valid;
+            Error = error;
+        }
+
+        public bool Valid { get; private set; }
+
+        public string? Error { get; private set; }
+
+        public static bool operator ==(ValidationResult x, ValidationResult y)
+        {
+            var xPrime = x;
+            var yPrime = y;
+            if (xPrime.Valid && yPrime.Valid)
+            {
+                return true;
+            }
+            if (xPrime.Valid || yPrime.Valid)
+            {
+                return false;
+            }
+            return xPrime.Error == yPrime.Error;
+        }
+
+        public static bool operator !=(ValidationResult x, ValidationResult y)
+        {
+            return !(x == y);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is ValidationResult)
+            {
+                var objAsValidationResult = obj as ValidationResult?;
+                return this == objAsValidationResult;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Valid.GetHashCode() + (Error ?? "").GetHashCode();
+        }
+    }
 
     public partial class ScriptsViewModel : INotifyPropertyChanged
     {
+        private static List<string> disallowList = new();
+
+        public static ValidationResult ValidateUser(string userName)
+        {
+            var userNameValidationResult = ValidateUserName(userName);
+            if (!userNameValidationResult.Valid)
+            {
+                return userNameValidationResult;
+            }
+            if (disallowList.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
+            {
+                return new ValidationResult(false, "User is on the disallow list");
+            }
+            return new ValidationResult(true);
+        }
+
+        public static ValidationResult ValidateValueNotEmpty(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return new ValidationResult(false, "Required value");
+            }
+            return new ValidationResult(true);
+        }
+
+        public static ValidationResult ValidateValueNotDefault(string value, string defaultValue)
+        {
+            if (string.IsNullOrEmpty(value) || string.Equals(value, defaultValue, StringComparison.OrdinalIgnoreCase))
+            {
+                return new ValidationResult(false, "Required value");
+            }
+            return new ValidationResult(true);
+        }
+
+        public static ValidationResult ValidateUserName(string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                return new ValidationResult(false, "Required value");
+            }
+            if (userName.StartsWith("@"))
+            {
+                return new ValidationResult(false, "Don't include the '@' in user names");
+            }
+            return new ValidationResult(true);
+        }
+
         private readonly HttpClient httpClient = new();
 
         public ScriptsViewModel()
@@ -117,7 +226,18 @@ namespace Vero_Scripts
             PagesCatalog = new PagesCatalog();
             _ = LoadPages();
             TemplatesCatalog = new TemplatesCatalog();
-            Placeholders = new ObservableCollection<Placeholder>();
+            Scripts = new Dictionary<Script, string>
+            {
+                { Script.Feature, "" },
+                { Script.Comment, "" },
+                { Script.OriginalPost, "" }
+            };
+            PlaceholdersMap = new Dictionary<Script, ObservableCollection<Placeholder>>
+            {
+                { Script.Feature, new ObservableCollection<Placeholder>() },
+                { Script.Comment, new ObservableCollection<Placeholder>() },
+                { Script.OriginalPost, new ObservableCollection<Placeholder>() }
+            };
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "---";
         }
 
@@ -143,6 +263,7 @@ namespace Vero_Scripts
                     Pages = PagesCatalog.Pages.Select(page => page.Name).ToArray();
                 }
                 _ = LoadTemplates();
+                _ = LoadDisallowList();
             }
             catch (Exception ex)
             {
@@ -181,6 +302,37 @@ namespace Vero_Scripts
             }
         }
 
+        private async Task LoadDisallowList()
+        {
+            try
+            {
+                // Disable client-side caching.
+                httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+                {
+                    NoCache = true
+                };
+                var templatesUri = new Uri("https://vero.andydragon.com/static/data/disallowlist.json");
+                var content = await httpClient.GetStringAsync(templatesUri);
+                if (!string.IsNullOrEmpty(content))
+                {
+                    var serializerOptions = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        WriteIndented = true,
+                    };
+                    disallowList = JsonSerializer.Deserialize<List<string>>(content, serializerOptions) ?? new List<string>();
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserNameValidation)));
+                    UpdateScripts();
+                    UpdateNewMembershipScripts();
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO andydragon : handle errors
+                Console.WriteLine("Error occurred: {0}", ex.Message);
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public PagesCatalog PagesCatalog { get; private set; }
@@ -199,9 +351,29 @@ namespace Vero_Scripts
                 {
                     userName = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserName)));
-                    Placeholders.Clear();
+                    UserNameValidation = ValidateUser(UserName);
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
+                }
+            }
+        }
+
+        private ValidationResult userNameValidation = ValidateUser("");
+
+        public ValidationResult UserNameValidation
+        {
+            get { return userNameValidation; }
+            private set
+            {
+                if (userNameValidation != value)
+                {
+                    userNameValidation = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserNameValidation)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyScripts)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyNewMembershipScript)));
                 }
             }
         }
@@ -236,8 +408,27 @@ namespace Vero_Scripts
                 {
                     membership = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Membership)));
-                    Placeholders.Clear();
+                    MembershipValidation = ValidateValueNotDefault(Membership, "None");
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
+                }
+            }
+        }
+
+        private ValidationResult membershipValidation = ValidateValueNotDefault("None", "None");
+
+        public ValidationResult MembershipValidation
+        {
+            get { return membershipValidation; }
+            private set
+            {
+                if (membershipValidation != value)
+                {
+                    membershipValidation = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MembershipValidation)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyScripts)));
                 }
             }
         }
@@ -255,9 +446,28 @@ namespace Vero_Scripts
                     Settings.Default.YourName = YourName;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourName)));
-                    Placeholders.Clear();
+                    YourNameValidation = ValidateUserName(YourName);
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
+                }
+            }
+        }
+
+        private ValidationResult yourNameValidation = ValidateUserName(Settings.Default.YourName ?? "");
+
+        public ValidationResult YourNameValidation
+        {
+            get { return yourNameValidation; }
+            private set
+            {
+                if (yourNameValidation != value)
+                {
+                    yourNameValidation = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourNameValidation)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyScripts)));
                 }
             }
         }
@@ -275,9 +485,28 @@ namespace Vero_Scripts
                     Settings.Default.YourFirstName = YourFirstName;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourFirstName)));
-                    Placeholders.Clear();
+                    YourFirstNameValidation = ValidateValueNotEmpty(YourFirstName);
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
+                }
+            }
+        }
+
+        private ValidationResult yourFirstNameValidation = ValidateUserName(Settings.Default.YourFirstName ?? "");
+
+        public ValidationResult YourFirstNameValidation
+        {
+            get { return yourFirstNameValidation; }
+            private set
+            {
+                if (yourFirstNameValidation != value)
+                {
+                    yourFirstNameValidation = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(YourFirstNameValidation)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyScripts)));
                 }
             }
         }
@@ -293,8 +522,20 @@ namespace Vero_Scripts
                 {
                     pages = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pages)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Page)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameEnabled)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameDisabled)));
                 }
             }
+        }
+
+        private static ValidationResult CalculatePageValidation(string page, string pageName)
+        {
+            if (string.IsNullOrEmpty(page) || string.Equals(page, "default", StringComparison.OrdinalIgnoreCase))
+            {
+                return ValidateValueNotEmpty(pageName);
+            }
+            return new ValidationResult(true);
         }
 
         private string page = Settings.Default.Page ?? "default";
@@ -312,8 +553,27 @@ namespace Vero_Scripts
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Page)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameEnabled)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageNameDisabled)));
-                    Placeholders.Clear();
+                    PageValidation = CalculatePageValidation(Page, PageName);
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
+                }
+            }
+        }
+
+        private ValidationResult pageValidation = CalculatePageValidation(Settings.Default.Page ?? "default", Settings.Default.PageName);
+
+        public ValidationResult PageValidation
+        {
+            get { return pageValidation; }
+            private set
+            {
+                if (pageValidation != value)
+                {
+                    pageValidation = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageValidation)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyScripts)));
                 }
             }
         }
@@ -324,7 +584,7 @@ namespace Vero_Scripts
         }
         public bool PageNameEnabled
         {
-            get { return Page == "default" || string.IsNullOrEmpty(Page); }
+            get { return Page == "default"; }
         }
 
         private string pageName = Settings.Default.PageName;
@@ -340,7 +600,10 @@ namespace Vero_Scripts
                     Settings.Default.PageName = PageName;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PageName)));
-                    Placeholders.Clear();
+                    PageValidation = CalculatePageValidation(Page, PageName);
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
                 }
             }
@@ -372,7 +635,9 @@ namespace Vero_Scripts
                     Settings.Default.StaffLevel = StaffLevel;
                     Settings.Default.Save();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StaffLevel)));
-                    Placeholders.Clear();
+                    PlaceholdersMap[Script.Feature].Clear();
+                    PlaceholdersMap[Script.Comment].Clear();
+                    PlaceholdersMap[Script.OriginalPost].Clear();
                     UpdateScripts();
                 }
             }
@@ -410,49 +675,63 @@ namespace Vero_Scripts
             }
         }
 
-        private string featureScript = "";
+        public Dictionary<Script, string> Scripts { get; private set; }
 
         public string FeatureScript
         {
-            get { return featureScript; }
+            get { return Scripts[Script.Feature]; }
             set
             {
-                if (featureScript != value)
+                if (Scripts[Script.Feature] != value)
                 {
-                    featureScript = value;
+                    Scripts[Script.Feature] = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FeatureScript)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FeatureScriptPlaceholderVisibility)));
                 }
             }
         }
 
-        private string commentScript = "";
+        public Visibility FeatureScriptPlaceholderVisibility
+        {
+            get { return ScriptHasPlaceholder(Script.Feature) ? Visibility.Visible : Visibility.Collapsed; }
+        }
 
         public string CommentScript
         {
-            get { return commentScript; }
+            get { return Scripts[Script.Comment]; }
             set
             {
-                if (commentScript != value)
+                if (Scripts[Script.Comment] != value)
                 {
-                    commentScript = value;
+                    Scripts[Script.Comment] = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CommentScript)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CommentScriptPlaceholderVisibility)));
                 }
             }
         }
 
-        private string originalPostScript = "";
+        public Visibility CommentScriptPlaceholderVisibility
+        {
+            get { return ScriptHasPlaceholder(Script.Comment) ? Visibility.Visible : Visibility.Collapsed; }
+        }
 
         public string OriginalPostScript
         {
-            get { return originalPostScript; }
+            get { return Scripts[Script.OriginalPost]; }
             set
             {
-                if (originalPostScript != value)
+                if (Scripts[Script.OriginalPost] != value)
                 {
-                    originalPostScript = value;
+                    Scripts[Script.OriginalPost] = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OriginalPostScript)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OriginalPostScriptPlaceholderVisibility)));
                 }
             }
+        }
+
+        public Visibility OriginalPostScriptPlaceholderVisibility
+        {
+            get { return ScriptHasPlaceholder(Script.OriginalPost) ? Visibility.Visible : Visibility.Collapsed; }
         }
 
         public static string[] NewMemberships
@@ -499,28 +778,68 @@ namespace Vero_Scripts
             }
         }
 
-        public ObservableCollection<Placeholder> Placeholders { get; private set; }
+        private string themeName = "";
 
-        public bool CheckForPlaceholders(string[] scripts, bool force = false)
+        public string ThemeName
+        {
+            get
+            {
+                return themeName switch
+                {
+                    "SoftDark" => "Soft dark",
+                    "LightTheme" => "Light",
+                    "DeepDark" => "Deep dark",
+                    "DarkGreyTheme" => "Dark gray",
+                    "GreyTheme" => "Gray",
+                    _ => themeName,
+                };
+            }
+            set
+            {
+                if (themeName != value)
+                {
+                    themeName = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ThemeName)));
+                }
+            }
+        }
+
+        public Dictionary<Script, ObservableCollection<Placeholder>> PlaceholdersMap { get; private set; }
+
+        public bool ScriptHasPlaceholder(Script script)
+        {
+            return PlaceholderRegex().Matches(Scripts[script]).Count != 0;
+        }
+
+        public bool CheckForPlaceholders(Script script, bool force = false)
         {
             var placeholders = new List<string>();
-            foreach (var script in scripts)
+            var matches = PlaceholderRegex().Matches(Scripts[script]);
+            foreach (Match match in matches.Cast<Match>())
             {
-                var matches = PlaceholderRegex().Matches(script);
-                foreach (Match match in matches.Cast<Match>())
-                {
-                    placeholders.Add(match.Captures.First().Value);
-                }
+                placeholders.Add(match.Captures.First().Value);
             }
             if (placeholders.Count != 0)
             {
                 var needEditor = false;
                 foreach (var placeholderName in placeholders)
                 {
-                    if (Placeholders.FirstOrDefault(placeholder => placeholder.Name == placeholderName) == null)
+                    if (PlaceholdersMap[script].FirstOrDefault(placeholder => placeholder.Name == placeholderName) == null)
                     {
+                        var placeholderValue = "";
+                        foreach (var otherScript in Enum.GetValues<Script>())
+                        {
+                            if (otherScript != script)
+                            {
+                                var otherPlaceholder = PlaceholdersMap[otherScript].FirstOrDefault(otherPlaceholder => otherPlaceholder.Name == placeholderName);
+                                if (otherPlaceholder != null && !string.IsNullOrEmpty(otherPlaceholder.Value))
+                                {
+                                    placeholderValue = otherPlaceholder.Value;
+                                }
+                            }
+                        }
                         needEditor = true;
-                        Placeholders.Add(new Placeholder(placeholderName));
+                        PlaceholdersMap[script].Add(new Placeholder(placeholderName, placeholderValue));
                     }
                 }
                 return needEditor || force;
@@ -528,27 +847,78 @@ namespace Vero_Scripts
             return false;
         }
 
-        public string ProcessPlaceholders(string script)
+        internal void TransferPlaceholders(Script script)
         {
-            var result = script;
-            foreach (var placeholder in Placeholders)
+            foreach (var placeholder in PlaceholdersMap[script])
+            {
+                if (!string.IsNullOrEmpty(placeholder.Value))
+                {
+                    foreach (Script otherScript in Enum.GetValues(typeof(Script)))
+                    {
+                        if (otherScript != script)
+                        {
+                            var otherPlaceholder = PlaceholdersMap[otherScript].FirstOrDefault(otherPlaceholder => otherPlaceholder.Name == placeholder.Name);
+                            if (otherPlaceholder != null)
+                            {
+                                otherPlaceholder.Value = placeholder.Value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public string ProcessPlaceholders(Script script)
+        {
+            var result = Scripts[script];
+            foreach (var placeholder in PlaceholdersMap[script])
             {
                 result = result.Replace(placeholder.Name, placeholder.Value);
             }
             return result;
         }
 
+        public bool CanCopyScripts
+        {
+            get
+            {
+                return UserNameValidation.Valid &&
+                    MembershipValidation.Valid &&
+                    YourNameValidation.Valid &&
+                    YourFirstNameValidation.Valid &&
+                    PageValidation.Valid;
+            }
+        }
+
+        public bool CanCopyNewMembershipScript
+        {
+            get
+            {
+                return NewMembership != "None" &&
+                    UserNameValidation.Valid;
+            }
+        }
+
         private void UpdateScripts()
         {
-            if (string.IsNullOrEmpty(UserName)
-                || string.IsNullOrEmpty(Membership)
-                || Membership == "None"
-                || string.IsNullOrEmpty(YourName)
-                || string.IsNullOrEmpty(YourFirstName)
-                || string.IsNullOrEmpty(Page)
-                || Page == "default" && string.IsNullOrEmpty(PageName))
+            if (!CanCopyScripts)
             {
-                FeatureScript = "";
+                var validationErrors = "";
+                void CheckValidation(string prefix, ValidationResult result)
+                {
+                    if (!result.Valid)
+                    {
+                        validationErrors += prefix + ": " + (result.Error ?? "unknown") + "\n";
+                    }
+                }
+
+                CheckValidation("User", UserNameValidation);
+                CheckValidation("Level", MembershipValidation);
+                CheckValidation("You", YourNameValidation);
+                CheckValidation("Your first name", YourFirstNameValidation);
+                CheckValidation("Page:", PageValidation);
+
+                FeatureScript = validationErrors;
                 CommentScript = "";
                 OriginalPostScript = "";
             }
@@ -626,9 +996,20 @@ namespace Vero_Scripts
 
         private void UpdateNewMembershipScripts()
         {
-            if (NewMembership == "None" || string.IsNullOrEmpty(UserName))
+            if (!CanCopyNewMembershipScript)
             {
-                NewMembershipScript = "";
+                var validationErrors = "";
+                void CheckValidation(string prefix, ValidationResult result)
+                {
+                    if (!result.Valid)
+                    {
+                        validationErrors += prefix + ": " + (result.Error ?? "unknown") + "\n";
+                    }
+                }
+
+                CheckValidation("User", UserNameValidation);
+
+                NewMembershipScript = validationErrors;
             }
             else if (NewMembership == "Member")
             {

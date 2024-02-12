@@ -8,20 +8,21 @@ namespace Vero_Scripts
     /// </summary>
     public partial class PlaceholderEditor : Window
     {
-        private readonly string unprocessedScript;
+        private readonly Script script;
 
-        public PlaceholderEditor(ScriptsViewModel viewModel, string unprocessedScript)
+        public PlaceholderEditor(ScriptsViewModel viewModel, Script script)
         {
             InitializeComponent();
-            this.DataContext = viewModel;
-            this.unprocessedScript = unprocessedScript;
+            this.DataContext = new PlaceholdersViewModel(viewModel, script);
+            this.script = script;
         }
 
         private void OnCopyClick(object sender, RoutedEventArgs e)
         {
-            if (this.DataContext is ScriptsViewModel viewModel)
+            if (this.DataContext is PlaceholdersViewModel viewModel)
             {
-                Clipboard.SetText(viewModel.ProcessPlaceholders(unprocessedScript));
+                viewModel.ScriptsViewModel.TransferPlaceholders(script);
+                Clipboard.SetText(viewModel.ScriptsViewModel.ProcessPlaceholders(script));
             }
             DialogResult = true;
             Close();
@@ -29,9 +30,9 @@ namespace Vero_Scripts
 
         private void OnCopyUnchangedClick(object sender, RoutedEventArgs e)
         {
-            if (this.DataContext is ScriptsViewModel)
+            if (this.DataContext is PlaceholdersViewModel viewModel)
             {
-                Clipboard.SetText(unprocessedScript);
+                Clipboard.SetText(viewModel.ScriptsViewModel.Scripts[script]);
             }
             DialogResult = true;
             Close();
