@@ -4,20 +4,28 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Vero Scripts Release.xcscheme</key>
+		<key>Vero Scripts Release.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>Vero Scripts.xcscheme</key>
+		<key>Vero Scripts debug.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<key>Vero Scripts.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>495CCC472B45E3AA00BBA415</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
