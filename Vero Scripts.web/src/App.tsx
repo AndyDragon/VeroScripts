@@ -11,15 +11,18 @@ import {
   Dropdown,
   IDropdownOption,
   Label,
+  PartialTheme,
   PrimaryButton,
   Separator,
   Stack,
   Text,
   TextField,
+  ThemeProvider,
 } from "@fluentui/react";
 import { useBoolean } from '@fluentui/react-hooks';
 import axios from "axios";
 import { initializeIcons } from '@fluentui/font-icons-mdl2';
+import { themeDictionary, defaultThemeKey } from "./themes";
 
 initializeIcons();
 
@@ -50,6 +53,8 @@ interface PageCatalog {
 const modalPropsStyles = { main: { maxWidth: 450 } };
 
 function App() {
+  const [currentTheme, setCurrentTheme] = useState<PartialTheme>(themeDictionary[defaultThemeKey].theme);
+  const [selectedTheme, setSelectedTheme] = useState<string>("dark");
   const [userName, setUserName] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("none");
   const [yourName, setYourName] = useState<string>("");
@@ -71,6 +76,10 @@ function App() {
   const templateCatalog = useRef<TemplateCatalog>({ pages: [], specialTemplates: [] });
   const scriptWithPlaceholders = useRef<string>("");
   const scriptWithPlaceholdersUntouched = useRef<string>("");
+
+  const themeOptions: IDropdownOption[] = Object.keys(themeDictionary).map(key => {
+    return { key, text: themeDictionary[key].name, data: themeDictionary[key].theme };
+  });
 
   const levelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
@@ -99,6 +108,9 @@ function App() {
   useEffect(() => {
     document.title = "VERO Scripts";
 
+    const themeKey = localStorage.getItem("theme") || defaultThemeKey;
+    setSelectedTheme(themeKey)
+    setCurrentTheme(themeDictionary[themeKey].theme || themeDictionary[defaultThemeKey].theme);
     setYourName(localStorage.getItem("yourname") || "");
     setFirstName(localStorage.getItem("firstname") || "");
     setSelectedPage(localStorage.getItem("page") || "default");
@@ -245,12 +257,13 @@ function App() {
   }
 
   useEffect(() => {
+    localStorage.setItem("theme", selectedTheme);
     localStorage.setItem("yourname", yourName);
     localStorage.setItem("firstname", firstName);
     localStorage.setItem("page", selectedPage);
     localStorage.setItem("custompage", customPage);
     localStorage.setItem("stafflevel", selectedStaffLevel);
-  }, [yourName, firstName, selectedPage, customPage, selectedStaffLevel]);
+  }, [selectedTheme, yourName, firstName, selectedPage, customPage, selectedStaffLevel]);
 
   useEffect(() => {
     if (selectedNewLevel === "none" || !userName) {
@@ -278,21 +291,44 @@ function App() {
   ]);
 
   return (
-    <>
+    <ThemeProvider applyTo="body" theme={currentTheme}>
       <div className="App">
         <header className="App-header">
-          <Stack>
+          <Stack
+            horizontal
+            horizontalAlign="space-between"
+            style={{
+              backgroundColor: currentTheme.palette?.themeTertiary,
+              color: currentTheme.palette?.themeDarker,
+            }}
+            >
             {/* Title */}
             <Text
               variant="large"
               style={{
-                color: "cornflowerblue",
-                marginBottom: "10px",
+                margin: "18px 8px 18px 20px",
+                fontWeight: "bolder",
               }}
             >
               VERO Scripts
             </Text>
+            <Dropdown
+              options={themeOptions}
+              selectedKey={selectedTheme || defaultThemeKey}
+              onChange={(_, item) => {
+                setSelectedTheme((item?.key as string) || defaultThemeKey);
+                setCurrentTheme(item?.data || themeDictionary[defaultThemeKey].theme);
+              }}
+              style={{
+                margin: "13px 10px 10px 10px",
+                minWidth: "200px",
+               }}
+            />
+          </Stack>
+        </header>
 
+        <div className="App-body">
+          <Stack>
             {/* User name editor */}
             <Stack
               horizontal
@@ -307,7 +343,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !userName ? "red" : "white",
+                  color: !userName ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 User:
@@ -337,7 +373,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: ((selectedLevel || "none") === "none") ? "red" : "white",
+                  color: ((selectedLevel || "none") === "none") ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 Level:
@@ -368,7 +404,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !yourName ? "red" : "white",
+                  color: !yourName ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 You:
@@ -398,7 +434,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !firstName ? "red" : "white",
+                  color: !firstName ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 Your first name:
@@ -427,7 +463,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: ((selectedPage || "default") === "default") ? (!customPage ? "red" : undefined) : "white",
+                  color: ((selectedPage || "default") === "default") ? (!customPage ? currentTheme.semanticColors?.errorText : undefined) : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 Page:
@@ -467,7 +503,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !selectedStaffLevel ? "red" : "white",
+                  color: !selectedStaffLevel ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 Staff level:
@@ -495,9 +531,7 @@ function App() {
                 checked={isFirstFeature}
                 onChange={(_, newValue) => setIsFirstFeature(!!newValue)}
                 styles={{
-                  checkbox: { borderColor: "white !important" },
-                  checkmark: { color: "white !important" },
-                  text: { color: "white !important" },
+                  text: { fontWeight: "bold" },
                 }}
               />
               <Checkbox
@@ -505,9 +539,7 @@ function App() {
                 checked={isCommunityTag}
                 onChange={(_, newValue) => setIsCommunityTag(!!newValue)}
                 styles={{
-                  checkbox: { borderColor: "white !important" },
-                  checkmark: { color: "white !important" },
-                  text: { color: "white !important" },
+                  text: { fontWeight: "bold" },
                 }}
               />
             </Stack>
@@ -526,7 +558,6 @@ function App() {
                   margin: "4px 8px",
                   textAlign: "left",
                   whiteSpace: "nowrap",
-                  color: "white",
                 }}
               >
                 Feature script:
@@ -538,12 +569,6 @@ function App() {
                   await copyScript(featureScript, [commentScript, originalPostScript]);
                 }}
                 disabled={!featureScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
               <CommandButton
                 iconProps={{ iconName: "Copy" }}
@@ -552,12 +577,6 @@ function App() {
                   await copyScript(featureScript, [commentScript, originalPostScript], true);
                 }}
                 disabled={!featureScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
             </Stack>
             <TextField
@@ -581,7 +600,6 @@ function App() {
                   margin: "4px 8px",
                   textAlign: "left",
                   whiteSpace: "nowrap",
-                  color: "white",
                 }}
               >
                 Comment script:
@@ -593,12 +611,6 @@ function App() {
                   await copyScript(commentScript, [featureScript, originalPostScript]);
                 }}
                 disabled={!commentScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
               <CommandButton
                 iconProps={{ iconName: "Copy" }}
@@ -607,12 +619,6 @@ function App() {
                   await copyScript(commentScript, [featureScript, originalPostScript], true);
                 }}
                 disabled={!commentScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
             </Stack>
             <TextField
@@ -636,7 +642,6 @@ function App() {
                   margin: "4px 8px",
                   textAlign: "left",
                   whiteSpace: "nowrap",
-                  color: "white",
                 }}
               >
                 Original post script:
@@ -648,12 +653,6 @@ function App() {
                   await copyScript(originalPostScript, [featureScript, commentScript]);
                 }}
                 disabled={!originalPostScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
               <CommandButton
                 iconProps={{ iconName: "Copy" }}
@@ -662,12 +661,6 @@ function App() {
                   await copyScript(originalPostScript, [featureScript, commentScript], true);
                 }}
                 disabled={!originalPostScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
             </Stack>
             <TextField
@@ -691,7 +684,6 @@ function App() {
                   margin: "4px 8px",
                   textAlign: "left",
                   whiteSpace: "nowrap",
-                  color: "white",
                 }}
               >
                 New membership:
@@ -715,12 +707,6 @@ function App() {
                 text="Copy"
                 onClick={async () => await navigator.clipboard.writeText(newLevelScript)}
                 disabled={!newLevelScript}
-                styles={{
-                  label: { color: "white" },
-                  labelHovered: { color: "cornflowerblue" },
-                  labelDisabled: { color: "#606060" },
-                  iconDisabled: { color: "#606060" },
-                }}
               />
             </Stack>
             <TextField
@@ -731,7 +717,7 @@ function App() {
             />
             <Separator />
           </Stack>
-        </header>
+        </div>
       </div>
       <Dialog
         hidden={hideDialog}
@@ -777,7 +763,7 @@ function App() {
           }} text="Copy with placeholders" />
         </DialogFooter>
       </Dialog>
-    </>
+    </ThemeProvider>
   );
 }
 

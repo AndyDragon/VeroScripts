@@ -1,15 +1,17 @@
 .App {
-  background-color: #20242c;
   width: 100%;
 }
 
 .App-header {
-  min-height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   font-size: calc(10px + 2vmin);
-  margin: 20px;
+  margin: 0;
   font-weight: bold;
-  background-color: #20242c;
+}
+
+.App-body {
+  margin: 20px;
 }
