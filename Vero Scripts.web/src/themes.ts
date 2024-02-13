@@ -270,8 +270,7 @@ const darkRose: PartialTheme = {
     semanticColors: {
         errorText: '#ff5050',
     },
-}
-
+};
 
 const lightRose: PartialTheme = {
     palette: {
@@ -301,19 +300,81 @@ const lightRose: PartialTheme = {
     semanticColors: {
         errorText: '#d04040',
     },
-}
+};
+
+const darkForest: PartialTheme = {
+    palette: {
+        themePrimary: '#70c080',
+        themeLighterAlt: '#f8fcf9',
+        themeLighter: '#e4f5e8',
+        themeLight: '#ceecd4',
+        themeTertiary: '#549161',
+        themeSecondary: '#7dc78c',
+        themeDarkAlt: '#64ac72',
+        themeDark: '#549161',
+        themeDarker: '#3e6b47',
+        neutralLighterAlt: '#0b2d15',
+        neutralLighter: '#0f361a',
+        neutralLight: '#164323',
+        neutralQuaternaryAlt: '#1c4c29',
+        neutralQuaternary: '#20532f',
+        neutralTertiaryAlt: '#377047',
+        neutralTertiary: '#eafff6',
+        neutralSecondary: '#eefff8',
+        neutralPrimaryAlt: '#f1fff9',
+        neutralPrimary: '#e0fff2',
+        neutralDark: '#f8fffc',
+        black: '#fbfffd',
+        white: '#082410',
+    },
+    semanticColors: {
+        errorText: '#d04040',
+    },
+};
+
+const lightForest: PartialTheme = {
+    palette: {
+        themePrimary: '#208030',
+        themeLighterAlt: '#f2faf4',
+        themeLighter: '#ceebd3',
+        themeLight: '#a8d9b0',
+        themeTertiary: '#62b370',
+        themeSecondary: '#318f40',
+        themeDarkAlt: '#1d732b',
+        themeDark: '#186124',
+        themeDarker: '#12471b',
+        neutralLighterAlt: '#f1f8f3',
+        neutralLighter: '#edf4ef',
+        neutralLight: '#e3eae5',
+        neutralQuaternaryAlt: '#d3dad5',
+        neutralQuaternary: '#cad0cc',
+        neutralTertiaryAlt: '#c2c8c4',
+        neutralTertiary: '#b0d0bb',
+        neutralSecondary: '#70a080',
+        neutralPrimaryAlt: '#417452',
+        neutralPrimary: '#306040',
+        neutralDark: '#254a31',
+        black: '#1b3624',
+        white: '#f8fffa',
+    },
+    semanticColors: {
+        errorText: '#d04040',
+    },
+};
 
 export const themeDictionary: Record<string, { name: string, theme: PartialTheme }> = {
     "dark": { name: "Dark", theme: darkTheme },
     "light": { name: "Light", theme: lightTheme },
-    "darkOcean": { name: "Dark ocean", theme: darkOcean },
-    "lightOcean": { name: "Light ocean", theme: lightOcean },
     "cardboard": { name: "Cardboard", theme: cardboard },
     "paper": { name: "Paper", theme: paper },
     "softDark": { name: "Soft dark", theme: softDark },
     "softLight": { name: "Soft light", theme: softLight },
+    "darkOcean": { name: "Dark ocean", theme: darkOcean },
+    "lightOcean": { name: "Light ocean", theme: lightOcean },
     "darkRose": { name: "Dark rose", theme: darkRose },
     "lightRose": { name: "Light rose", theme: lightRose },
+    "darkForest": { name: "Dark forest", theme: darkForest },
+    "lightForest": { name: "Light forest", theme: lightForest },
 };
 
 export const defaultThemeKey = "dark";
