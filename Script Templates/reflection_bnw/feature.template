@@ -1,13 +1,15 @@
-• #snap_%%FULLPAGENAME%% •
+• #snap_%%FULLPAGENAME%%
 
-⭐️ Featured %%MEMBERLEVEL%% @%%USERNAME%%  ⭐️
+⭐️ Featured %%MEMBERLEVEL%% @%%USERNAME%% ⭐️
 .
  _________________________________
 ✨CONGRATULATIONS ✨
 __________________________________
 .
 Selected by: @%%YOURNAME%%
-Moderator on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%%
+%%STAFFLEVEL%% on @snap_%%PAGENAME%%
+For Reflections Midweek Monochrome
+
 .
 Join us in our fresh, creative and supportive community on VERO. Please follow @snap_community
 .
@@ -28,5 +30,6 @@ Please check out @snap_kingdom for more of our Snap_community pages.
  For internal use only!
 #snap_%%PAGENAME%%_%%USERNAME%%
 #snap_featured_%%USERNAME%%
-#snap_featured_%%FULLPAGENAME%%
+#snap_%%FULLPAGENAME%%
+.
 .

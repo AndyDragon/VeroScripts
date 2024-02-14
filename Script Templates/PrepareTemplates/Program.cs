@@ -4,6 +4,7 @@ class Program
 {
     static void Main()
     {
+        var originalForeground = Console.ForegroundColor;
         var cwd = Directory.GetCurrentDirectory();
         var pageCatalog = new PageCatalog();
         var templateCatalog = new TemplateCatalog();
@@ -75,6 +76,12 @@ class Program
                 Console.WriteLine("{0}", warning);
             }
         }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("No warnings found");
+        }
+        Console.ForegroundColor = originalForeground;
     }
 
     private static readonly string[] validFileNames = new[]

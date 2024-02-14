@@ -1319,19 +1319,19 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured as part of the @snap_community\n[[PERSONALIZED MESSAGE]]\nThank you for tagging this great photo with #snap_%%FULLPAGENAME%%\n"
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured as part of the Reflections Midweek Monochrome on @snap_%%PAGENAME%%, as part of the @snap_community\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful reflection photography with us using #snap_%%FULLPAGENAME%%\n"
         },
         {
           "name": "feature",
-          "template": "• #snap_%%FULLPAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%% @%%USERNAME%%  ⭐️\n.\n _________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\nModerator on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#reflections #reflectionphoto #reflectionphotos\n\n#reflectionperfection #reflection_addict #mirror #beautifulphotography #beautifulphoto #photooftheday #bestofthe_world  #amazingshot #worthafollow #verofriends #verotography #bnw2024 #black4vero\n#black__white #blackand_white_photography #MacroPhotography\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n#snap_featured_%%FULLPAGENAME%%\n.\n"
+          "template": "• #snap_%%FULLPAGENAME%%\n\n⭐️ Featured %%MEMBERLEVEL%% @%%USERNAME%% ⭐️\n.\n _________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\nFor Reflections Midweek Monochrome\n\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#reflections #reflectionphoto #reflectionphotos\n\n#reflectionperfection #reflection_addict #mirror #beautifulphotography #beautifulphoto #photooftheday #bestofthe_world  #amazingshot #worthafollow #verofriends #verotography #bnw2024 #black4vero\n#black__white #blackand_white_photography #MacroPhotography\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n#snap_%%FULLPAGENAME%%\n.\n.\n"
         },
         {
           "name": "first comment",
-          "template": "✨✨CONGRATULATIONS!!! ✨\n[[USER'S FIRST NAME]] @%%USERNAME%%! Welcome to @snap_%%PAGENAME%%, Big Congratulations on a perfect reflection as your first feature in this gallery!\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful photography with us using #snap_%%FULLPAGENAME%%!\n"
+          "template": "✨✨ CONGRATULATIONS!!! ✨\n@%%USERNAME%%! Welcome to @snap_%%PAGENAME%%, Big Congratulations on your first feature in our Reflections Midweek Monochrome\n[[PERSONALIZED MESSAGE]]\nPlease continue sharing your beautiful reflection photography with us using #snap_%%FULLPAGENAME%%\n"
         },
         {
           "name": "original post",
-          "template": "✨ Featured by @snap_%%PAGENAME%% ✨\na page out of the @snap_kingdom at the @snap_community"
+          "template": "✨ Featured by @snap_%%PAGENAME%% ✨\nFeatures BNW every Wednesday & Thursday.\n    ✨ #snap_%%FULLPAGENAME%% ✨"
         }
       ]
     },
