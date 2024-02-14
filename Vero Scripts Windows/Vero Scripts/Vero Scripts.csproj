@@ -10,14 +10,22 @@
     <AssemblyVersion>1.0.22.0</AssemblyVersion>
     <FileVersion>1.0.22.0</FileVersion>
     <ApplicationIcon>App.ico</ApplicationIcon>
+    <PackageId>VeroScripts</PackageId>
+    <Title>Vero Scripts</Title>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="App.ico" />
+    <Compile Remove="Settings\**" />
+    <EmbeddedResource Remove="Settings\**" />
+    <None Remove="Settings\**" />
+    <Page Remove="Settings\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Settings\" />
+    <Resource Include="App.ico" />
   </ItemGroup>
 
   <ItemGroup>
