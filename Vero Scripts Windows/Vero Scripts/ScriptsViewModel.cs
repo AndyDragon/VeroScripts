@@ -12,109 +12,6 @@ using FramePFX.Themes;
 
 namespace Vero_Scripts
 {
-    public class PagesCatalog
-    {
-        public PagesCatalog()
-        {
-            Pages = Array.Empty<PageEntry>();
-        }
-
-        public PageEntry[] Pages { get; set; }
-    }
-
-    public class PageEntry
-    {
-        public PageEntry()
-        {
-            Name = string.Empty;
-        }
-
-        public string Name { get; set; }
-        public string? PageName { get; set; }
-    }
-
-    public class TemplatesCatalog
-    {
-        public TemplatesCatalog()
-        {
-            Pages = Array.Empty<TemplatePageEntry>();
-            SpecialTemplates = Array.Empty<TemplateEntry>();
-        }
-
-        public TemplatePageEntry[] Pages { get; set; }
-
-        public TemplateEntry[] SpecialTemplates { get; set; }
-    }
-
-    public class TemplatePageEntry
-    {
-        public TemplatePageEntry()
-        {
-            Name = string.Empty;
-            Templates = Array.Empty<TemplateEntry>();
-        }
-
-        public string Name { get; set; }
-
-        public TemplateEntry[] Templates { get; set; }
-    }
-
-    public class TemplateEntry
-    {
-        public TemplateEntry()
-        {
-            Name = string.Empty;
-            Template = string.Empty;
-        }
-
-        public string Name { get; set; }
-
-        public string Template { get; set; }
-    }
-
-    public class Placeholder : INotifyPropertyChanged
-    {
-        public Placeholder(string name)
-        {
-            Name = name;
-        }
-
-        public Placeholder(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private string name = "";
-        public string Name
-        {
-            get { return name; }
-            set
-            {
-                if (value != name)
-                {
-                    name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                }
-            }
-        }
-
-        private string value = "";
-        public string Value
-        {
-            get { return value; }
-            set
-            {
-                if (value != this.value)
-                {
-                    this.value = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-                }
-            }
-        }
-    }
     public enum Script
     {
         Feature = 1,
@@ -122,57 +19,9 @@ namespace Vero_Scripts
         OriginalPost,
     }
 
-    public struct ValidationResult
-    {
-        public ValidationResult(bool valid, string? error = null)
-        {
-            Valid = valid;
-            Error = error;
-        }
-
-        public bool Valid { get; private set; }
-
-        public string? Error { get; private set; }
-
-        public static bool operator ==(ValidationResult x, ValidationResult y)
-        {
-            var xPrime = x;
-            var yPrime = y;
-            if (xPrime.Valid && yPrime.Valid)
-            {
-                return true;
-            }
-            if (xPrime.Valid || yPrime.Valid)
-            {
-                return false;
-            }
-            return xPrime.Error == yPrime.Error;
-        }
-
-        public static bool operator !=(ValidationResult x, ValidationResult y)
-        {
-            return !(x == y);
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is ValidationResult)
-            {
-                var objAsValidationResult = obj as ValidationResult?;
-                return this == objAsValidationResult;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return Valid.GetHashCode() + (Error ?? "").GetHashCode();
-        }
-    }
-
     public partial class ScriptsViewModel : INotifyPropertyChanged
     {
-        private static List<string> disallowList = new();
+        #region Field validation
 
         public static ValidationResult ValidateUser(string userName)
         {
@@ -219,6 +68,8 @@ namespace Vero_Scripts
             return new ValidationResult(true);
         }
 
+        #endregion
+
         private readonly HttpClient httpClient = new();
 
         public ScriptsViewModel()
@@ -240,6 +91,8 @@ namespace Vero_Scripts
             };
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "---";
         }
+
+        #region Server access
 
         private async Task LoadPages()
         {
@@ -333,12 +186,19 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public PagesCatalog PagesCatalog { get; private set; }
+        
         public TemplatesCatalog TemplatesCatalog { get; private set; }
+        
+        private static List<string> disallowList = new();
 
         public string Version { get; set; }
+
+        #region User name
 
         private string userName = "";
 
@@ -377,6 +237,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Membership level
 
         public static string[] Memberships
         {
@@ -433,6 +297,10 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
+        #region Your name
+
         private string yourName = Settings.Default.YourName ?? "";
 
         public string YourName
@@ -471,6 +339,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Your first name
 
         private string yourFirstName = Settings.Default.YourFirstName ?? "";
 
@@ -511,6 +383,10 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
+        #region Pages
+
         private string[] pages = Array.Empty<string>();
 
         public string[] Pages
@@ -528,6 +404,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Page
 
         private static ValidationResult CalculatePageValidation(string page, string pageName)
         {
@@ -609,6 +489,10 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
+        #region Staff level
+
         public static string[] StaffLevels
         {
             get
@@ -643,6 +527,10 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
+        #region First for page
+
         private bool firstForPage = false;
 
         public bool FirstForPage
@@ -659,6 +547,10 @@ namespace Vero_Scripts
             }
         }
 
+        #endregion
+
+        #region Community tag
+
         private bool communityTag = false;
 
         public bool CommunityTag
@@ -674,6 +566,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Feature script
 
         public Dictionary<Script, string> Scripts { get; private set; }
 
@@ -696,6 +592,10 @@ namespace Vero_Scripts
             get { return ScriptHasPlaceholder(Script.Feature) ? Visibility.Visible : Visibility.Collapsed; }
         }
 
+        #endregion
+
+        #region Comment script
+
         public string CommentScript
         {
             get { return Scripts[Script.Comment]; }
@@ -715,6 +615,10 @@ namespace Vero_Scripts
             get { return ScriptHasPlaceholder(Script.Comment) ? Visibility.Visible : Visibility.Collapsed; }
         }
 
+        #endregion
+
+        #region Original post script
+
         public string OriginalPostScript
         {
             get { return Scripts[Script.OriginalPost]; }
@@ -733,6 +637,10 @@ namespace Vero_Scripts
         {
             get { return ScriptHasPlaceholder(Script.OriginalPost) ? Visibility.Visible : Visibility.Collapsed; }
         }
+
+        #endregion
+
+        #region New membership level
 
         public static string[] NewMemberships
         {
@@ -758,6 +666,7 @@ namespace Vero_Scripts
                 {
                     newMembership = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NewMembership)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCopyNewMembershipScript)));
                     UpdateNewMembershipScripts();
                 }
             }
@@ -777,6 +686,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Themes
 
         private string themeName = "";
 
@@ -803,6 +716,10 @@ namespace Vero_Scripts
                 }
             }
         }
+
+        #endregion
+
+        #region Placeholder management
 
         public Dictionary<Script, ObservableCollection<Placeholder>> PlaceholdersMap { get; private set; }
 
@@ -877,6 +794,10 @@ namespace Vero_Scripts
             }
             return result;
         }
+
+        #endregion
+
+        #region Script management
 
         public bool CanCopyScripts
         {
@@ -1028,6 +949,8 @@ namespace Vero_Scripts
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName);
             }
         }
+
+        #endregion
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
         private static partial Regex PlaceholderRegex();
