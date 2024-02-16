@@ -5,6 +5,21 @@
 //  Created by Andrew Forget on 2024-02-10.
 //
 
+enum FocusedField: Hashable {
+    case userName,
+         level,
+         yourName,
+         yourFirstName,
+         page,
+         pageName,
+         staffLevel,
+         firstFeature,
+         communityTag,
+         featureScript,
+         commentScript,
+         originalPostScript
+}
+
 enum MembershipCase: String, CaseIterable, Identifiable {
     case none = "None",
          artist = "Artist",
@@ -73,4 +88,22 @@ struct Template: Codable, Identifiable {
     var id: String { self.name }
     let name: String
     let template: String
+}
+
+struct VersionManifest: Codable {
+    let macOS: VersionEntry
+    let windows: VersionEntry
+}
+
+struct VersionEntry: Codable {
+    let current: String
+    let link: String
+    let vital: Bool
+}
+
+enum ToastDuration: Int {
+    case disabled = 0,
+         short = 3,
+         medium = 10,
+         long = 20
 }

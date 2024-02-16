@@ -15,7 +15,9 @@ struct ScriptEditor: View {
     var canCopy: Bool
     var hasPlaceholders: Bool
     var copy: (Bool, Bool) -> Void
-    
+    var focus: FocusState<FocusedField?>.Binding
+    var focusField: FocusedField
+
     var body: some View {        
         // Header
         HStack {
@@ -57,5 +59,6 @@ struct ScriptEditor: View {
 #endif
             .foregroundColor(.labelColor(canCopy))
             .padding([.bottom], 6)
+            .focused(focus, equals: focusField)
     }
 }

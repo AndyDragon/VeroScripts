@@ -20,6 +20,8 @@ struct FieldEditor: View {
         }
         return (true, nil)
     }
+    var focus: FocusState<FocusedField?>.Binding
+    var focusField: FocusedField
     
     var body: some View {
         HStack {
@@ -53,7 +55,7 @@ struct FieldEditor: View {
                 fieldChanged(value)
             }).onAppear(perform: {
                 fieldValidation = validate(field)
-            })
+            }).focused(focus, equals: focusField)
 #if os(iOS)
             .textInputAutocapitalization(.never)
 #endif

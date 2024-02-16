@@ -41,6 +41,7 @@ struct NewMembershipEditor: View {
         .padding([.top], 4)
 
         TextEditor(text: $script)
+            .font(.system(size: 14))
 #if os(iOS)
             .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
             .colorMultiply(Color(

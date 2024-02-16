@@ -84,6 +84,7 @@ struct PlaceholderSheet: View {
     @Binding var scriptWithPlaceholdersInPlace: String
     @Binding var isPresenting: Bool
     var transferPlaceholders: () -> Void
+    var toastCopyToClipboard: (_ copySuffix: String) -> Void
     
     var body: some View {
         ZStack {
@@ -107,6 +108,7 @@ struct PlaceholderSheet: View {
                         transferPlaceholders()
                         copyToClipboard(scriptWithPlaceholders)
                         isPresenting.toggle()
+                        toastCopyToClipboard("")
                     }, label: {
                         Text("Copy")
                             .padding(.horizontal, 20)
@@ -114,6 +116,7 @@ struct PlaceholderSheet: View {
                     Button(action: {
                         copyToClipboard(scriptWithPlaceholdersInPlace)
                         isPresenting.toggle()
+                        toastCopyToClipboard("with placeholders")
                     }, label: {
                         Text("Copy with Placeholders")
                             .padding(.horizontal, 20)

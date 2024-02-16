@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Vero Scripts (script testing).xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>Vero Scripts Release.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>

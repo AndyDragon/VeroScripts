@@ -76,3 +76,18 @@ func copyToClipboard(_ text: String) -> Void {
         pasteBoard.writeObjects([text as NSString])
 #endif
 }
+
+extension Bundle {
+    var releaseVersionNumber: String? {
+        return infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+    var buildVersionNumber: String? {
+        return infoDictionary?["CFBundleVersion"] as? String
+    }
+    var releaseVersionNumberPretty: String {
+        return "\(releaseVersionNumber ?? "1.0").\(buildVersionNumber ?? "0")"
+    }
+    func releaseVersionOlder(than: String) -> Bool {
+        return releaseVersionNumberPretty.compare(than, options: .numeric) == .orderedAscending
+    }
+}
