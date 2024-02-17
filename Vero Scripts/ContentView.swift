@@ -51,7 +51,7 @@ struct ContentView: View {
     @State var lastPage = ""
     @State var lastPageName = ""
     @State var lastPageStaffLevel = StaffLevelCase.mod
-    @State private var showingToast = false
+    @State private var isShowingToast = false
     @State private var toastType = AlertToast.AlertType.regular
     @State private var toastDuration = 0.0
     @State private var toastText = ""
@@ -71,403 +71,420 @@ struct ContentView: View {
     }
     @Environment(\.colorScheme) var ColorScheme
     var appState: VersionCheckAppState
-    
+    private var isAnyToastShowing: Bool {
+        isShowingToast || appState.isShowingVersionAvailableToast.wrappedValue || appState.isShowingVersionRequiredToast.wrappedValue
+    }
+
     init(_ appState: VersionCheckAppState) {
         self.appState = appState
     }
     
     var body: some View {
-        VStack {
-            Group {
-                HStack {
-                    // User name editor
-                    FieldEditor(
-                        title: "User: ",
-                        titleWidth: [42, 60],
-                        placeholder: "Enter user name without '@'",
-                        field: $userName,
-                        fieldChanged: userNameChanged,
-                        fieldValidation: $userNameValidation,
-                        validate: validateUserName,
-                        focus: $focusedField,
-                        focusField: .userName
-                    )
-                    
-                    // User level picker
-                    if !membershipValidation.valid {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                            .help("Required value")
-                            .imageScale(.small)
-                            .padding([.leading], 8)
-                    }
-                    Text("Level: ")
-                        .foregroundColor(.labelColor(membership != MembershipCase.none))
+        ZStack {
+            VStack {
+                Group {
+                    HStack {
+                        // User name editor
+                        FieldEditor(
+                            title: "User: ",
+                            titleWidth: [42, 60],
+                            placeholder: "Enter user name without '@'",
+                            field: $userName,
+                            fieldChanged: userNameChanged,
+                            fieldValidation: $userNameValidation,
+                            validate: validateUserName,
+                            focus: $focusedField,
+                            focusField: .userName
+                        )
+                        
+                        // User level picker
+                        if !membershipValidation.valid {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                                .help("Required value")
+                                .imageScale(.small)
+                                .padding([.leading], 8)
+                        }
+                        Text("Level: ")
+                            .foregroundColor(.labelColor(membership != MembershipCase.none))
 #if os(iOS)
-                        .frame(width: 60, alignment: .leading)
+                            .frame(width: 60, alignment: .leading)
 #else
-                        .frame(width: 36, alignment: .leading)
+                            .frame(width: 36, alignment: .leading)
 #endif
-                        .padding([.leading], membership == MembershipCase.none ? 0 : 8)
-                    Picker("", selection: $membership.onChange { value in
-                        membershipValidation = validateMembership(value: value)
-                        membershipChanged(to: value)
-                    }) {
-                        ForEach(MembershipCase.allCases) { level in
-                            Text(level.rawValue).tag(level)
+                            .padding([.leading], membership == MembershipCase.none ? 0 : 8)
+                        Picker("", selection: $membership.onChange { value in
+                            membershipValidation = validateMembership(value: value)
+                            membershipChanged(to: value)
+                        }) {
+                            ForEach(MembershipCase.allCases) { level in
+                                Text(level.rawValue).tag(level)
+                            }
                         }
+                        .onAppear {
+                            membershipValidation = validateMembership(value: membership)
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .level)
+                        Spacer()
                     }
-                    .onAppear {
-                        membershipValidation = validateMembership(value: membership)
-                    }
-                    .focusable()
-                    .focused($focusedField, equals: .level)
-                    Spacer()
-                }
-                
-                HStack {
-                    // Your name editor
-                    FieldEditor(
-                        title: "You:",
-                        titleWidth: [42, 60],
-                        placeholder: "Enter your user name without '@'",
-                        field: $yourName,
-                        fieldChanged: yourNameChanged,
-                        fieldValidation: $yourNameValidation,
-                        validate: { value in
-                            if value.count == 0 {
-                                return (false, "Required value")
-                            } else if value.first! == "@" {
-                                return (false, "Don't include the '@' in user names")
-                            }
-                            return (true, nil)
-                        },
-                        focus: $focusedField,
-                        focusField: .yourName
-                    )
                     
-                    // Your first name editor
-                    FieldEditor(
-                        title: "Your first name:",
-                        placeholder: "Enter your first name (capitalized)",
-                        field: $yourFirstName,
-                        fieldChanged: yourFirstNameChanged,
-                        fieldValidation: $yourFirstNameValidation,
-                        validate: { value in
-                            if value.count == 0 {
-                                return (false, "Required value")
-                            }
-                            return (true, nil)
-                        },
-                        focus: $focusedField,
-                        focusField: .yourFirstName
-                    ).padding([.leading], 8)
-                }
-                
-                HStack {
-                    // Page picker
-                    if page == "default" && pageName.count == 0 {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                            .help("Page required")
-                            .imageScale(.small)
+                    HStack {
+                        // Your name editor
+                        FieldEditor(
+                            title: "You:",
+                            titleWidth: [42, 60],
+                            placeholder: "Enter your user name without '@'",
+                            field: $yourName,
+                            fieldChanged: yourNameChanged,
+                            fieldValidation: $yourNameValidation,
+                            validate: { value in
+                                if value.count == 0 {
+                                    return (false, "Required value")
+                                } else if value.first! == "@" {
+                                    return (false, "Don't include the '@' in user names")
+                                }
+                                return (true, nil)
+                            },
+                            focus: $focusedField,
+                            focusField: .yourName
+                        )
+                        
+                        // Your first name editor
+                        FieldEditor(
+                            title: "Your first name:",
+                            placeholder: "Enter your first name (capitalized)",
+                            field: $yourFirstName,
+                            fieldChanged: yourFirstNameChanged,
+                            fieldValidation: $yourFirstNameValidation,
+                            validate: { value in
+                                if value.count == 0 {
+                                    return (false, "Required value")
+                                }
+                                return (true, nil)
+                            },
+                            focus: $focusedField,
+                            focusField: .yourFirstName
+                        ).padding([.leading], 8)
                     }
-                    Text("Page: ")
-                        .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
+                    
+                    HStack {
+                        // Page picker
+                        if page == "default" && pageName.count == 0 {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                                .help("Page required")
+                                .imageScale(.small)
+                        }
+                        Text("Page: ")
+                            .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
 #if os(iOS)
-                        .frame(width: 60, alignment: .leading)
+                            .frame(width: 60, alignment: .leading)
 #else
-                        .frame(width: 36, alignment: .leading)
+                            .frame(width: 36, alignment: .leading)
 #endif
-                    Picker("", selection: $page.onChange { value in
-                        if page == "default" && pageName.count == 0 {
-                            pageValidation = (false, "Page must not be 'default' or a page name is required")
-                        } else {
-                            pageValidation = (true, nil)
-                        }
-                        pageChanged(to: value)
-                    }) {
-                        ForEach(pagesCatalog.pages) { page in
-                            Text(page.name).tag(page.name)
-                        }
-                    }
-                    .focusable()
-                    .focused($focusedField, equals: .page)
-                    .onAppear {
-                        if page == "default" && pageName.count == 0 {
-                            pageValidation = (false, "Page must not be 'default' or a page name is required")
-                        } else {
-                            pageValidation = (true, nil)
-                        }
-                    }
-                    
-                    // Page name editor
-                    TextField(
-                        "Enter page name",
-                        text: $pageName.onChange { value in
+                        Picker("", selection: $page.onChange { value in
                             if page == "default" && pageName.count == 0 {
                                 pageValidation = (false, "Page must not be 'default' or a page name is required")
                             } else {
                                 pageValidation = (true, nil)
                             }
-                            pageNameChanged(to: value)
+                            pageChanged(to: value)
+                        }) {
+                            ForEach(pagesCatalog.pages) { page in
+                                Text(page.name).tag(page.name)
+                            }
                         }
-                    )
-                    .disabled(page != "default")
-                    .focusable(page == "default")
-                    .focused($focusedField, equals: .page)
+                        .focusable()
+                        .focused($focusedField, equals: .page)
+                        .onAppear {
+                            if page == "default" && pageName.count == 0 {
+                                pageValidation = (false, "Page must not be 'default' or a page name is required")
+                            } else {
+                                pageValidation = (true, nil)
+                            }
+                        }
+                        
+                        // Page name editor
+                        TextField(
+                            "Enter page name",
+                            text: $pageName.onChange { value in
+                                if page == "default" && pageName.count == 0 {
+                                    pageValidation = (false, "Page must not be 'default' or a page name is required")
+                                } else {
+                                    pageValidation = (true, nil)
+                                }
+                                pageNameChanged(to: value)
+                            }
+                        )
+                        .disabled(page != "default")
+                        .focusable(page == "default")
+                        .focused($focusedField, equals: .page)
 #if os(iOS)
-                    .textInputAutocapitalization(.never)
+                        .textInputAutocapitalization(.never)
 #endif
-                    
-                    // Page staff level picker
-                    Text("Page staff level: ")
-                        .padding([.leading], 8)
-                    Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
-                        ForEach(StaffLevelCase.allCases) { staffLevelCase in
-                            Text(staffLevelCase.rawValue).tag(staffLevelCase)
+                        
+                        // Page staff level picker
+                        Text("Page staff level: ")
+                            .padding([.leading], 8)
+                        Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
+                            ForEach(StaffLevelCase.allCases) { staffLevelCase in
+                                Text(staffLevelCase.rawValue).tag(staffLevelCase)
+                            }
                         }
-                    }
-                    .focusable()
-                    .focused($focusedField, equals: .staffLevel)
-
+                        .focusable()
+                        .focused($focusedField, equals: .staffLevel)
+                        
 #if !os(iOS)
+                        // Options
+                        Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
+                            Text("First feature on page")
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .firstFeature)
+                        .padding([.leading], 8)
+                        
+                        Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                            Text("From community tag")
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .communityTag)
+                        .padding([.leading], 8)
+#else
+                        Spacer()
+#endif
+                    }
+                }
+                
+#if os(iOS)
+                HStack {
                     // Options
                     Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                         Text("First feature on page")
                     }
                     .focusable()
-                    .focused($focusedField, equals: .firstFeature)
-                    .padding([.leading], 8)
-                    
                     Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
                         Text("From community tag")
                     }
                     .focusable()
-                    .focused($focusedField, equals: .communityTag)
-                    .padding([.leading], 8)
-#else
                     Spacer()
+                }
 #endif
-                }
-            }
-            
-#if os(iOS)
-            HStack {
-                // Options
-                Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
-                    Text("First feature on page")
-                }
-                .focusable()
-                Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                    Text("From community tag")
-                }
-                .focusable()
-                Spacer()
-            }
-#endif
-            
-            Group {
-                // Feature script output
-                ScriptEditor(
-                    title: "Feature script:",
-                    script: $featureScript,
-                    minHeight: 200,
-                    maxHeight: .infinity,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(featureScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .featureScript
-                        if copyScript(
-                            featureScript,
-                            featureScriptPlaceholders,
-                            [commentScriptPlaceholders, originalPostScriptPlaceholders],
-                            force: force,
-                            withPlaceholders: withPlaceholders) {
-                            Task {
-                                await showToast(
-                                    .complete(.green),
-                                    "Copied",
-                                    subTitle: "Copied the feature script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
-                                    duration: .short)
-                            }
-                        }
-                    },
-                    focus: $focusedField,
-                    focusField: .featureScript)
                 
-                // Comment script output
-                ScriptEditor(
-                    title: "Comment script:",
-                    script: $commentScript,
-                    minHeight: 80,
-                    maxHeight: 160,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(commentScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .commentScript
-                        if copyScript(
-                            commentScript,
-                            commentScriptPlaceholders,
-                            [featureScriptPlaceholders, originalPostScriptPlaceholders], 
-                            force: force,
-                            withPlaceholders: withPlaceholders) {
-                            Task {
-                                await showToast(
-                                    .complete(.green),
-                                    "Copied",
-                                    subTitle: "Copied the comment script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
-                                    duration: .short)
+                Group {
+                    // Feature script output
+                    ScriptEditor(
+                        title: "Feature script:",
+                        script: $featureScript,
+                        minHeight: 200,
+                        maxHeight: .infinity,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(featureScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .featureScript
+                            if copyScript(
+                                featureScript,
+                                featureScriptPlaceholders,
+                                [commentScriptPlaceholders, originalPostScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders) {
+                                Task {
+                                    await showToast(
+                                        .complete(.green),
+                                        "Copied",
+                                        subTitle: "Copied the feature script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        duration: .short)
+                                }
                             }
-                        }
-                    },
-                    focus: $focusedField,
-                    focusField: .commentScript)
+                        },
+                        focus: $focusedField,
+                        focusField: .featureScript)
+                    
+                    // Comment script output
+                    ScriptEditor(
+                        title: "Comment script:",
+                        script: $commentScript,
+                        minHeight: 80,
+                        maxHeight: 160,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(commentScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .commentScript
+                            if copyScript(
+                                commentScript,
+                                commentScriptPlaceholders,
+                                [featureScriptPlaceholders, originalPostScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders) {
+                                Task {
+                                    await showToast(
+                                        .complete(.green),
+                                        "Copied",
+                                        subTitle: "Copied the comment script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        duration: .short)
+                                }
+                            }
+                        },
+                        focus: $focusedField,
+                        focusField: .commentScript)
+                    
+                    // Original post script output
+                    ScriptEditor(
+                        title: "Original post script:",
+                        script: $originalPostScript,
+                        minHeight: 40,
+                        maxHeight: 80,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(originalPostScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .originalPostScript
+                            if copyScript(
+                                originalPostScript,
+                                originalPostScriptPlaceholders,
+                                [featureScriptPlaceholders, commentScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders) {
+                                Task {
+                                    await showToast(
+                                        .complete(.green),
+                                        "Copied",
+                                        subTitle: "Copied the original script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        duration: .short)
+                                }
+                            }
+                        },
+                        focus: $focusedField,
+                        focusField: .originalPostScript)
+                }
                 
-                // Original post script output
-                ScriptEditor(
-                    title: "Original post script:",
-                    script: $originalPostScript,
-                    minHeight: 40,
-                    maxHeight: 80,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(originalPostScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .originalPostScript
-                        if copyScript(
-                            originalPostScript,
-                            originalPostScriptPlaceholders,
-                            [featureScriptPlaceholders, commentScriptPlaceholders],
-                            force: force,
-                            withPlaceholders: withPlaceholders) {
+                Group {
+                    // New membership picker and script output
+                    NewMembershipEditor(
+                        newMembership: $newMembership,
+                        script: $newMembershipScript,
+                        onChanged: newMembershipChanged,
+                        valid: userNameValidation.valid,
+                        canCopy: canCopyNewMembershipScript,
+                        copy: {
+                            copyToClipboard(newMembershipScript)
                             Task {
                                 await showToast(
                                     .complete(.green),
                                     "Copied",
-                                    subTitle: "Copied the original script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                    subTitle: "Copied the new membership script to the clipboard",
                                     duration: .short)
                             }
+                        })
+                }
+            }
+            .padding()
+            .textFieldStyle(.roundedBorder)
+            .alert(
+                alertTitle,
+                isPresented: $showingAlert,
+                actions: {
+                },
+                message: {
+                    Text(alertMessage)
+                })
+            .sheet(isPresented: $showingPlaceholderSheet) {
+                PlaceholderSheet(
+                    placeholders: placeholderSheetCase == .featureScript
+                    ? featureScriptPlaceholders
+                    : placeholderSheetCase == .commentScript
+                    ? commentScriptPlaceholders
+                    : originalPostScriptPlaceholders,
+                    scriptWithPlaceholders: $scriptWithPlaceholders,
+                    scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
+                    isPresenting: $showingPlaceholderSheet,
+                    transferPlaceholders: {
+                        switch placeholderSheetCase {
+                        case .featureScript:
+                            transferPlaceholderValues(
+                                featureScriptPlaceholders,
+                                [commentScriptPlaceholders, originalPostScriptPlaceholders])
+                            break
+                        case .commentScript:
+                            transferPlaceholderValues(
+                                commentScriptPlaceholders,
+                                [featureScriptPlaceholders, originalPostScriptPlaceholders])
+                            break
+                        case .originalPostScript:
+                            transferPlaceholderValues(
+                                originalPostScriptPlaceholders,
+                                [featureScriptPlaceholders, commentScriptPlaceholders])
+                            break
                         }
                     },
-                    focus: $focusedField,
-                    focusField: .originalPostScript)
-            }
-            
-            Group {
-                // New membership picker and script output
-                NewMembershipEditor(
-                    newMembership: $newMembership,
-                    script: $newMembershipScript,
-                    onChanged: newMembershipChanged,
-                    valid: userNameValidation.valid,
-                    canCopy: canCopyNewMembershipScript,
-                    copy: {
-                        copyToClipboard(newMembershipScript)
+                    toastCopyToClipboard: { copiedSuffix in
+                        var scriptName: String
+                        switch placeholderSheetCase {
+                        case .featureScript:
+                            scriptName = "feature"
+                            break
+                        case .commentScript:
+                            scriptName = "comment"
+                            break
+                        case .originalPostScript:
+                            scriptName = "original post"
+                            break
+                        }
+                        let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
                         Task {
                             await showToast(
                                 .complete(.green),
                                 "Copied",
-                                subTitle: "Copied the new membership script to the clipboard",
+                                subTitle: "Copied the \(scriptName) script\(suffix) to the clipboard",
                                 duration: .short)
                         }
                     })
             }
-        }
-        .padding()
-        .textFieldStyle(.roundedBorder)
-        .alert(
-            alertTitle,
-            isPresented: $showingAlert,
-            actions: {
-            },
-            message: {
-                Text(alertMessage)
-            })
-        .sheet(isPresented: $showingPlaceholderSheet) {
-            PlaceholderSheet(
-                placeholders: placeholderSheetCase == .featureScript
-                    ? featureScriptPlaceholders 
-                    : placeholderSheetCase == .commentScript
-                        ? commentScriptPlaceholders
-                        : originalPostScriptPlaceholders,
-                scriptWithPlaceholders: $scriptWithPlaceholders,
-                scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
-                isPresenting: $showingPlaceholderSheet,
-                transferPlaceholders: {
-                    switch placeholderSheetCase {
-                    case .featureScript:
-                        transferPlaceholderValues(
-                            featureScriptPlaceholders,
-                            [commentScriptPlaceholders, originalPostScriptPlaceholders])
-                        break
-                    case .commentScript:
-                        transferPlaceholderValues(
-                            commentScriptPlaceholders,
-                            [featureScriptPlaceholders, originalPostScriptPlaceholders])
-                        break
-                    case .originalPostScript:
-                        transferPlaceholderValues(
-                            originalPostScriptPlaceholders,
-                            [featureScriptPlaceholders, commentScriptPlaceholders])
-                        break
+            .toolbar {
+                ToolbarItem {
+                    Button(action: {
+                        userName = ""
+                        userNameChanged(to: userName)
+                        userNameValidation = validateUserName(value: userName)
+                        membership = MembershipCase.none
+                        membershipChanged(to: membership)
+                        membershipValidation = validateMembership(value: membership)
+                        firstForPage = false
+                        firstForPageChanged(to: firstForPage)
+                        fromCommunityTag = false
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        newMembership = NewMembershipCase.none
+                        newMembershipChanged(to: newMembership)
+                        focusedField = .userName
+                    }) {
+                        HStack {
+                            Image(systemName: "xmark")
+                                .foregroundStyle(.red)
+                            Text("Clear user")
+                                .font(.system(.body, design: .rounded).bold())
+                                .foregroundColor(.red)
+                        }
+                        .padding(4)
+                        .buttonStyle(.plain)
+                    }.disabled(isAnyToastShowing)
+                }
+            }
+            .allowsHitTesting(!isAnyToastShowing)
+            if isAnyToastShowing {
+                VStack {
+                    Rectangle().opacity(0.0000001)
+                }
+                .onTapGesture {
+                    if isShowingToast {
+                        isShowingToast.toggle()
+                    } else if appState.isShowingVersionAvailableToast.wrappedValue {
+                        appState.isShowingVersionAvailableToast.wrappedValue.toggle()
                     }
-                },
-                toastCopyToClipboard: { copiedSuffix in
-                    var scriptName: String
-                    switch placeholderSheetCase {
-                    case .featureScript:
-                        scriptName = "feature"
-                        break
-                    case .commentScript:
-                        scriptName = "comment"
-                        break
-                    case .originalPostScript:
-                        scriptName = "original post"
-                        break
-                    }
-                    let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
-                    Task {
-                        await showToast(
-                            .complete(.green),
-                            "Copied",
-                            subTitle: "Copied the \(scriptName) script\(suffix) to the clipboard",
-                            duration: .short)
-                    }
-                })
-        }
-        .toolbar {
-            ToolbarItem {
-                Button(action: {
-                    userName = ""
-                    userNameChanged(to: userName)
-                    userNameValidation = validateUserName(value: userName)
-                    membership = MembershipCase.none
-                    membershipChanged(to: membership)
-                    membershipValidation = validateMembership(value: membership)
-                    firstForPage = false
-                    firstForPageChanged(to: firstForPage)
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    newMembership = NewMembershipCase.none
-                    newMembershipChanged(to: newMembership)
-                    focusedField = .userName
-                }) {
-                    HStack {
-                        Image(systemName: "xmark")
-                            .foregroundStyle(.red)
-                        Text("Clear user")
-                            .font(.system(.body, design: .rounded).bold())
-                            .foregroundColor(.red)
-                    }
-                    .padding(4)
-                    .buttonStyle(.plain)
                 }
             }
         }
-        .blur(radius: (showingToast || appState.isShowingVersionAvailableToast.wrappedValue || appState.isShowingVersionRequiredToast.wrappedValue) ? 4 : 0)
-        .allowsHitTesting(!(showingToast || appState.isShowingVersionAvailableToast.wrappedValue || appState.isShowingVersionRequiredToast.wrappedValue))
+        .blur(radius: isAnyToastShowing ? 4 : 0)
         .toast(
-            isPresenting: $showingToast,
+            isPresenting: $isShowingToast,
             duration: 0,
             tapToDismiss: true,
             offsetY: 32,
@@ -601,12 +618,12 @@ struct ContentView: View {
         toastText = text
         toastSubTitle = subTitle
         toastTapAction = onTap
-        showingToast.toggle()
+        isShowingToast.toggle()
 
         if duration != .disabled {
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(duration.rawValue), execute: {
-                if (showingToast) {
-                    showingToast = false
+                if (isShowingToast) {
+                    isShowingToast.toggle()
                 }
             })
         }
