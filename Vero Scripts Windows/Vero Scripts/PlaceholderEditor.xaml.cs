@@ -21,8 +21,7 @@ namespace Vero_Scripts
         {
             if (this.DataContext is PlaceholdersViewModel viewModel)
             {
-                viewModel.ScriptsViewModel.TransferPlaceholders(script);
-                Clipboard.SetText(viewModel.ScriptsViewModel.ProcessPlaceholders(script));
+                viewModel.ScriptsViewModel.CopyScriptFromPlaceholders(script);
             }
             DialogResult = true;
             Close();
@@ -32,7 +31,7 @@ namespace Vero_Scripts
         {
             if (this.DataContext is PlaceholdersViewModel viewModel)
             {
-                Clipboard.SetText(viewModel.ScriptsViewModel.Scripts[script]);
+                viewModel.ScriptsViewModel.CopyScriptFromPlaceholders(script, withPlaceholders: true);
             }
             DialogResult = true;
             Close();

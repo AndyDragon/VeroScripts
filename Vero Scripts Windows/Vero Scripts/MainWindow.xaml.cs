@@ -67,11 +67,19 @@ namespace Vero_Scripts
             }
         }
 
+        private void OnClearUserClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ScriptsViewModel viewModel)
+            {
+                viewModel.ClearUser();
+            }
+        }
+
         private void OnCopyFeatureScriptClick(object sender, RoutedEventArgs e)
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.Feature, force: true);
+                viewModel.CopyScript(this, Script.Feature, force: true);
             }
         }
 
@@ -79,7 +87,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.Feature, withPlaceholders: true);
+                viewModel.CopyScript(this, Script.Feature, withPlaceholders: true);
             }
         }
 
@@ -87,7 +95,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.Comment, force: true);
+                viewModel.CopyScript(this, Script.Comment, force: true);
             }
         }
 
@@ -95,7 +103,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.Comment, withPlaceholders: true);
+                viewModel.CopyScript(this, Script.Comment, withPlaceholders: true);
             }
         }
 
@@ -103,7 +111,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.OriginalPost, force: true);
+                viewModel.CopyScript(this, Script.OriginalPost, force: true);
             }
         }
 
@@ -111,30 +119,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                CopyScript(viewModel, Script.OriginalPost, withPlaceholders: true);
-            }
-        }
-
-        private void CopyScript(ScriptsViewModel viewModel, Script script, bool force = false, bool withPlaceholders = false)
-        {
-            if (withPlaceholders)
-            {
-                var unprocessedScript = viewModel.Scripts[script];
-                Clipboard.SetText(unprocessedScript);
-            }
-            else if (viewModel.CheckForPlaceholders(script, force))
-            {
-                var editor = new PlaceholderEditor(viewModel, script)
-                {
-                    Owner = this
-                };
-                editor.ShowDialog();
-            }
-            else
-            {
-                var processedScript = viewModel.ProcessPlaceholders(script);
-                viewModel.TransferPlaceholders(script);
-                Clipboard.SetText(processedScript);
+                viewModel.CopyScript(this, Script.OriginalPost, withPlaceholders: true);
             }
         }
 
@@ -142,7 +127,7 @@ namespace Vero_Scripts
         {
             if (DataContext is ScriptsViewModel viewModel)
             {
-                Clipboard.SetText(viewModel.NewMembershipScript);
+                viewModel.CopyNewMembershipScript();
             }
         }
     }

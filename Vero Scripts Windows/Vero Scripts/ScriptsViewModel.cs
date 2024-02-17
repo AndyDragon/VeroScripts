@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using Vero_Scripts.Properties;
 using FramePFX.Themes;
+using Notification.Wpf;
+using System.Printing;
+using Notifications.Wpf.ViewModels.Base;
 
 namespace Vero_Scripts
 {
@@ -71,6 +74,13 @@ namespace Vero_Scripts
         #endregion
 
         private readonly HttpClient httpClient = new();
+        private readonly NotificationManager notificationManager = new();
+        private readonly Dictionary<Script, string> scriptNames = new()
+        {
+            { Script.Feature, "feature" },
+            { Script.Comment, "comment" },
+            { Script.OriginalPost, "original post" },
+        };
 
         public ScriptsViewModel()
         {
@@ -114,6 +124,12 @@ namespace Vero_Scripts
                     };
                     PagesCatalog = JsonSerializer.Deserialize<PagesCatalog>(content, serializerOptions) ?? new PagesCatalog();
                     Pages = PagesCatalog.Pages.Select(page => page.Name).ToArray();
+                    notificationManager.Show(
+                        "Pages loaded",
+                        "Loaded " + Pages.Length.ToString() + " pages from the server",
+                        type: NotificationType.Information,
+                        areaName: "WindowArea",
+                        expirationTime: TimeSpan.FromSeconds(3));
                 }
                 _ = LoadTemplates();
                 _ = LoadDisallowList();
@@ -199,6 +215,15 @@ namespace Vero_Scripts
         public string Version { get; set; }
 
         #region User name
+
+        public void ClearUser()
+        {
+            UserName = "";
+            Membership = "None";
+            FirstForPage = false;
+            CommunityTag = false;
+            NewMembership = "None";
+        }
 
         private string userName = "";
 
@@ -734,7 +759,7 @@ namespace Vero_Scripts
             var matches = PlaceholderRegex().Matches(Scripts[script]);
             foreach (Match match in matches.Cast<Match>())
             {
-                placeholders.Add(match.Captures.First().Value);
+                placeholders.Add(match.Captures.First().Value.Trim(new[] { '[', ']' }));
             }
             if (placeholders.Count != 0)
             {
@@ -790,7 +815,7 @@ namespace Vero_Scripts
             var result = Scripts[script];
             foreach (var placeholder in PlaceholdersMap[script])
             {
-                result = result.Replace(placeholder.Name, placeholder.Value);
+                result = result.Replace("[[" + placeholder.Name + "]]", placeholder.Value.Trim());
             }
             return result;
         }
@@ -947,6 +972,81 @@ namespace Vero_Scripts
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+            }
+        }
+
+        #endregion
+
+        #region Clipboard management
+
+        public void CopyScript(Window owner, Script script, bool force = false, bool withPlaceholders = false)
+        {
+            if (withPlaceholders)
+            {
+                var unprocessedScript = Scripts[script];
+                Clipboard.SetText(unprocessedScript);
+                notificationManager.Show(
+                    "Copied script",
+                    "Copied the " + scriptNames[script] + " script with placeholders to the clipboard",
+                    type: NotificationType.Success,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(3));
+            }
+            else if (CheckForPlaceholders(script, force))
+            {
+                var editor = new PlaceholderEditor(this, script)
+                {
+                    Owner = owner
+                };
+                editor.ShowDialog();
+            }
+            else
+            {
+                var processedScript = ProcessPlaceholders(script);
+                TransferPlaceholders(script);
+                Clipboard.SetText(processedScript);
+                notificationManager.Show(
+                    "Copied script",
+                    "Copied the " + scriptNames[script] + " script to the clipboard",
+                    type: NotificationType.Success,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(3));
+            }
+        }
+
+        public void CopyNewMembershipScript()
+        {
+            Clipboard.SetText(NewMembershipScript);
+            notificationManager.Show(
+                "Copied script",
+                "Copied the new membership script to the clipboard",
+                type: NotificationType.Success,
+                areaName: "WindowArea",
+                expirationTime: TimeSpan.FromSeconds(3));
+        }
+
+        public void CopyScriptFromPlaceholders(Script script, bool withPlaceholders = false)
+        {
+            if (withPlaceholders)
+            {
+                Clipboard.SetText(Scripts[script]);
+                notificationManager.Show(
+                    "Copied script",
+                    "Copied the " + scriptNames[script] + " script with placeholders to the clipboard",
+                    type: NotificationType.Success,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(3));
+            }
+            else
+            {
+                TransferPlaceholders(script);
+                Clipboard.SetText(ProcessPlaceholders(script));
+                notificationManager.Show(
+                    "Copied script",
+                    "Copied the " + scriptNames[script] + " script to the clipboard",
+                    type: NotificationType.Success,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(3));
             }
         }
 
