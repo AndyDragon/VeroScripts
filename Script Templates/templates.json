@@ -1433,11 +1433,11 @@
       "templates": [
         {
           "name": "comment",
-          "template": "« CONGRATULATIONS @%%USERNAME%% on your feature with @snap_%%PAGENAME%% today!!! ✨🏆 😍 Thank you for sharing this wonderful image with us. Keep tagging #snap_%%PAGENAME%% for a chance of more features.\n"
+          "template": "💫 CONGRATULATIONS 💫 @%%USERNAME%% on your feature with @snap_%%PAGENAME%% today!!! ✨🏆 😍 Thank you for sharing this wonderful image with us. Keep tagging #snap_%%PAGENAME%% for a chance of more features.\n"
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%%   •\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n\n#snap_community\n#snap_symmetry\n#vero\n#verofamily\n#verofriends\n#symmetry\n#symmetric\n#symmetrical\n#architecture\n#perspective\n#pattern\n\n•\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n_________________________\n\n✨CONGRATULATIONS ✨\n_________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n\n#snap_community\n#snap_symmetry\n#vero\n#verofamily\n#verofriends\n#symmetry\n#symmetric\n#symmetrical\n#architecture\n#perspective\n#pattern\n\n•\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
         },
         {
           "name": "first comment",
