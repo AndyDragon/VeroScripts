@@ -8,10 +8,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using Vero_Scripts.Properties;
-using FramePFX.Themes;
 using Notification.Wpf;
-using System.Printing;
-using Notifications.Wpf.ViewModels.Base;
 
 namespace Vero_Scripts
 {
