@@ -38,11 +38,17 @@ struct FieldEditor: View {
                 if titleWidth.isEmpty {
                     Text(title)
                         .foregroundColor(.labelColor(fieldValidation.valid))
+#if os(iOS)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+#endif
                 } else {
                     Text(title)
                         .foregroundColor(.labelColor(fieldValidation.valid))
 #if os(iOS)
                         .frame(width: titleWidth[1], alignment: .leading)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
 #else
                         .frame(width: titleWidth[0], alignment: .leading)
 #endif

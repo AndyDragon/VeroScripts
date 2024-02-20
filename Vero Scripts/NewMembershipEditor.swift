@@ -10,6 +10,8 @@ import SwiftUI
 struct NewMembershipEditor: View {
     @Binding var newMembership: NewMembershipCase
     @Binding var script: String
+    var minHeight: CGFloat
+    var maxHeight: CGFloat
     var onChanged: (NewMembershipCase) -> Void
     var valid: Bool
     var canCopy: Bool
@@ -25,8 +27,12 @@ struct NewMembershipEditor: View {
                     Text(level.rawValue).tag(level)
                 }
             }
+#if os(iOS)
+            .frame(minWidth: 120, alignment: .leading)
+#else
             .frame(width: 320)
-            
+#endif
+
             Button(action: {
                 copy()
             }, label: {
@@ -44,13 +50,9 @@ struct NewMembershipEditor: View {
             .font(.system(size: 14))
 #if os(iOS)
             .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-            .colorMultiply(Color(
-                red: ColorScheme == .dark ? 1.05 : 0.95,
-                green: ColorScheme == .dark ? 1.05 : 0.95,
-                blue: ColorScheme == .dark ? 1.05 : 0.95))
             .border(.gray)
 #else
-            .frame(minWidth: 200, maxWidth: .infinity, minHeight: 80, maxHeight: 160)
+            .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
 #endif
             .foregroundColor(.labelColor(valid))
     }

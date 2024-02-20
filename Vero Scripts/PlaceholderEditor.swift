@@ -91,7 +91,9 @@ struct PlaceholderSheet: View {
             VStack {
                 Text("There are manual placeholders that need to be filled out:")
                 List() {
-                    ForEach(placeholders.placeholderDict.sorted(by: { entry1, entry2 in entry1.key < entry2.key}), id: \.key) { entry in
+                    ForEach(placeholders.placeholderDict.sorted(by: { entry1, entry2 in
+                        entry1.key < entry2.key
+                    }), id: \.key) { entry in
                         PlaceholderView(entry)
 #if os(iOS)
                             .padding(.horizontal, 20)
@@ -103,7 +105,9 @@ struct PlaceholderSheet: View {
                     Button(action: {
                         scriptWithPlaceholders = scriptWithPlaceholdersInPlace
                         placeholders.placeholderDict.forEach({ placeholder in
-                            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.value)
+                            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                                of: placeholder.key,
+                                with: placeholder.value.value)
                         })
                         transferPlaceholders()
                         copyToClipboard(scriptWithPlaceholders)

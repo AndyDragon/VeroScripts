@@ -91,3 +91,16 @@ extension Bundle {
         return releaseVersionNumberPretty.compare(than, options: .numeric) == .orderedAscending
     }
 }
+
+@resultBuilder
+public struct StringBuilder {
+    public static func buildBlock(_ components: String...) -> String {
+        return components.reduce("", +)
+    }
+}
+
+public extension String {
+    init(@StringBuilder _ builder: () -> String) {
+        self.init(builder())
+    }
+}

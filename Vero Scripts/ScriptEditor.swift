@@ -49,10 +49,6 @@ struct ScriptEditor: View {
             .font(.system(size: 14))
 #if os(iOS)
             .frame(maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-            .colorMultiply(Color(
-                red: ColorScheme == .dark ? 1.05 : 0.95,
-                green: ColorScheme == .dark ? 1.05 : 0.95,
-                blue: ColorScheme == .dark ? 1.05 : 0.95))
             .border(.gray)
 #else
             .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)

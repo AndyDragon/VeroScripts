@@ -21,7 +21,9 @@ struct ContentView: View {
     @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
     @State var pageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
     @State var pageValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue) ?? StaffLevelCase.mod
+    @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(
+        rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue
+    ) ?? StaffLevelCase.mod
     @State var firstForPage: Bool = false
     @State var fromCommunityTag: Bool = false
     @State var featureScript: String = ""
@@ -72,9 +74,12 @@ struct ContentView: View {
     @Environment(\.colorScheme) var ColorScheme
     var appState: VersionCheckAppState
     private var isAnyToastShowing: Bool {
-        isShowingToast || appState.isShowingVersionAvailableToast.wrappedValue || appState.isShowingVersionRequiredToast.wrappedValue
+        isShowingToast 
+        || appState.isShowingVersionAvailableToast.wrappedValue
+        || appState.isShowingVersionRequiredToast.wrappedValue
     }
-
+    private var accordionHeightRatio = 3.5
+    
     init(_ appState: VersionCheckAppState) {
         self.appState = appState
     }
@@ -121,11 +126,41 @@ struct ContentView: View {
                                 Text(level.rawValue).tag(level)
                             }
                         }
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
                         .onAppear {
                             membershipValidation = validateMembership(value: membership)
                         }
                         .focusable()
                         .focused($focusedField, equals: .level)
+#if os(iOS)
+                        Button(action: {
+                            userName = ""
+                            userNameChanged(to: userName)
+                            userNameValidation = validateUserName(value: userName)
+                            membership = MembershipCase.none
+                            membershipChanged(to: membership)
+                            membershipValidation = validateMembership(value: membership)
+                            firstForPage = false
+                            firstForPageChanged(to: firstForPage)
+                            fromCommunityTag = false
+                            fromCommunityTagChanged(to: fromCommunityTag)
+                            newMembership = NewMembershipCase.none
+                            newMembershipChanged(to: newMembership)
+                            focusedField = .userName
+                        }) {
+                            HStack {
+                                Image(systemName: "xmark")
+                                    .foregroundStyle(.red)
+                                Text("Clear user")
+                                    .font(.system(.body, design: .rounded).bold())
+                                    .foregroundColor(.red)
+                            }
+                            .padding(4)
+                            .buttonStyle(.plain)
+                        }.disabled(isAnyToastShowing)
+#endif
                         Spacer()
                     }
                     
@@ -180,6 +215,8 @@ struct ContentView: View {
                             .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
 #else
                             .frame(width: 36, alignment: .leading)
 #endif
@@ -197,6 +234,9 @@ struct ContentView: View {
                         }
                         .focusable()
                         .focused($focusedField, equals: .page)
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
                         .onAppear {
                             if page == "default" && pageName.count == 0 {
                                 pageValidation = (false, "Page must not be 'default' or a page name is required")
@@ -227,6 +267,10 @@ struct ContentView: View {
                         // Page staff level picker
                         Text("Page staff level: ")
                             .padding([.leading], 8)
+#if os(iOS)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+#endif
                         Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
                             ForEach(StaffLevelCase.allCases) { staffLevelCase in
                                 Text(staffLevelCase.rawValue).tag(staffLevelCase)
@@ -234,6 +278,9 @@ struct ContentView: View {
                         }
                         .focusable()
                         .focused($focusedField, equals: .staffLevel)
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
                         
 #if !os(iOS)
                         // Options
@@ -261,13 +308,24 @@ struct ContentView: View {
                     // Options
                     Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                         Text("First feature on page")
-                    }
-                    .focusable()
-                    Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                        Text("From community tag")
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                     .focusable()
                     Spacer()
+                        .frame(width: 20)
+                    Rectangle()
+                        .frame(width: 1, height: 24)
+                        .background(Color.gray)
+                        .opacity(0.2)
+                    Spacer()
+                        .frame(width: 20)
+                    Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                        Text("From community tag")
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                    .focusable()
                 }
 #endif
                 
@@ -276,7 +334,7 @@ struct ContentView: View {
                     ScriptEditor(
                         title: "Feature script:",
                         script: $featureScript,
-                        minHeight: 200,
+                        minHeight: 72,
                         maxHeight: .infinity,
                         canCopy: canCopyScripts,
                         hasPlaceholders: scriptHasPlaceholders(featureScript),
@@ -292,7 +350,10 @@ struct ContentView: View {
                                     await showToast(
                                         .complete(.green),
                                         "Copied",
-                                        subTitle: "Copied the feature script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        subTitle: String {
+                                            "Copied the feature script\(withPlaceholders ? " with placeholders" : "") "
+                                            "to the clipboard"
+                                        },
                                         duration: .short)
                                 }
                             }
@@ -304,8 +365,8 @@ struct ContentView: View {
                     ScriptEditor(
                         title: "Comment script:",
                         script: $commentScript,
-                        minHeight: 80,
-                        maxHeight: 160,
+                        minHeight: 36,
+                        maxHeight: 36 * accordionHeightRatio,
                         canCopy: canCopyScripts,
                         hasPlaceholders: scriptHasPlaceholders(commentScript),
                         copy: { force, withPlaceholders in
@@ -320,7 +381,10 @@ struct ContentView: View {
                                     await showToast(
                                         .complete(.green),
                                         "Copied",
-                                        subTitle: "Copied the comment script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        subTitle: String {
+                                            "Copied the comment script\(withPlaceholders ? " with placeholders" : "") "
+                                            "to the clipboard"
+                                        },
                                         duration: .short)
                                 }
                             }
@@ -332,8 +396,8 @@ struct ContentView: View {
                     ScriptEditor(
                         title: "Original post script:",
                         script: $originalPostScript,
-                        minHeight: 40,
-                        maxHeight: 80,
+                        minHeight: 24,
+                        maxHeight: 24 * accordionHeightRatio,
                         canCopy: canCopyScripts,
                         hasPlaceholders: scriptHasPlaceholders(originalPostScript),
                         copy: { force, withPlaceholders in
@@ -348,7 +412,10 @@ struct ContentView: View {
                                     await showToast(
                                         .complete(.green),
                                         "Copied",
-                                        subTitle: "Copied the original script\(withPlaceholders ? " with placeholders" : "") to the clipboard",
+                                        subTitle: String {
+                                            "Copied the original script\(withPlaceholders ? " with placeholders" : "") "
+                                            "to the clipboard"
+                                        },
                                         duration: .short)
                                 }
                             }
@@ -362,6 +429,8 @@ struct ContentView: View {
                     NewMembershipEditor(
                         newMembership: $newMembership,
                         script: $newMembershipScript,
+                        minHeight: 36,
+                        maxHeight: 36 * accordionHeightRatio,
                         onChanged: newMembershipChanged,
                         valid: userNameValidation.valid,
                         canCopy: canCopyNewMembershipScript,
@@ -439,6 +508,7 @@ struct ContentView: View {
                         }
                     })
             }
+#if !os(iOS)
             .toolbar {
                 ToolbarItem {
                     Button(action: {
@@ -468,6 +538,7 @@ struct ContentView: View {
                     }.disabled(isAnyToastShowing)
                 }
             }
+#endif
             .allowsHitTesting(!isAnyToastShowing)
             if isAnyToastShowing {
                 VStack {
@@ -483,6 +554,11 @@ struct ContentView: View {
             }
         }
         .blur(radius: isAnyToastShowing ? 4 : 0)
+#if os(iOS)
+        .frame(minHeight: 600)
+#else
+        .frame(minWidth: 1024, minHeight: 600)
+#endif
         .toast(
             isPresenting: $isShowingToast,
             duration: 0,
@@ -509,7 +585,7 @@ struct ContentView: View {
                     displayMode: .hud,
                     type: .systemImage("exclamationmark.triangle.fill", .yellow),
                     title: "New version available",
-                    subTitle: "You are using v\(appState.versionCheckToast.wrappedValue.appVersion) and v\(appState.versionCheckToast.wrappedValue.currentVersion) is available\(appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty ? "" : ", click here to open your browser") (this will go away in 10 seconds)")
+                    subTitle: getVersionToastSubtitle())
             },
             onTap: {
                 if let url = URL(string: appState.versionCheckToast.wrappedValue.linkToCurrentVersion) {
@@ -530,81 +606,87 @@ struct ContentView: View {
                     displayMode: .hud,
                     type: .systemImage("xmark.octagon.fill", .red),
                     title: "New version required",
-                    subTitle: "You are using v\(appState.versionCheckToast.wrappedValue.appVersion) and v\(appState.versionCheckToast.wrappedValue.currentVersion) is required\(appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty ? "" : ", click here to open your browser") or ⌘ + Q to Quit")
+                    subTitle: getVersionToastSubtitle())
             },
             onTap: {
                 if let url = URL(string: appState.versionCheckToast.wrappedValue.linkToCurrentVersion) {
                     openURL(url)
+#if !os(iOS)
                     NSApplication.shared.terminate(nil)
+#endif
                 }
             },
             completion: {
                 appState.resetCheckingForUpdates()
                 focusedField = .userName
             })        .onAppear {
-            focusedField = .userName
-        }
+                focusedField = .userName
+            }
 #if TESTING
-        .navigationTitle("Vero Scripts - Script Testing")
+            .navigationTitle("Vero Scripts - Script Testing")
 #endif
-        .task {
-            // Hack for page staff level to handle changes (otherwise they are not persisted)
-            lastPageStaffLevel = pageStaffLevel
-
-            do {
-#if TESTING
-                let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
-#else
-                let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
-#endif
-                pagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
-
-                // Delay the start of the templates download so the window can be ready faster
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-
-#if TESTING
-                let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
-#else
-                let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
-#endif
-                templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
-                waitingForTemplates = false
-                updateScripts()
-                updateNewMembershipScripts()
-
+            .task {
+                // Hack for page staff level to handle changes (otherwise they are not persisted)
+                lastPageStaffLevel = pageStaffLevel
+                
                 do {
-                    // Delay the start of the disallowed list download so the window can be ready faster
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
-
 #if TESTING
-                    let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
+                    let pagesUrl = URL(
+                        string: "https://vero.andydragon.com/static/data/testing/pages.json")!
 #else
-                    let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
+                    let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
 #endif
-                    disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
+                    pagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
+                    
+                    // Delay the start of the templates download so the window can be ready faster
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                    
+#if TESTING
+                    let templatesUrl = URL(
+                        string: "https://vero.andydragon.com/static/data/testing/templates.json")!
+#else
+                    let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
+#endif
+                    templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
+                    waitingForTemplates = false
                     updateScripts()
                     updateNewMembershipScripts()
+                    
+                    do {
+                        // Delay the start of the disallowed list download so the window can be ready faster
+                        try await Task.sleep(nanoseconds: 1_000_000_000)
+                        
+#if TESTING
+                        let disallowListUrl = URL(
+                            string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
+#else
+                        let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
+#endif
+                        disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
+                        updateScripts()
+                        updateNewMembershipScripts()
+                    } catch {
+                        // do nothing, the disallow list is not critical
+                        debugPrint(error.localizedDescription)
+                    }
+                    
+                    do {
+                        // Delay the start of the disallowed list download so the window can be ready faster
+                        try await Task.sleep(nanoseconds: 100_000_000)
+                        
+                        appState.checkForUpdates()
+                    } catch {
+                        // do nothing, the version check is not critical
+                        debugPrint(error.localizedDescription)
+                    }
                 } catch {
-                    // do nothing, the disallow list is not critical
-                    debugPrint(error.localizedDescription)
+                    alertTitle = "Could not load the page catalog from the server"
+                    alertMessage = "The application requires the catalog to perform its operations: " +
+                        error.localizedDescription
+                    terminalAlert = true
+                    showingAlert = true
                 }
-
-                do {
-                    // Delay the start of the disallowed list download so the window can be ready faster
-                    try await Task.sleep(nanoseconds: 100_000_000)
-
-                    appState.checkForUpdates()
-                } catch {
-                    // do nothing, the version check is not critical
-                    debugPrint(error.localizedDescription)
-                }
-            } catch {
-                alertTitle = "Could not load the page catalog from the server"
-                alertMessage = "The application requires the catalog to perform its operations: " + error.localizedDescription
-                terminalAlert = true
-                showingAlert = true
             }
-        }
     }
     
     func showToast(
@@ -619,13 +701,34 @@ struct ContentView: View {
         toastSubTitle = subTitle
         toastTapAction = onTap
         isShowingToast.toggle()
-
+        
         if duration != .disabled {
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(duration.rawValue), execute: {
                 if (isShowingToast) {
                     isShowingToast.toggle()
                 }
             })
+        }
+    }
+    
+    func getVersionToastSubtitle() -> String {
+        let appVersion = appState.versionCheckToast.wrappedValue.appVersion
+        let currentVersion = appState.versionCheckToast.wrappedValue.currentVersion
+        let linkAvailable = appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty
+        var availableOrRequired: String
+        var optionInstruction: String
+        if appState.isShowingVersionAvailableToast.wrappedValue {
+            availableOrRequired = "available"
+            optionInstruction = " (this will go away in 10 seconds)"
+        } else {
+            availableOrRequired = "required"
+            optionInstruction = " or ⌘ + Q to Quit"
+        }
+        return String {
+            "You are using v\(appVersion) "
+            "and v\(currentVersion) is \(availableOrRequired)"
+            "\(linkAvailable ? "" : ", click here to open your browser")"
+            optionInstruction
         }
     }
 
@@ -737,23 +840,38 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    func copyScript(_ script: String, _ placeholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList], force: Bool = false, withPlaceholders: Bool = false) -> Bool {
+    func copyScript(
+        _ script: String,
+        _ placeholders: PlaceholderList,
+        _ otherPlaceholders: [PlaceholderList],
+        force: Bool = false,
+        withPlaceholders: Bool = false
+    ) -> Bool {
         scriptWithPlaceholders = script
         scriptWithPlaceholdersInPlace = script
         placeholders.placeholderDict.forEach({ placeholder in
-            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(of: placeholder.key, with: placeholder.value.value)
+            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                of: placeholder.key, with: placeholder.value.value)
         })
         if withPlaceholders {
             copyToClipboard(scriptWithPlaceholdersInPlace)
             return true
-        } else if !checkForPlaceholders(scriptWithPlaceholdersInPlace, placeholders, otherPlaceholders, force: force) {
+        } else if !checkForPlaceholders(
+            scriptWithPlaceholdersInPlace,
+            placeholders,
+            otherPlaceholders,
+            force: force
+        ) {
             copyToClipboard(scriptWithPlaceholders)
             return true
         }
         return false
     }
     
-    func transferPlaceholderValues(_ scriptPlaceholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList]) -> Void {
+    func transferPlaceholderValues(
+        _ scriptPlaceholders: PlaceholderList,
+        _ otherPlaceholders: [PlaceholderList]
+    ) -> Void {
         scriptPlaceholders.placeholderDict.forEach { placeholder in
             otherPlaceholders.forEach { destinationPlaceholders in
                 let destinationPlaceholderEntry = destinationPlaceholders.placeholderDict[placeholder.key]
@@ -768,7 +886,12 @@ struct ContentView: View {
         return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty
     }
     
-    func checkForPlaceholders(_ script: String, _ placeholders: PlaceholderList, _ otherPlaceholders: [PlaceholderList], force: Bool = false) -> Bool {
+    func checkForPlaceholders(
+        _ script: String,
+        _ placeholders: PlaceholderList,
+        _ otherPlaceholders: [PlaceholderList],
+        force: Bool = false
+    ) -> Bool {
         var foundPlaceholders: [String] = [];
         foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))
         if foundPlaceholders.count != 0 {
@@ -780,7 +903,9 @@ struct ContentView: View {
                     var value: String? = nil
                     otherPlaceholders.forEach { sourcePlaceholders in
                         let sourcePlaceholderEntry = sourcePlaceholders.placeholderDict[placeholder]
-                        if (value == nil || value!.isEmpty) && sourcePlaceholderEntry != nil && !(sourcePlaceholderEntry?.value ?? "").isEmpty {
+                        if (value == nil || value!.isEmpty) 
+                            && sourcePlaceholderEntry != nil
+                            && !(sourcePlaceholderEntry?.value ?? "").isEmpty {
                             value = sourcePlaceholderEntry?.value
                         }
                     }
@@ -876,29 +1001,50 @@ struct ContentView: View {
         }
     }
 
-    func getTemplateFromCatalog(_ templateName: String, from pageName: String, firstFeature: Bool, communityTag: Bool) -> String! {
+    func getTemplateFromCatalog(
+        _ templateName: String,
+        from pageName: String,
+        firstFeature: Bool,
+        communityTag: Bool
+    ) -> String! {
         var template: Template!
         if waitingForTemplates {
             return "";
         }
-        let defaultTemplatePage = templatesCatalog.pages.first(where: { page in page.name == "default" });
-        let templatePage = templatesCatalog.pages.first(where: { page in page.name == pageName});
+        let defaultTemplatePage = templatesCatalog.pages.first(where: { page in
+            page.name == "default"
+        });
+        let templatePage = templatesCatalog.pages.first(where: { page in
+            page.name == pageName
+        });
         if communityTag {
-            template = templatePage?.templates.first(where: { template in template.name == "community " + templateName })
+            template = templatePage?.templates.first(where: { template in
+                template.name == "community " + templateName
+            })
             if template == nil {
-                template = defaultTemplatePage?.templates.first(where: { template in template.name == "community " + templateName })
+                template = defaultTemplatePage?.templates.first(where: { template in
+                    template.name == "community " + templateName
+                })
             }
         } else if firstFeature {
-            template = templatePage?.templates.first(where: { template in template.name == "first " + templateName })
+            template = templatePage?.templates.first(where: { template in
+                template.name == "first " + templateName
+            })
             if template == nil {
-                template = defaultTemplatePage?.templates.first(where: { template in template.name == "first " + templateName })
+                template = defaultTemplatePage?.templates.first(where: { template in
+                    template.name == "first " + templateName
+                })
             }
         }
         if template == nil {
-            template = templatePage?.templates.first(where: { template in template.name == templateName })
+            template = templatePage?.templates.first(where: { template in
+                template.name == templateName
+            })
         }
         if template == nil {
-            template = defaultTemplatePage?.templates.first(where: { template in template.name == templateName })
+            template = defaultTemplatePage?.templates.first(where: { template in
+                template.name == templateName
+            })
         }
         return template?.template
     }
@@ -915,7 +1061,9 @@ struct ContentView: View {
             }
             newMembershipScript = validationErrors
         } else if newMembership == NewMembershipCase.member {
-            let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new member" })
+            let template = templatesCatalog.specialTemplates.first(where: { template in
+                template.name == "new member"
+            })
             if template == nil {
                 newMembershipScript = ""
                 return
@@ -925,7 +1073,9 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
         } else if newMembership == NewMembershipCase.vipMember {
-            let template = templatesCatalog.specialTemplates.first(where: { template in template.name == "new vip member" })
+            let template = templatesCatalog.specialTemplates.first(where: { template in
+                template.name == "new vip member"
+            })
             if template == nil {
                 newMembershipScript = ""
                 return
