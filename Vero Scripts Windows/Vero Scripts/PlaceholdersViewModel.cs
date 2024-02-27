@@ -2,18 +2,12 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Vero_Scripts
+namespace VeroScripts
 {
-    public partial class PlaceholdersViewModel
+    public partial class PlaceholdersViewModel(ScriptsViewModel scriptViewModel, Script script)
     {
-        public PlaceholdersViewModel(ScriptsViewModel scriptViewModel, Script script) 
-        {
-            ScriptsViewModel = scriptViewModel;
-            Placeholders = scriptViewModel.PlaceholdersMap[script];
-        }
+        public ScriptsViewModel ScriptsViewModel { get; private set; } = scriptViewModel;
 
-        public ScriptsViewModel ScriptsViewModel { get; private set; }
-
-        public ObservableCollection<Placeholder> Placeholders { get; private set; }
+        public ObservableCollection<Placeholder> Placeholders { get; private set; } = scriptViewModel.PlaceholdersMap[script];
     }
 }

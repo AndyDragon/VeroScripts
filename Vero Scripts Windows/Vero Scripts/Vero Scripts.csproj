@@ -2,19 +2,22 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <RootNamespace>Vero_Scripts</RootNamespace>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <RootNamespace>VeroScripts</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.0.23.0</AssemblyVersion>
-    <FileVersion>1.0.23.0</FileVersion>
+    <AssemblyVersion>1.0.24.0</AssemblyVersion>
+    <FileVersion>1.0.24.0</FileVersion>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <PackageId>VeroScripts</PackageId>
     <Title>Vero Scripts</Title>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
+    <Copyright>Copyright (c) 2024, AndyDragon Software. All rights reserved.</Copyright>
+    <Company>AndyDragon Software</Company>
+    <Authors>Andrew Forget</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +33,9 @@
 
   <ItemGroup>
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
-    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Notification.Wpf" Version="8.0.0" />
   </ItemGroup>
 

@@ -1,18 +1,12 @@
 ﻿using System;
 
-namespace Vero_Scripts
+namespace VeroScripts
 {
-    public struct ValidationResult
+    public struct ValidationResult(bool valid, string? error = null)
     {
-        public ValidationResult(bool valid, string? error = null)
-        {
-            Valid = valid;
-            Error = error;
-        }
+        public bool Valid { get; private set; } = valid;
 
-        public bool Valid { get; private set; }
-
-        public string? Error { get; private set; }
+        public string? Error { get; private set; } = error;
 
         public static bool operator ==(ValidationResult x, ValidationResult y)
         {
@@ -34,7 +28,7 @@ namespace Vero_Scripts
             return !(x == y);
         }
 
-        public override bool Equals(object? obj)
+        public override readonly bool Equals(object? obj)
         {
             if (obj is ValidationResult)
             {
@@ -44,7 +38,7 @@ namespace Vero_Scripts
             return false;
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return Valid.GetHashCode() + (Error ?? "").GetHashCode();
         }

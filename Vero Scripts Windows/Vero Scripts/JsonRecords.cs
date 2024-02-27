@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace Vero_Scripts
+﻿namespace VeroScripts
 {
     public class PagesCatalog
     {
         public PagesCatalog()
         {
-            Pages = Array.Empty<PageEntry>();
+            Pages = [];
         }
 
         public PageEntry[] Pages { get; set; }
@@ -27,8 +25,8 @@ namespace Vero_Scripts
     {
         public TemplatesCatalog()
         {
-            Pages = Array.Empty<TemplatePageEntry>();
-            SpecialTemplates = Array.Empty<TemplateEntry>();
+            Pages = [];
+            SpecialTemplates = [];
         }
 
         public TemplatePageEntry[] Pages { get; set; }
@@ -41,7 +39,7 @@ namespace Vero_Scripts
         public TemplatePageEntry()
         {
             Name = string.Empty;
-            Templates = Array.Empty<TemplateEntry>();
+            Templates = [];
         }
 
         public string Name { get; set; }

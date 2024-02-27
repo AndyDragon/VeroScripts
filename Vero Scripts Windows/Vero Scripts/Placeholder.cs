@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Vero_Scripts
+namespace VeroScripts
 {
     public class Placeholder : INotifyPropertyChanged
     {

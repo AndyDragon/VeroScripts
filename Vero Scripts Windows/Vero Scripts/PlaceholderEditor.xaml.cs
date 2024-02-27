@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Windows;
 
-namespace Vero_Scripts
+namespace VeroScripts
 {
     /// <summary>
     /// Interaction logic for PlaceholderEditor.xaml
     /// </summary>
-    public partial class PlaceholderEditor : Window
+    public partial class PlaceholderEditor
     {
         private readonly Script script;
 
