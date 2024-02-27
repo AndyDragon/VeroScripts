@@ -15,9 +15,10 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <Copyright>Copyright (c) 2024, AndyDragon Software. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2024 AndyDragon Software, all rights reserved</Copyright>
     <Company>AndyDragon Software</Company>
     <Authors>Andrew Forget</Authors>
+    <Version>1.0.24</Version>
   </PropertyGroup>
 
   <ItemGroup>
