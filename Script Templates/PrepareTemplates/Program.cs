@@ -87,19 +87,21 @@ class Program
     private static readonly string[] validFileNames = new[]
     {
         "feature",
-        "comment",
-        "first comment",
-        "community comment",
-        "first community comment",
-        "raw comment",
+        "first raw community comment",
         "first raw comment",
+        "first community comment",
+        "first comment",
+        "raw community comment",
+        "raw comment",
+        "community comment",
+        "comment",
         "original post",
     };
     private static void ValidateFileName(string pageName, string fileName, ref List<string> warnings)
     {
         if (!validFileNames.Contains(fileName))
         {
-            warnings.Add(string.Format("PREP0100: The page '{0}' has filename '[1}' was not expected", pageName, fileName));
+            warnings.Add(string.Format("PREP0100: The page '{0}' has filename '{1}' was not expected", pageName, fileName));
         }
     }
 
