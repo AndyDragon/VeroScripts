@@ -1068,8 +1068,20 @@
           "template": "✨✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%%, your first feature in @snap_%%PAGENAME%% 🏆\n😍 Just an amazing shot.\n💕 🎉 Thanks for tagging this great picture with #snap_%%PAGENAME%%\n"
         },
         {
+          "name": "first community comment",
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%%, your first feature in @snap_%%PAGENAME%% 🏆\n😍 Just an amazing shot.\n💕 Thank You for sharing your wonderful photo with us and supporting our Community!! 💫 🙏 🏆 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features 👍💕🌟\n"
+        },
+        {
+          "name": "first raw comment",
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%%, your first feature in @snap_%%PAGENAME%% 🏆\n😍 Just an amazing shot.\n💕 🎉 Thanks for tagging this great picture with #raw_%%PAGENAME%%! Please consider tagging with #snap_%%PAGENAME%% for more chances at a feature.\n"
+        },
+        {
           "name": "original post",
           "template": "✨ Featured on @snap_%%PAGENAME%% ✨\na page out of the @snap_kingdom at the @snap_community"
+        },
+        {
+          "name": "raw comment",
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%% 🏆\n😍 Just an amazing shot.\n💕 🎉 Thanks for tagging this great picture with #raw_%%PAGENAME%%! Please consider tagging with #snap_%%PAGENAME%% for more chances at a feature.\n"
         }
       ]
     },
