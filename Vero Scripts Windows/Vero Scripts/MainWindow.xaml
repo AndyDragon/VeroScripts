@@ -183,6 +183,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0">
                     <StackPanel Orientation="Horizontal" ToolTip="{Binding PageValidation.Error}">
@@ -215,6 +216,14 @@
                     VerticalAlignment="Center" />
                 <CheckBox 
                     Grid.Column="6" 
+                    IsChecked="{Binding RawTag}" 
+                    Content="From RAW tag" 
+                    FontWeight="Bold" 
+                    FontSize="11" 
+                    Margin="16,0,0,0" 
+                    VerticalAlignment="Center" />
+                <CheckBox 
+                    Grid.Column="7" 
                     IsChecked="{Binding CommunityTag}" 
                     Content="From community tag" 
                     FontWeight="Bold" 

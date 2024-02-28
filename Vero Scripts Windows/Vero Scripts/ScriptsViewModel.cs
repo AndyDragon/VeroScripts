@@ -294,6 +294,7 @@ namespace VeroScripts
             UserName = "";
             Membership = "None";
             FirstForPage = false;
+            RawTag = false;
             CommunityTag = false;
             NewMembership = "None";
         }
@@ -595,6 +596,24 @@ namespace VeroScripts
 
         #endregion
 
+        #region RAW tag
+
+        private bool rawTag = false;
+
+        public bool RawTag
+        {
+            get => rawTag;
+            set
+            {
+                if (Set(ref rawTag, value))
+                {
+                    UpdateScripts();
+                }
+            }
+        }
+
+        #endregion
+
         #region Community tag
 
         private bool communityTag = false;
@@ -834,9 +853,9 @@ namespace VeroScripts
                         scriptPageName = sourcePage.PageName;
                     }
                 }
-                var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, CommunityTag);
-                var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, CommunityTag);
-                var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, CommunityTag);
+                var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, RawTag, CommunityTag);
+                var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, RawTag, CommunityTag);
+                var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, RawTag, CommunityTag);
                 FeatureScript = featureScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
@@ -874,28 +893,53 @@ namespace VeroScripts
             string templateName,
             string pageName,
             bool firstForPage,
+            bool rawTag,
             bool communityTag)
         {
             TemplateEntry? template = null;
             var defaultTemplatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == "default");
             var templatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == pageName);
 
-            // Check community and first feature
-            if (communityTag && firstForPage)
+            // Check first feature and raw and community
+            if (firstForPage && rawTag && communityTag)
             {
-                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first community " + templateName);
+                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first raw community " + templateName);
             }
 
-            // Next check community
-            if (communityTag)
+            // Next check first feature and raw
+            if (firstForPage && rawTag)
             {
-                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first raw " + templateName);
+            }
+
+            // Next check first feature and community
+            if (firstForPage && communityTag)
+            {
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first community " + templateName);
             }
 
             // Next check first feature
             if (firstForPage)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
+            }
+
+            // Next check raw and community
+            if (rawTag && communityTag)
+            {
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "raw community " + templateName);
+            }
+
+            // Next check raw
+            if (rawTag)
+            {
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "raw " + templateName);
+            }
+
+            // Next check community
+            if (communityTag)
+            {
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
             }
 
             // Last check standard
