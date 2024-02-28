@@ -90,6 +90,9 @@ class Program
         "comment",
         "first comment",
         "community comment",
+        "first community comment",
+        "raw comment",
+        "first raw comment",
         "original post",
     };
     private static void ValidateFileName(string pageName, string fileName, ref List<string> warnings)
