@@ -28,7 +28,7 @@ struct FieldEditor: View {
             // Title validator
             if !fieldValidation.valid {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.red)
+                    .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
                     .help(fieldValidation.reason ?? "")
                     .imageScale(.small)
             }
@@ -37,14 +37,18 @@ struct FieldEditor: View {
             if title.count != 0 {
                 if titleWidth.isEmpty {
                     Text(title)
-                        .foregroundColor(.labelColor(fieldValidation.valid))
+                        .foregroundStyle(fieldValidation.valid ?
+                                         Color.TextColorPrimary : Color.TextColorRequired,
+                                         Color.TextColorSecondary)
 #if os(iOS)
                         .lineLimit(1)
                         .truncationMode(.tail)
 #endif
                 } else {
                     Text(title)
-                        .foregroundColor(.labelColor(fieldValidation.valid))
+                        .foregroundStyle(fieldValidation.valid ?
+                                         Color.TextColorPrimary : Color.TextColorRequired,
+                                         Color.TextColorSecondary)
 #if os(iOS)
                         .frame(width: titleWidth[1], alignment: .leading)
                         .lineLimit(1)
@@ -61,7 +65,9 @@ struct FieldEditor: View {
                 fieldChanged(value)
             }).onAppear(perform: {
                 fieldValidation = validate(field)
-            }).focused(focus, equals: focusField)
+            })
+            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .focused(focus, equals: focusField)
 #if os(iOS)
             .textInputAutocapitalization(.never)
 #endif

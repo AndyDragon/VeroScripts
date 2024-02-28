@@ -8,7 +8,23 @@
 import SwiftUI
 import AlertToast
 
+var ThemeDetails: [Theme:(colorTheme:String,darkTheme:Bool)] = [
+    Theme.systemDark: (colorTheme: "", darkTheme: true),
+    Theme.darkSubtleGray: (colorTheme: "SubtleGray", darkTheme: true),
+    Theme.darkBlue: (colorTheme: "Blue", darkTheme: true),
+    Theme.darkGreen: (colorTheme: "Green", darkTheme: true),
+    Theme.darkRed: (colorTheme: "Red", darkTheme: true),
+    Theme.darkViolet: (colorTheme: "Violet", darkTheme: true),
+    Theme.systemLight: (colorTheme: "", darkTheme: false),
+    Theme.lightSubtleGray: (colorTheme: "SubtleGray", darkTheme: false),
+    Theme.lightBlue: (colorTheme: "Blue", darkTheme: false),
+    Theme.lightGreen: (colorTheme: "Green", darkTheme: false),
+    Theme.lightRed: (colorTheme: "Red", darkTheme: false),
+    Theme.lightViolet: (colorTheme: "Violet", darkTheme: false)
+]
+
 struct ContentView: View {
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @Environment(\.openURL) var openURL
     @State var membership: MembershipCase = MembershipCase.none
     @State var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
@@ -60,6 +76,8 @@ struct ContentView: View {
     @State private var toastSubTitle = ""
     @State private var toastTapAction: () -> Void = {}
     @FocusState var focusedField: FocusedField?
+    @State private var theme = Theme.notSet
+    @State private var isDarkModeOn = true
     var canCopyScripts: Bool {
         return membershipValidation.valid
         && userNameValidation.valid
@@ -74,7 +92,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) var ColorScheme
     var appState: VersionCheckAppState
     private var isAnyToastShowing: Bool {
-        isShowingToast 
+        isShowingToast
         || appState.isShowingVersionAvailableToast.wrappedValue
         || appState.isShowingVersionRequiredToast.wrappedValue
     }
@@ -86,6 +104,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
+            Color.BackgroundColor.edgesIgnoringSafeArea(.all)
             VStack {
                 Group {
                     HStack {
@@ -105,13 +124,15 @@ struct ContentView: View {
                         // User level picker
                         if !membershipValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
+                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
                                 .help("Required value")
                                 .imageScale(.small)
                                 .padding([.leading], 8)
                         }
                         Text("Level: ")
-                            .foregroundColor(.labelColor(membership != MembershipCase.none))
+                            .foregroundStyle(membership != MembershipCase.none ?
+                                             Color.TextColorPrimary :
+                                                Color.TextColorRequired, Color.TextColorSecondary)
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
 #else
@@ -123,9 +144,13 @@ struct ContentView: View {
                             membershipChanged(to: value)
                         }) {
                             ForEach(MembershipCase.allCases) { level in
-                                Text(level.rawValue).tag(level)
+                                Text(level.rawValue)
+                                    .tag(level)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
                             }
                         }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
 #if os(iOS)
                         .frame(minWidth: 120, alignment: .leading)
 #endif
@@ -152,10 +177,10 @@ struct ContentView: View {
                         }) {
                             HStack {
                                 Image(systemName: "xmark")
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
                                 Text("Clear user")
                                     .font(.system(.body, design: .rounded).bold())
-                                    .foregroundColor(.red)
+                                    .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
                             }
                             .padding(4)
                             .buttonStyle(.plain)
@@ -207,12 +232,15 @@ struct ContentView: View {
                         // Page picker
                         if page == "default" && pageName.count == 0 {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
+                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
                                 .help("Page required")
                                 .imageScale(.small)
                         }
                         Text("Page: ")
-                            .foregroundColor(.labelColor(page != "default" || pageName.count != 0))
+                            .foregroundStyle((page != "default" || pageName.count != 0) ?
+                                             Color.TextColorPrimary :
+                                                Color.TextColorRequired,
+                                             Color.TextColorSecondary)
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
                             .lineLimit(1)
@@ -229,9 +257,13 @@ struct ContentView: View {
                             pageChanged(to: value)
                         }) {
                             ForEach(pagesCatalog.pages) { page in
-                                Text(page.name).tag(page.name)
+                                Text(page.name)
+                                    .tag(page.name)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
                             }
                         }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
                         .focusable()
                         .focused($focusedField, equals: .page)
 #if os(iOS)
@@ -259,6 +291,7 @@ struct ContentView: View {
                         )
                         .disabled(page != "default")
                         .focusable(page == "default")
+                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
                         .focused($focusedField, equals: .page)
 #if os(iOS)
                         .textInputAutocapitalization(.never)
@@ -273,9 +306,13 @@ struct ContentView: View {
 #endif
                         Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
                             ForEach(StaffLevelCase.allCases) { staffLevelCase in
-                                Text(staffLevelCase.rawValue).tag(staffLevelCase)
+                                Text(staffLevelCase.rawValue)
+                                    .tag(staffLevelCase)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
                             }
                         }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
                         .focusable()
                         .focused($focusedField, equals: .staffLevel)
 #if os(iOS)
@@ -446,6 +483,7 @@ struct ContentView: View {
                         })
                 }
             }
+            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
             .padding()
             .textFieldStyle(.roundedBorder)
             .alert(
@@ -528,14 +566,28 @@ struct ContentView: View {
                     }) {
                         HStack {
                             Image(systemName: "xmark")
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
                             Text("Clear user")
                                 .font(.system(.body, design: .rounded).bold())
-                                .foregroundColor(.red)
+                                .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
                         }
                         .padding(4)
                         .buttonStyle(.plain)
                     }.disabled(isAnyToastShowing)
+                }
+                ToolbarItem {
+                    Menu("Theme", systemImage: "paintpalette") {
+                        Picker("Theme:", selection: $theme.onChange(setTheme)) {
+                            ForEach(Theme.allCases) { itemTheme in
+                                if itemTheme != .notSet {
+                                    Text(itemTheme.rawValue).tag(itemTheme)
+                                }
+                            }
+                        }
+                        .pickerStyle(.inline)
+                    }
+                    .foregroundStyle(Color.AccentColor, Color.TextColorSecondary)
+                    .disabled(isAnyToastShowing)
                 }
             }
 #endif
@@ -559,6 +611,7 @@ struct ContentView: View {
 #else
         .frame(minWidth: 1024, minHeight: 600)
 #endif
+        .background(Color.BackgroundColor)
         .toast(
             isPresenting: $isShowingToast,
             duration: 0,
@@ -604,7 +657,7 @@ struct ContentView: View {
             alert: {
                 AlertToast(
                     displayMode: .hud,
-                    type: .systemImage("xmark.octagon.fill", .red),
+                    type: .systemImage("xmark.octagon.fill", .TextColorRequired),
                     title: "New version required",
                     subTitle: getVersionToastSubtitle())
             },
@@ -628,6 +681,10 @@ struct ContentView: View {
             .task {
                 // Hack for page staff level to handle changes (otherwise they are not persisted)
                 lastPageStaffLevel = pageStaffLevel
+                
+                DispatchQueue.main.async {
+                    setTheme(UserDefaultsUtils.shared.getTheme())
+                }
                 
                 do {
 #if TESTING
@@ -682,11 +739,25 @@ struct ContentView: View {
                 } catch {
                     alertTitle = "Could not load the page catalog from the server"
                     alertMessage = "The application requires the catalog to perform its operations: " +
-                        error.localizedDescription
+                    error.localizedDescription
                     terminalAlert = true
                     showingAlert = true
                 }
             }
+            .preferredColorScheme(isDarkModeOn ? /*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/ : .light)
+    }
+    
+    func setTheme(_ newTheme: Theme) {
+        if (newTheme == .notSet) {
+            isDarkModeOn = colorScheme == .dark
+        } else {
+            if let details = ThemeDetails[newTheme] {
+                Color.currentTheme = details.colorTheme
+                isDarkModeOn = details.darkTheme
+                theme = newTheme
+                UserDefaultsUtils.shared.setTheme(theme: newTheme)
+            }
+        }
     }
     
     func showToast(
@@ -731,7 +802,7 @@ struct ContentView: View {
             optionInstruction
         }
     }
-
+    
     func membershipChanged(to value: MembershipCase) {
         if value != lastMembership {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -748,7 +819,7 @@ struct ContentView: View {
         }
         return (true, nil)
     }
-
+    
     func userNameChanged(to value: String) {
         if value != lastUserName {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -770,7 +841,7 @@ struct ContentView: View {
         }
         return (true, nil)
     }
-
+    
     func yourNameChanged(to value: String) {
         if value != lastYourName {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -782,7 +853,7 @@ struct ContentView: View {
             lastYourName = value
         }
     }
-
+    
     func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -794,7 +865,7 @@ struct ContentView: View {
             lastYourFirstName = value
         }
     }
-
+    
     func pageChanged(to value: String) {
         if value != lastPage {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -805,7 +876,7 @@ struct ContentView: View {
             lastPage = value
         }
     }
-
+    
     func pageNameChanged(to value: String) {
         if value != lastPageName {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -816,7 +887,7 @@ struct ContentView: View {
             lastPageName = value
         }
     }
-
+    
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -827,19 +898,19 @@ struct ContentView: View {
             lastPageStaffLevel = value
         }
     }
-
+    
     func firstForPageChanged(to value: Bool) {
         updateScripts()
     }
-
+    
     func fromCommunityTagChanged(to value: Bool) {
         updateScripts()
     }
-
+    
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
-
+    
     func copyScript(
         _ script: String,
         _ placeholders: PlaceholderList,
@@ -881,7 +952,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     func scriptHasPlaceholders(_ script: String) -> Bool {
         return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty
     }
@@ -903,7 +974,7 @@ struct ContentView: View {
                     var value: String? = nil
                     otherPlaceholders.forEach { sourcePlaceholders in
                         let sourcePlaceholderEntry = sourcePlaceholders.placeholderDict[placeholder]
-                        if (value == nil || value!.isEmpty) 
+                        if (value == nil || value!.isEmpty)
                             && sourcePlaceholderEntry != nil
                             && !(sourcePlaceholderEntry?.value ?? "").isEmpty {
                             value = sourcePlaceholderEntry?.value
@@ -975,7 +1046,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             originalPostScript = originalPostScriptTemplate
@@ -985,7 +1056,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             commentScript = commentScriptTemplate
@@ -995,12 +1066,12 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
     }
-
+    
     func getTemplateFromCatalog(
         _ templateName: String,
         from pageName: String,
@@ -1048,7 +1119,7 @@ struct ContentView: View {
         }
         return template?.template
     }
-
+    
     func updateNewMembershipScripts() -> Void {
         if waitingForTemplates {
             newMembershipScript = ""

@@ -53,7 +53,11 @@ struct ScriptEditor: View {
 #else
             .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
 #endif
-            .foregroundColor(.labelColor(canCopy))
+            .foregroundStyle(canCopy ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
+            .scrollContentBackground(.hidden)
+            .background(Color.BackgroundColorEditor)
+            .border(Color.windowBackground)
+            .cornerRadius(5)
             .padding([.bottom], 6)
             .focused(focus, equals: focusField)
     }

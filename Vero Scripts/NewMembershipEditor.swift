@@ -24,9 +24,13 @@ struct NewMembershipEditor: View {
 #endif
             Picker("New membership: ", selection: $newMembership.onChange(onChanged)) {
                 ForEach(NewMembershipCase.allCases) { level in
-                    Text(level.rawValue).tag(level)
+                    Text(level.rawValue)
+                        .tag(level)
+                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
                 }
             }
+            .tint(Color.AccentColor)
+            .accentColor(Color.AccentColor)
 #if os(iOS)
             .frame(minWidth: 120, alignment: .leading)
 #else
@@ -53,7 +57,12 @@ struct NewMembershipEditor: View {
             .border(.gray)
 #else
             .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
+            .padding(2)
+            .border(Color.windowBackground)
+            .cornerRadius(5)
 #endif
-            .foregroundColor(.labelColor(valid))
+            .foregroundColor(valid ? .TextColorPrimary : .TextColorRequired)
+            .scrollContentBackground(.hidden)
+            .background(Color.BackgroundColorEditor)
     }
 }

@@ -107,3 +107,20 @@ enum ToastDuration: Int {
          medium = 10,
          long = 20
 }
+
+enum Theme: String, CaseIterable, Identifiable {
+    case notSet,
+         systemDark = "System dark",
+         darkSubtleGray = "Dark subtle gray",
+         darkBlue = "Dark blue",
+         darkGreen = "Dark green",
+         darkRed = "Dark red",
+         darkViolet = "Dark violet",
+         systemLight = "System light",
+         lightSubtleGray = "Light subtle gray",
+         lightBlue = "Light blue",
+         lightGreen = "Light green",
+         lightRed = "Light red",
+         lightViolet = "Light violet"
+    var id: Self { self }
+}
