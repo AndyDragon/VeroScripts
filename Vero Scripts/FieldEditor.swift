@@ -40,10 +40,8 @@ struct FieldEditor: View {
                         .foregroundStyle(fieldValidation.valid ?
                                          Color.TextColorPrimary : Color.TextColorRequired,
                                          Color.TextColorSecondary)
-#if os(iOS)
                         .lineLimit(1)
                         .truncationMode(.tail)
-#endif
                 } else {
                     Text(title)
                         .foregroundStyle(fieldValidation.valid ?
@@ -51,11 +49,11 @@ struct FieldEditor: View {
                                          Color.TextColorSecondary)
 #if os(iOS)
                         .frame(width: titleWidth[1], alignment: .leading)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
 #else
                         .frame(width: titleWidth[0], alignment: .leading)
 #endif
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
             }
             

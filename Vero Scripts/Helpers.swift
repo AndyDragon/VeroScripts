@@ -96,55 +96,48 @@ import SystemColors
 
 extension Color {
     static var currentTheme = ""
-    
+
     static var theme: Color  {
         return Color("theme")
     }
     static var BackgroundColor: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .windowBackgroundColor)
             return .windowBackground
         }
         return Color("\(currentTheme)/BackgroundColor")
     }
     static var BackgroundColorEditor: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .windowBackgroundColor)
             return .controlBackground.opacity(0.5)
         }
         return Color("\(currentTheme)/BackgroundColorEditor")
     }
     static var BackgroundColorList: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .controlBackgroundColor)
             return .controlBackground
         }
         return Color("\(currentTheme)/BackgroundColorList")
     }
     static var BackgroundColorNavigationBar: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .windowBackgroundColor)
             return .windowBackground
         }
         return Color("\(currentTheme)/BackgroundColorNavigationBar")
     }
     static var ColorPrimary: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .highlightColor)
             return .highlight
         }
         return Color("\(currentTheme)/ColorPrimary")
     }
     static var AccentColor: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .systemGray)
             return .accentColor
         }
         return Color("\(currentTheme)/AccentColor")
     }
     static var TextColorPrimary: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .labelColor)
             return .label
         }
         return Color("\(currentTheme)/TextColorPrimary")
@@ -157,7 +150,6 @@ extension Color {
     }
     static var TextColorSecondary: Color  {
         if currentTheme.isEmpty {
-            //return Color(nsColor: .secondaryLabelColor)
             return .secondaryLabel
         }
         return Color("\(currentTheme)/TextColorSecondary")
@@ -170,12 +162,12 @@ class Constants {
 
 class UserDefaultsUtils {
     static var shared = UserDefaultsUtils()
-    
+
     func setTheme(theme: Theme) {
         UserDefaults.standard.set(theme.rawValue, forKey: Constants.THEME)
     }
-    
+
     func getTheme() -> Theme {
-        return Theme(rawValue: UserDefaults.standard.string(forKey: Constants.THEME) ?? Theme.darkSubtleGray.rawValue) ?? Theme.darkSubtleGray
+        return Theme(rawValue: UserDefaults.standard.string(forKey: Constants.THEME) ?? Theme.systemDark.rawValue) ?? Theme.systemDark
     }
 }

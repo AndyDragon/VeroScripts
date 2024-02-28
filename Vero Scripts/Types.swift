@@ -14,6 +14,7 @@ enum FocusedField: Hashable {
          pageName,
          staffLevel,
          firstFeature,
+         rawTag,
          communityTag,
          featureScript,
          commentScript,

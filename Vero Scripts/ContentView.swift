@@ -42,6 +42,7 @@ struct ContentView: View {
     ) ?? StaffLevelCase.mod
     @State var firstForPage: Bool = false
     @State var fromCommunityTag: Bool = false
+    @State var fromRawTag: Bool = false
     @State var featureScript: String = ""
     @State var commentScript: String = ""
     @State var originalPostScript: String = ""
@@ -171,6 +172,8 @@ struct ContentView: View {
                             firstForPageChanged(to: firstForPage)
                             fromCommunityTag = false
                             fromCommunityTagChanged(to: fromCommunityTag)
+                            fromRawTag = false
+                            fromRawTagChanged(to: fromRawTag)
                             newMembership = NewMembershipCase.none
                             newMembershipChanged(to: newMembership)
                             focusedField = .userName
@@ -243,11 +246,11 @@ struct ContentView: View {
                                              Color.TextColorSecondary)
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
 #else
                             .frame(width: 36, alignment: .leading)
 #endif
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                         Picker("", selection: $page.onChange { value in
                             if page == "default" && pageName.count == 0 {
                                 pageValidation = (false, "Page must not be 'default' or a page name is required")
@@ -300,10 +303,8 @@ struct ContentView: View {
                         // Page staff level picker
                         Text("Page staff level: ")
                             .padding([.leading], 8)
-#if os(iOS)
                             .lineLimit(1)
                             .truncationMode(.tail)
-#endif
                         Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
                             ForEach(StaffLevelCase.allCases) { staffLevelCase in
                                 Text(staffLevelCase.rawValue)
@@ -323,17 +324,33 @@ struct ContentView: View {
                         // Options
                         Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                             Text("First feature on page")
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                         }
                         .focusable()
                         .focused($focusedField, equals: .firstFeature)
                         .padding([.leading], 8)
+                        .help("First feature on page")
+                        
+                        Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
+                            Text("From RAW tag")
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .rawTag)
+                        .padding([.leading], 8)
+                        .help("From RAW tag")
                         
                         Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
                             Text("From community tag")
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                         }
                         .focusable()
                         .focused($focusedField, equals: .communityTag)
                         .padding([.leading], 8)
+                        .help("From community tag")
 #else
                         Spacer()
 #endif
@@ -345,6 +362,20 @@ struct ContentView: View {
                     // Options
                     Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                         Text("First feature on page")
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                    .focusable()
+                    Spacer()
+                        .frame(width: 20)
+                    Rectangle()
+                        .frame(width: 1, height: 24)
+                        .background(Color.gray)
+                        .opacity(0.2)
+                    Spacer()
+                        .frame(width: 20)
+                    Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
+                        Text("From RAW tag")
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
@@ -560,6 +591,8 @@ struct ContentView: View {
                         firstForPageChanged(to: firstForPage)
                         fromCommunityTag = false
                         fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = false
+                        fromRawTagChanged(to: fromRawTag)
                         newMembership = NewMembershipCase.none
                         newMembershipChanged(to: newMembership)
                         focusedField = .userName
@@ -907,6 +940,10 @@ struct ContentView: View {
         updateScripts()
     }
     
+    func fromRawTagChanged(to value: Bool) {
+        updateScripts()
+    }
+    
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
@@ -1028,16 +1065,19 @@ struct ContentView: View {
                 "feature",
                 from: currentPageName,
                 firstFeature: firstForPage,
+                rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
                 from: currentPageName,
                 firstFeature: firstForPage,
+                rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
                 from: currentPageName,
                 firstFeature: firstForPage,
+                rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
@@ -1076,47 +1116,83 @@ struct ContentView: View {
         _ templateName: String,
         from pageName: String,
         firstFeature: Bool,
+        rawTag: Bool,
         communityTag: Bool
     ) -> String! {
         var template: Template!
         if waitingForTemplates {
             return "";
         }
-        let defaultTemplatePage = templatesCatalog.pages.first(where: { page in
-            page.name == "default"
-        });
         let templatePage = templatesCatalog.pages.first(where: { page in
             page.name == pageName
         });
-        if communityTag {
+
+        // check first feature AND raw AND community
+        if firstFeature && rawTag && communityTag {
             template = templatePage?.templates.first(where: { template in
-                template.name == "community " + templateName
+                template.name == "first raw community " + templateName
             })
-            if template == nil {
-                template = defaultTemplatePage?.templates.first(where: { template in
-                    template.name == "community " + templateName
-                })
-            }
-        } else if firstFeature {
+        }
+        
+        // next check first feature AND raw
+        if firstFeature && rawTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "first raw " + templateName
+            })
+        }
+        
+        // next check first feature AND community
+        if firstFeature && communityTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "first community " + templateName
+            })
+        }
+        
+        // next check first feature
+        if firstFeature && template == nil {
             template = templatePage?.templates.first(where: { template in
                 template.name == "first " + templateName
             })
-            if template == nil {
-                template = defaultTemplatePage?.templates.first(where: { template in
-                    template.name == "first " + templateName
-                })
-            }
         }
+        
+        // next check raw
+        if rawTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "raw " + templateName
+            })
+        }
+        
+        // next check raw AND community
+        if rawTag && communityTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "raw community " + templateName
+            })
+        }
+        
+        // next check community
+        if communityTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "community " + templateName
+            })
+        }
+        
+        // last check standard
         if template == nil {
             template = templatePage?.templates.first(where: { template in
                 template.name == templateName
             })
         }
+
+        // fallback to default
         if template == nil {
+            let defaultTemplatePage = templatesCatalog.pages.first(where: { page in
+                page.name == "default"
+            });
             template = defaultTemplatePage?.templates.first(where: { template in
                 template.name == templateName
             })
         }
+        
         return template?.template
     }
     

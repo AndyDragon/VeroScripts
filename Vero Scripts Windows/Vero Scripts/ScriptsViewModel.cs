@@ -254,9 +254,9 @@ namespace VeroScripts
         #endregion
 
         public PagesCatalog PagesCatalog { get; private set; }
-        
+
         public TemplatesCatalog TemplatesCatalog { get; private set; }
-        
+
         private static List<string> disallowList = [];
 
         private Theme? theme = ThemeManager.Current.DetectTheme();
@@ -619,7 +619,7 @@ namespace VeroScripts
 
         public string FeatureScript
         {
-            get => Scripts[Script.Feature]; 
+            get => Scripts[Script.Feature];
             set
             {
                 if (Scripts[Script.Feature] != value)
@@ -788,7 +788,7 @@ namespace VeroScripts
 
         #region Script management
 
-        public bool CanCopyScripts => 
+        public bool CanCopyScripts =>
             UserNameValidation.Valid &&
             MembershipValidation.Valid &&
             YourNameValidation.Valid &&
@@ -879,18 +879,31 @@ namespace VeroScripts
             TemplateEntry? template = null;
             var defaultTemplatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == "default");
             var templatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == pageName);
+
+            // Check community and first feature
+            if (communityTag && firstForPage)
+            {
+                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first community " + templateName);
+            }
+
+            // Next check community
             if (communityTag)
             {
-                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
-                template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
             }
-            else if (firstForPage)
+
+            // Next check first feature
+            if (firstForPage)
             {
-                template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
-                template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
+                template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first " + templateName);
             }
+
+            // Last check standard
             template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
+
+            // Fallback to default
             template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
+
             return template?.Template ?? "";
         }
 
