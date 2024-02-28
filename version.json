@@ -1,11 +1,11 @@
 {
     "macOS": {
-        "current": "1.0.24",
-        "link": "https://github.com/AndyDragon/VeroScripts/releases/tag/build_24",
+        "current": "1.0.25",
+        "link": "https://github.com/AndyDragon/VeroScripts/releases/tag/macos_build_25",
         "vital": false
     },
     "windows": {
-        "current": "1.0.23",
+        "current": "1.0.24",
         "link": "https://vero.andydragon.com/app/windows/setup.exe",
         "vital": false
     }
