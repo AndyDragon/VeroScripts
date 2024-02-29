@@ -11,5 +11,5 @@ Vero Scripts Windows/Vero Scripts/obj/
 Vero Scripts Windows/Vero Scripts/*.csproj.user
 Vero Scripts Windows/Vero Scripts/Properties/PublishProfiles/*.user
 
-*.xcbkptlist
-**/xcuserdata/
+#*.xcbkptlist
+#**/xcuserdata/
