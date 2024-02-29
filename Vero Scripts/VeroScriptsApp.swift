@@ -1,5 +1,5 @@
 //
-//  Vero_ScriptsApp.swift
+//  VeroScriptsApp.swift
 //  Vero Scripts
 //
 //  Created by Andrew Forget on 2024-01-03.
@@ -77,7 +77,7 @@ struct VersionCheckAppState {
 }
 
 @main
-struct Vero_ScriptsApp: App {
+struct VeroScriptsApp: App {
     @State var checkingForUpdates = false
     @State var isShowingVersionAvailableToast: Bool = false
     @State var isShowingVersionRequiredToast: Bool = false
