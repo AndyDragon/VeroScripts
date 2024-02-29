@@ -1,9 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace VeroScripts
+﻿namespace VeroScripts
 {
-    public class Placeholder : INotifyPropertyChanged
+    public class Placeholder : NotifyPropertyChanged
     {
         public Placeholder(string name)
         {
@@ -16,34 +13,18 @@ namespace VeroScripts
             Value = value;
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         private string name = "";
         public string Name
         {
-            get { return name; }
-            set
-            {
-                if (value != name)
-                {
-                    name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                }
-            }
+            get => name;
+            set => Set(ref name, value);
         }
 
-        private string value = "";
+        private string currentValue = "";
         public string Value
         {
-            get { return value; }
-            set
-            {
-                if (value != this.value)
-                {
-                    this.value = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-                }
-            }
+            get => currentValue;
+            set => Set(ref this.currentValue, value);
         }
     }
 }

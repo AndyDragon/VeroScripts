@@ -1,14 +1,14 @@
-﻿using System.Collections.ObjectModel;
+﻿using ControlzEx.Theming;
+using Newtonsoft.Json;
+using Notification.Wpf;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Notification.Wpf;
-using System.IO;
-using System.Security.Principal;
-using Newtonsoft.Json;
-using ControlzEx.Theming;
 using System.Windows.Input;
 
 namespace VeroScripts
@@ -97,15 +97,15 @@ namespace VeroScripts
                 { Script.Comment, new ObservableCollection<Placeholder>() },
                 { Script.OriginalPost, new ObservableCollection<Placeholder>() }
             };
-            clearUserCommand = new Command(ClearUser);
-            copyFeatureScriptCommand = new Command(() => CopyScript(Script.Feature, force: true));
-            copyFeatureScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.Feature, force: true, withPlaceholders: true));
-            copyCommentScriptCommand = new Command(() => CopyScript(Script.Comment, force: true));
-            copyCommentScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.Comment, force: true, withPlaceholders: true));
-            copyOriginalPostScriptCommand = new Command(() => CopyScript(Script.OriginalPost, force: true));
-            copyOriginalPostScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.OriginalPost, force: true, withPlaceholders: true));
-            copyNewMembershipScriptCommand = new Command(CopyNewMembershipScript);
-            setThemeCommand = new CommandWithParameter((parameter) =>
+            ClearUserCommand = new Command(ClearUser);
+            CopyFeatureScriptCommand = new Command(() => CopyScript(Script.Feature, force: true));
+            CopyFeatureScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.Feature, force: true, withPlaceholders: true));
+            CopyCommentScriptCommand = new Command(() => CopyScript(Script.Comment, force: true));
+            CopyCommentScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.Comment, force: true, withPlaceholders: true));
+            CopyOriginalPostScriptCommand = new Command(() => CopyScript(Script.OriginalPost, force: true));
+            CopyOriginalPostScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.OriginalPost, force: true, withPlaceholders: true));
+            CopyNewMembershipScriptCommand = new Command(CopyNewMembershipScript);
+            SetThemeCommand = new CommandWithParameter((parameter) =>
             {
                 if (parameter is Theme theme)
                 {
@@ -224,32 +224,23 @@ namespace VeroScripts
 
         #region Commands
 
-        private readonly ICommand clearUserCommand;
-        public ICommand ClearUserCommand => clearUserCommand;
+        public ICommand ClearUserCommand { get; }
 
-        private readonly ICommand copyFeatureScriptCommand;
-        public ICommand CopyFeatureScriptCommand => copyFeatureScriptCommand;
+        public ICommand CopyFeatureScriptCommand { get; }
 
-        private readonly ICommand copyFeatureScriptWithPlaceholdersCommand;
-        public ICommand CopyFeatureScriptWithPlaceholdersCommand => copyFeatureScriptWithPlaceholdersCommand;
+        public ICommand CopyFeatureScriptWithPlaceholdersCommand { get; }
 
-        private readonly ICommand copyCommentScriptCommand;
-        public ICommand CopyCommentScriptCommand => copyCommentScriptCommand;
+        public ICommand CopyCommentScriptCommand { get; }
 
-        private readonly ICommand copyCommentScriptWithPlaceholdersCommand;
-        public ICommand CopyCommentScriptWithPlaceholdersCommand => copyCommentScriptWithPlaceholdersCommand;
+        public ICommand CopyCommentScriptWithPlaceholdersCommand { get; }
 
-        private readonly ICommand copyOriginalPostScriptCommand;
-        public ICommand CopyOriginalPostScriptCommand => copyOriginalPostScriptCommand;
+        public ICommand CopyOriginalPostScriptCommand { get; }
 
-        private readonly ICommand copyOriginalPostScriptWithPlaceholdersCommand;
-        public ICommand CopyOriginalPostScriptWithPlaceholdersCommand => copyOriginalPostScriptWithPlaceholdersCommand;
+        public ICommand CopyOriginalPostScriptWithPlaceholdersCommand { get; }
 
-        private readonly ICommand copyNewMembershipScriptCommand;
-        public ICommand CopyNewMembershipScriptCommand => copyNewMembershipScriptCommand;
+        public ICommand CopyNewMembershipScriptCommand { get; }
 
-        private readonly ICommand setThemeCommand;
-        public ICommand SetThemeCommand => setThemeCommand;
+        public ICommand SetThemeCommand { get; }
 
         #endregion
 

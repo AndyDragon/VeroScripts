@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VeroScripts
+﻿namespace VeroScripts
 {
     public struct ValidationResult(bool valid, string? error = null)
     {
