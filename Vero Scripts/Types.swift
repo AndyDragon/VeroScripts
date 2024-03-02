@@ -66,15 +66,41 @@ enum PlaceholderSheetCase {
 }
 
 struct PageCatalog: Codable {
-    let pages: [Page]
-    let users: [String: [Page]]?
+    var pages: [Page]
+    var hubs: [String: [HubPage]]?
 }
 
-struct Page: Codable, Identifiable {
+struct Page: Codable {
     var id: String { self.name }
     let name: String
     let pageName: String?
-    let hub: String?
+}
+
+struct HubPage: Codable {
+    var id: String { self.name }
+    let name: String
+    let pageName: String?
+    let users: [String]?
+}
+
+struct LoadedPage: Codable, Identifiable {
+    var id: String {
+        if let hub = self.hubName {
+            return "\(hub):\(self.name)"
+        }
+        return self.name
+    }
+    let name: String
+    let pageName: String?
+    let hubName: String?
+    
+    static func from(page: Page) -> LoadedPage {
+        return LoadedPage(name: page.name, pageName: page.pageName, hubName: nil)
+    }
+    
+    static func from(hubPage: HubPage, with name: String) -> LoadedPage {
+        return LoadedPage(name: hubPage.name, pageName: hubPage.pageName, hubName: name)
+    }
 }
 
 struct TemplateCatalog: Codable {

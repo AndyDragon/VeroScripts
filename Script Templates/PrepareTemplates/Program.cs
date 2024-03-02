@@ -40,31 +40,39 @@ class Program
                 else
                 {
                     // Add page to all the catalogs.
-                    var page = new Page(pageName);
-                    var user = string.Empty;
+                    //var pageHub = string.Empty;
                     var foundManifest = false;
                     if (File.Exists(Path.Combine(folder, "manifest.json")))
                     {
                         var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
                         var manifest =  Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile);
-                        page.PageName = manifest?.PageName;
-                        user = manifest?.UserName;
-                        if (!string.IsNullOrEmpty(user))
+                        var pageHub = manifest?.Hub;
+                        if (!string.IsNullOrEmpty(pageHub))
                         {
-                            page.Hub = manifest?.Hub;
+                            var hubPage = new HubPage(manifest?.Page ?? pageName)
+                            {
+                                PageName = manifest?.PageName,
+                                Users = new List<string>(manifest?.UserNames ?? new List<string>())
+                            };
+                            if (!pageCatalog.Hubs.ContainsKey(pageHub))
+                            {
+                                pageCatalog.Hubs[pageHub] = new List<HubPage>();
+                            }
+                            pageCatalog.Hubs[pageHub].Add(hubPage);
+                        }
+                        else
+                        {
+                            var page = new Page(pageName)
+                            {
+                                PageName = manifest?.PageName
+                            };
+                            pageCatalog.Pages.Add(page);
                         }
                         foundManifest = true;
                     }
-                    if (!string.IsNullOrEmpty(user))
-                    {
-                        if (!pageCatalog.UserPages.ContainsKey(user))
-                        {
-                            pageCatalog.UserPages[user] = new List<Page>();
-                        }
-                        pageCatalog.UserPages[user].Add(page);
-                    }
                     else
                     {
+                        var page = new Page(pageName);
                         pageCatalog.Pages.Add(page);
                     }
                     templateCatalog.Pages.Add(new TemplatePage(pageName, templates));
@@ -150,17 +158,15 @@ class PageCatalog
     public PageCatalog()
     {
         Pages = new List<Page>();
-        UserPages = new Dictionary<string, IList<Page>>();
+        Hubs = new Dictionary<string, IList<HubPage>>();
     }
 
     [Newtonsoft.Json.JsonProperty(propertyName: "pages")]
     public IList<Page> Pages { get; private set; }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "users")]
-    public IDictionary<string, IList<Page>> UserPages { get; private set; }
+    [Newtonsoft.Json.JsonProperty(propertyName: "hubs")]
+    public IDictionary<string, IList<HubPage>> Hubs { get; private set; }
 }
-
-
 
 class Page
 {
@@ -174,9 +180,16 @@ class Page
 
     [Newtonsoft.Json.JsonProperty(propertyName: "pageName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? PageName { get; set; }
+}
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "hub", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-    public string? Hub { get; set; }
+class HubPage : Page
+{
+    public HubPage(string name) : base(name)
+    {
+    }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "users", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    public List<string>? Users { get; set; }
 }
 
 class Manifest
@@ -186,14 +199,17 @@ class Manifest
         PageName = pageName;
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "pageName")]
-    public string PageName { get; set; }
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "userName")]
-    public string UserName { get; set; } = string.Empty;
-
     [Newtonsoft.Json.JsonProperty(propertyName: "hub")]
     public string Hub { get; set; } = string.Empty;
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "page")]
+    public string Page { get; set; } = string.Empty;
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "pageName")]
+    public string PageName { get; set; } = string.Empty;
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "userNames")]
+    public IList<string> UserNames { get; set; } = new List<string>();
 }
 
 class HubCatalog

@@ -166,27 +166,6 @@
       ]
     },
     {
-      "name": "andrew:machines",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
-        },
-        {
-          "name": "feature",
-          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n\n       ⚙️ #click_%%PAGENAME%% ⚙️\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it embodies the nature of machines, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of machines and machinery!\n\n@click_%%PAGENAME%% is a community-run hub for featuring machines and machinery in today's world as well as machines from our past.\n\nFor internal use only!\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "first comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫\n"
-        }
-      ]
-    },
-    {
       "name": "architecture",
       "templates": [
         {
@@ -454,6 +433,27 @@
         {
           "name": "original post",
           "template": "✴️ Featured %%MEMBERLEVEL%% ✴️"
+        }
+      ]
+    },
+    {
+      "name": "click:machines",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
+        },
+        {
+          "name": "feature",
+          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n\n       ⚙️ #click_%%PAGENAME%% ⚙️\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it embodies the nature of machines, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of machines and machinery!\n\n@click_%%PAGENAME%% is a community-run hub for featuring machines and machinery in today's world as well as machines from our past.\n\nFor internal use only!\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "first comment",
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫\n"
         }
       ]
     },
