@@ -93,7 +93,13 @@ struct LoadedPage: Codable, Identifiable {
     let name: String
     let pageName: String?
     let hubName: String?
-    
+    var displayName: String {
+        if let hub = hubName {
+            return "\(hub)_\(name)"
+        }
+        return name;
+    }
+
     static func from(page: Page) -> LoadedPage {
         return LoadedPage(name: page.name, pageName: page.pageName, hubName: nil)
     }

@@ -10,5 +10,17 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.28",
+        "notes": [
+            {
+                "date": "March 2, 2024",
+                "notes": [
+                    "Fixed some bugs from hubs handling."
+                ]
+            }
+        ]
     }
+
 ]

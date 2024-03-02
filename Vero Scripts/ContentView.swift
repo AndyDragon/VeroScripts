@@ -57,7 +57,7 @@ struct ContentView: View {
     @State var terminalAlert = false
     @State var placeholderSheetCase = PlaceholderSheetCase.featureScript
     @State var showingPlaceholderSheet = false
-    @State var allPages = [LoadedPage]()
+    @State var loadedPages = [LoadedPage]()
     @State var currentPage: LoadedPage? = nil
     @State var waitingForTemplates: Bool = true
     @State var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
@@ -289,8 +289,8 @@ struct ContentView: View {
                             }
                             pageChanged(to: value)
                         }) {
-                            ForEach(allPages) { page in
-                                Text(getPageDisplay(for: page))
+                            ForEach(loadedPages) { page in
+                                Text(page.displayName)
                                     .tag(page.id)
                                     .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
                             }
@@ -776,8 +776,8 @@ struct ContentView: View {
                             }
                         }
                     }
-                    allPages.removeAll()
-                    allPages.append(contentsOf: pages.sorted(by: {
+                    loadedPages.removeAll()
+                    loadedPages.append(contentsOf: pages.sorted(by: {
                         if $0.name.starts(with: "_") && $1.name.starts(with: "_") {
                             return $0.name < $1.name
                         }
@@ -840,13 +840,6 @@ struct ContentView: View {
                 }
             }
             .preferredColorScheme(isDarkModeOn ? /*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/ : .light)
-    }
-
-    func getPageDisplay(for page: LoadedPage) -> String {
-        if let hubName = page.hubName {
-            return "\(hubName)_\(page.name)"
-        }
-        return page.name
     }
 
     func setTheme(_ newTheme: Theme) {
@@ -1114,13 +1107,17 @@ struct ContentView: View {
     }
 
     func updateScripts() -> Void {
-        let currentPageName = page == "default" ? pageName : page
+        var currentPageName = page == "default" ? pageName : page
         var scriptPageName = currentPageName
         let oldHubName = currentPage?.hubName
         if currentPageName != "default" {
-            let pageSource = allPages.first(where: { needle in needle.id == page })
-            if pageSource != nil && pageSource?.pageName != nil {
-                scriptPageName = (pageSource?.pageName)!
+            let pageSource = loadedPages.first(where: { needle in needle.id == page })
+            if pageSource != nil {
+                currentPageName = pageSource?.name ?? page
+                scriptPageName = currentPageName
+                if pageSource?.pageName != nil {
+                    scriptPageName = (pageSource?.pageName)!
+                }
             }
             currentPage = pageSource
         } else {
@@ -1153,19 +1150,19 @@ struct ContentView: View {
         } else {
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
-                from: currentPageName,
+                from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
-                from: currentPageName,
+                from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
-                from: currentPageName,
+                from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag) ?? ""
@@ -1204,7 +1201,7 @@ struct ContentView: View {
 
     func getTemplateFromCatalog(
         _ templateName: String,
-        from pageName: String,
+        from pageId: String,
         firstFeature: Bool,
         rawTag: Bool,
         communityTag: Bool
@@ -1214,7 +1211,7 @@ struct ContentView: View {
             return "";
         }
         let templatePage = templatesCatalog.pages.first(where: { page in
-            page.name == pageName
+            page.id == pageId
         });
 
         // check first feature AND raw AND community
