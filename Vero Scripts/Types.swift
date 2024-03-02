@@ -34,6 +34,17 @@ enum MembershipCase: String, CaseIterable, Identifiable {
     var id: Self { self }
 }
 
+enum ClickMembershipCase: String, CaseIterable, Identifiable {
+    case none = "None",
+         artist = "Artist",
+         member = "Member",
+         bronzeMember = "Bronze Member",
+         silverMember = "Silver Member",
+         goldMember = "Gold Member",
+         platinumMember = "Platinum Member"
+    var id: Self { self }
+}
+
 enum NewMembershipCase: String, CaseIterable, Identifiable {
     case none = "None",
          member = "Member",
@@ -56,12 +67,14 @@ enum PlaceholderSheetCase {
 
 struct PageCatalog: Codable {
     let pages: [Page]
+    let users: [String: [Page]]?
 }
 
 struct Page: Codable, Identifiable {
     var id: String { self.name }
     let name: String
     let pageName: String?
+    let hub: String?
 }
 
 struct TemplateCatalog: Codable {

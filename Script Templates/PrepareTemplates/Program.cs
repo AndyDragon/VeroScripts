@@ -41,14 +41,32 @@ class Program
                 {
                     // Add page to all the catalogs.
                     var page = new Page(pageName);
+                    var user = string.Empty;
                     var foundManifest = false;
                     if (File.Exists(Path.Combine(folder, "manifest.json")))
                     {
                         var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
-                        page.PageName = Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile)?.PageName;
+                        var manifest =  Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile);
+                        page.PageName = manifest?.PageName;
+                        user = manifest?.UserName;
+                        if (!string.IsNullOrEmpty(user))
+                        {
+                            page.Hub = manifest?.Hub;
+                        }
                         foundManifest = true;
                     }
-                    pageCatalog.Pages.Add(page);
+                    if (!string.IsNullOrEmpty(user))
+                    {
+                        if (!pageCatalog.UserPages.ContainsKey(user))
+                        {
+                            pageCatalog.UserPages[user] = new List<Page>();
+                        }
+                        pageCatalog.UserPages[user].Add(page);
+                    }
+                    else
+                    {
+                        pageCatalog.Pages.Add(page);
+                    }
                     templateCatalog.Pages.Add(new TemplatePage(pageName, templates));
                     if (!foundManifest)
                     {
@@ -132,11 +150,17 @@ class PageCatalog
     public PageCatalog()
     {
         Pages = new List<Page>();
+        UserPages = new Dictionary<string, IList<Page>>();
     }
 
     [Newtonsoft.Json.JsonProperty(propertyName: "pages")]
     public IList<Page> Pages { get; private set; }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "users")]
+    public IDictionary<string, IList<Page>> UserPages { get; private set; }
 }
+
+
 
 class Page
 {
@@ -150,6 +174,9 @@ class Page
 
     [Newtonsoft.Json.JsonProperty(propertyName: "pageName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? PageName { get; set; }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "hub", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    public string? Hub { get; set; }
 }
 
 class Manifest
@@ -161,6 +188,12 @@ class Manifest
 
     [Newtonsoft.Json.JsonProperty(propertyName: "pageName")]
     public string PageName { get; set; }
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "userName")]
+    public string UserName { get; set; } = string.Empty;
+
+    [Newtonsoft.Json.JsonProperty(propertyName: "hub")]
+    public string Hub { get; set; } = string.Empty;
 }
 
 class HubCatalog
