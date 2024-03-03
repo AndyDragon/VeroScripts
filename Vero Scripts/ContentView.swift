@@ -765,10 +765,14 @@ struct ContentView: View {
                     var pages = [LoadedPage]()
                     pages.append(contentsOf: pagesCatalog.pages.map({ LoadedPage.from(page: $0) }))
                     pages.append(LoadedPage(name: "community", pageName: "community", hubName: nil))
+                    let user = "\(ProcessInfo.processInfo.userName)@\(ProcessInfo.processInfo.hostName)".lowercased()
+                    let userKey = user
+                        .sha256()
+                        .hexEncodedString(options: .upperCase)
                     for hubPair in (pagesCatalog.hubs ?? [:]) {
                         for hubPage in hubPair.value {
                             if let pageUsers = hubPage.users {
-                                if pageUsers.includesWithoutCase(ProcessInfo.processInfo.fullUserName) {
+                                if pageUsers.includesWithoutCase(userKey) {
                                     pages.append(LoadedPage.from(hubPage: hubPage, with: hubPair.key))
                                 }
                             } else {

@@ -50,7 +50,7 @@ struct VersionCheckAppState {
     private func checkForUpdatesAsync() async throws -> Void {
         do {
             // Check version from server manifest
-            let versionManifestUrl = URL(string: "https://vero.andydragon.com/static/data/version.json")!
+            let versionManifestUrl = URL(string: "https://vero.andydragon.com/static/data/veroscripts/version.json")!
             let versionManifest = try await URLSession.shared.decode(VersionManifest.self, from: versionManifestUrl)
             if Bundle.main.releaseVersionOlder(than: versionManifest.macOS.current) {
                 DispatchQueue.main.async {
