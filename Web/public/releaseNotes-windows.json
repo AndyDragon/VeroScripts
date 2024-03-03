@@ -1,1 +1,15 @@
-[]
+[
+    {
+        "version": "1.0.26",
+        "notes": [
+            {
+                "date": "March 3, 2024",
+                "notes": [
+                    "Updated app to allow for hubs with users instead of users.",
+                    "Updated the script template compiler.",
+                    "Fixed some bugs from hubs handling."
+                ]
+            }
+        ]
+    }
+]
