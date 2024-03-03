@@ -6,7 +6,9 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Security.Principal;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -82,7 +84,6 @@ namespace VeroScripts
 
         public ScriptsViewModel()
         {
-            PagesCatalog = new PagesCatalog();
             _ = LoadPages();
             TemplatesCatalog = new TemplatesCatalog();
             Scripts = new Dictionary<Script, string>
@@ -150,11 +151,40 @@ namespace VeroScripts
                 var content = await httpClient.GetStringAsync(pagesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
-                    PagesCatalog = JsonConvert.DeserializeObject<PagesCatalog>(content) ?? new PagesCatalog();
-                    Pages = PagesCatalog.Pages.Select(page => page.Name).ToArray();
+                    var loadedPages = new List<LoadedPage>();
+                    var pagesCatalog = JsonConvert.DeserializeObject<PagesCatalog>(content) ?? new PagesCatalog();
+                    foreach (var page in pagesCatalog.Pages)
+                    {
+                        loadedPages.Add(new LoadedPage(page));
+                    }
+                    if (pagesCatalog.Hubs != null)
+                    {
+                        var currentUser = WindowsIdentity.GetCurrent().User?.Value ?? "unknown";
+                        var currentUserHash = ComputeSHA256(currentUser);
+                        foreach (var hubPair in pagesCatalog.Hubs)
+                        {
+                            foreach (var hubPage in hubPair.Value)
+                            {
+                                var canAddPage = true;
+                                if (hubPage.Users != null)
+                                {
+                                    canAddPage = hubPage.Users.FirstOrDefault(user => string.Equals(user, currentUserHash, StringComparison.OrdinalIgnoreCase)) != null;
+                                }
+                                if (canAddPage)
+                                {
+                                    loadedPages.Add(new LoadedPage(hubPair.Key, hubPage));
+                                }
+                            }
+                        }
+                    }
+                    LoadedPages.Clear();
+                    foreach (var page in loadedPages.OrderBy(page => page, LoadedPageComparer.Default))
+                    {
+                        LoadedPages.Add(page);
+                    }
                     notificationManager.Show(
                         "Pages loaded",
-                        "Loaded " + Pages.Length.ToString() + " pages from the server",
+                        "Loaded " + LoadedPages.Count.ToString() + " pages from the server",
                         type: NotificationType.Information,
                         areaName: "WindowArea",
                         expirationTime: TimeSpan.FromSeconds(3));
@@ -244,8 +274,6 @@ namespace VeroScripts
 
         #endregion
 
-        public PagesCatalog PagesCatalog { get; private set; }
-
         public TemplatesCatalog TemplatesCatalog { get; private set; }
 
         private static List<string> disallowList = [];
@@ -328,7 +356,7 @@ namespace VeroScripts
 
         #region Membership level
 
-        public static string[] Memberships => [
+        private static string[] Memberships => [
             "None",
             "Artist",
             "Member",
@@ -339,6 +367,18 @@ namespace VeroScripts
             "Hall of Fame Member",
             "Diamond Member",
         ];
+
+        private static string[] ClickMemberships => [
+            "None",
+            "Artist",
+            "Member",
+            "Bronze Member",
+            "Silver Member",
+            "Gold Member",
+            "Platinum Member",
+        ];
+
+        public string[] HubMemberships => SelectedPage?.HubName == "click" ? ClickMemberships : Memberships;
 
         private string membership = "None";
 
@@ -452,22 +492,34 @@ namespace VeroScripts
 
         #region Pages
 
-        private string[] pages = [];
+        public ObservableCollection<LoadedPage> LoadedPages { get; } = [];
 
-        public string[] Pages
+        private LoadedPage? selectedPage = null;
+
+        public LoadedPage? SelectedPage
         {
-            get => pages;
+            get => selectedPage;
             set
             {
-                if (Set(ref pages, value))
+                var oldHubName = SelectedPage?.HubName;
+                if (Set(ref selectedPage, value))
                 {
-                    pages = value;
-                    OnPropertyChanged(nameof(Page));
-                    OnPropertyChanged(nameof(PageNameEnabled));
-                    OnPropertyChanged(nameof(PageNameDisabled));
+                    Page = SelectedPage?.Id ?? string.Empty;
+                    if (oldHubName != SelectedPage?.HubName)
+                    {
+                        Membership = "None";
+                        OnPropertyChanged(nameof(HubMemberships));
+                        OnPropertyChanged(nameof(ClickHubVisibility));
+                        OnPropertyChanged(nameof(NonClickHubVisibility));
+                        NewMembership = "None";
+                        OnPropertyChanged(nameof(HubNewMemberships));
+                    }
                 }
             }
         }
+
+        public Visibility ClickHubVisibility => SelectedPage?.HubName == "click" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NonClickHubVisibility => SelectedPage?.HubName == "click" ? Visibility.Collapsed : Visibility.Visible;
 
         #endregion
 
@@ -687,11 +739,22 @@ namespace VeroScripts
 
         #region New membership level
 
-        public static string[] NewMemberships => [
+        private static string[] NewMemberships => [
             "None",
             "Member",
             "VIP Member",
         ];
+
+        private static string[] ClickNewMemberships => [
+            "None",
+            "Member",
+            "Bronze Member",
+            "Silver Member",
+            "Gold Member",
+            "Platinum Member",
+        ];
+
+        public string[] HubNewMemberships => SelectedPage?.HubName == "click" ? ClickNewMemberships : NewMemberships;
 
         private string newMembership = "None";
 
@@ -811,6 +874,33 @@ namespace VeroScripts
 
         private void UpdateScripts()
         {
+            var pageName = Page == "default" || string.IsNullOrEmpty(Page) ? PageName : Page;
+            var pageId = pageName;
+            var scriptPageName = pageName;
+            var oldHubName = selectedPage?.HubName;
+            if (Page != "default")
+            {
+                var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
+                if (sourcePage != null)
+                {
+                    pageId = sourcePage.Id;
+                    pageName = sourcePage.Name;
+                    scriptPageName = pageName;
+                    if (sourcePage.PageName != null)
+                    {
+                        scriptPageName = sourcePage.PageName;
+                    }
+                }
+                SelectedPage = sourcePage;
+            }
+            else
+            {
+                SelectedPage = null; // ??
+            }
+            if (SelectedPage?.HubName != oldHubName) 
+            {
+                MembershipValidation = ValidateValueNotDefault(Membership, "None");
+            }
             if (!CanCopyScripts)
             {
                 var validationErrors = "";
@@ -834,19 +924,9 @@ namespace VeroScripts
             }
             else
             {
-                var pageName = Page == "default" || string.IsNullOrEmpty(Page) ? PageName : Page;
-                var scriptPageName = pageName;
-                if (Page != "default")
-                {
-                    var sourcePage = PagesCatalog.Pages.FirstOrDefault(page => page.Name == Page);
-                    if (sourcePage != null && sourcePage.PageName != null)
-                    {
-                        scriptPageName = sourcePage.PageName;
-                    }
-                }
-                var featureScriptTemplate = GetTemplate("feature", pageName, FirstForPage, RawTag, CommunityTag);
-                var commentScriptTemplate = GetTemplate("comment", pageName, FirstForPage, RawTag, CommunityTag);
-                var originalPostScriptTemplate = GetTemplate("original post", pageName, FirstForPage, RawTag, CommunityTag);
+                var featureScriptTemplate = GetTemplate("feature", pageId, FirstForPage, RawTag, CommunityTag);
+                var commentScriptTemplate = GetTemplate("comment", pageId, FirstForPage, RawTag, CommunityTag);
+                var originalPostScriptTemplate = GetTemplate("original post", pageId, FirstForPage, RawTag, CommunityTag);
                 FeatureScript = featureScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
@@ -959,21 +1039,33 @@ namespace VeroScripts
 
                 NewMembershipScript = validationErrors;
             }
-            else if (NewMembership == "Member")
+            else
             {
-                TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new member");
-                NewMembershipScript = (template?.Template ?? "")
-                    .Replace("%%USERNAME%%", UserName)
-                    .Replace("%%YOURNAME%%", YourName)
-                    .Replace("%%YOURFIRSTNAME%%", YourFirstName);
-            }
-            else if (NewMembership == "VIP Member")
-            {
-                TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new vip member");
-                NewMembershipScript = (template?.Template ?? "")
-                    .Replace("%%USERNAME%%", UserName)
-                    .Replace("%%YOURNAME%%", YourName)
-                    .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                var hubName = SelectedPage?.HubName;
+                if (!string.IsNullOrEmpty(hubName))
+                {
+                    TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == hubName + ":" + NewMembership.Replace(" ", "_").ToLowerInvariant());
+                    NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%YOURNAME%%", YourName)
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                }
+                else if (NewMembership == "Member")
+                {
+                    TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new member");
+                    NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%YOURNAME%%", YourName)
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                }
+                else if (NewMembership == "VIP Member")
+                {
+                    TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new vip member");
+                    NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%YOURNAME%%", YourName)
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                }
             }
         }
 
@@ -1056,6 +1148,21 @@ namespace VeroScripts
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
         private static partial Regex PlaceholderRegex();
+
+        private static string ComputeSHA256(string s)
+        {
+            // Compute the hash of the given string
+            byte[] hashValue = SHA256.HashData(Encoding.UTF8.GetBytes(s));
+
+            // Convert the byte array to string format
+            string hash = string.Empty;
+            foreach (byte b in hashValue)
+            {
+                hash += $"{b:X2}";
+            }
+
+            return hash;
+        }
     }
 
     public class ThemeOption(Theme theme, bool isSelected = false)
