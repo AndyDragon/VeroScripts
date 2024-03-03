@@ -1,5 +1,9 @@
 {
     "hub": "click",
     "page": "machines",
-    "userNames": ["Andrew Forget"]
+    "userNames": [
+        "Andrew Forget",
+        "7AE32ED3F557C4F57813E67C95D958CAAD5DF00A693D52B87779B4276703D255",
+        "EB8EDCBFAF8281518EEC02049966F60043306A98EAD49B99C0C3996B0AC7C618"
+    ]
 }

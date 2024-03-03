@@ -36,6 +36,27 @@ class Program
                     {
                         templateCatalog.SpecialTemplates.Add(new Template(key, templates[key]));
                     }
+                    foreach (var hubFolder in Directory.EnumerateDirectories(folder).OrderBy(dir => dir, PageDirectoryComparer.Default))
+                    {
+                        var hubName = hubFolder[(folder.Length + 1)..];
+                        var hubTemplates = new Dictionary<string, string>();
+                        Console.WriteLine("Searching {0} hub folder...", hubFolder);
+                        foreach (var hubFile in Directory.EnumerateFiles(hubFolder, "*.template").Order())
+                        {
+                            var hubFileName = Path.GetFileNameWithoutExtension(hubFile);
+                            Console.WriteLine("\tAdding hub {0}...", hubFile);
+                            var hubTemplate = File.ReadAllText(hubFile);
+                            hubTemplates.Add(hubName + ":" + hubFileName, hubTemplate);
+                            ValidateTemplate(pageName + ":" + hubName, hubFileName, hubTemplate, ref warnings);
+                        }
+                        if (hubTemplates.Count != 0)
+                        {
+                            foreach (var hubKey in hubTemplates.Keys)
+                            {
+                                templateCatalog.SpecialTemplates.Add(new Template(hubKey, hubTemplates[hubKey]));
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -59,6 +80,8 @@ class Program
                                 pageCatalog.Hubs[pageHub] = new List<HubPage>();
                             }
                             pageCatalog.Hubs[pageHub].Add(hubPage);
+                            // Fix the template name for hubs.
+                            pageName = pageName.Replace("_", ":");
                         }
                         else
                         {
