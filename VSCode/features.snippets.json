@@ -1,13 +1,30 @@
 {
-    "Entry for feature candidate": {
+    "Click Entry for feature candidate": {
         "scope": "features",
-        "prefix": "entry",
+        "prefix": "click_entry",
+        "body": [
+            "${CLIPBOARD:[link to post]}",
+            "user - ${1:[user name + alias]}",
+            "member level - ${2|artist,Member,Bronze member,Silver member,Gold member,Platinum member|}",
+            "last feature on page - [date/never] (features on page [n])",
+            "feature - ${3:[description]}, featured - ${6|no,[date] on [page]|}",
+            "team mate - ${4|no,yes|}",
+            "hashtag - #click_${5:[hashtag]}",
+            "tineye - [results]",
+            "aiornot - [results]",
+            ""
+        ],
+        "description": "Entry for feature candidate with #click_ hashtag"
+    },
+    "Snap Entry for feature candidate": {
+        "scope": "features",
+        "prefix": "snap_entry",
         "body": [
             "${CLIPBOARD:[link to post]}",
             "user - ${1:[user name + alias]}",
             "member level - ${2|not listed,artist,member,VIP member,VIP Gold member,Platinum member,Elite member,HOF member,Diamond member|}",
-            "last feature - [date + page] (featured [n] Snap + [n] RAW)",
-            "last feature on page - [date/never] (featured on page [n] Snap + [n] RAW)",
+            "last feature - [date + page] (features [n] Snap + [n] RAW)",
+            "last feature on page - [date/never] (features on page [n] Snap + [n] RAW)",
             "feature - ${3:[description]}, featured - ${6|no,[date] on [page]|}",
             "team mate - ${4|no,yes|}",
             "hashtag - #snap_${5:[hashtag]}",
@@ -15,11 +32,11 @@
             "aiornot - [results]",
             ""
         ],
-        "description": "Entry for feature candidate"
+        "description": "Entry for feature candidate with #snap_ hashtag"
     },
     "RAW Entry for feature candidate": {
         "scope": "features",
-        "prefix": "rawentry",
+        "prefix": "raw_entry",
         "body": [
             "[RAW] ${CLIPBOARD:[link to post]}",
             "user - ${1:[user name + alias]}",
@@ -33,7 +50,7 @@
             "aiornot - [results]",
             ""
         ],
-        "description": "Entry for feature candidate with #raw_ hastag"
+        "description": "Entry for feature candidate with #raw_ hashtag"
     },
     "Entry for challenge candidate": {
         "scope": "features",
@@ -50,6 +67,6 @@
             "aiornot - [results]",
             ""
         ],
-        "description": "Entry for feature candidate with #raw_ hastag"
+        "description": "Entry for feature candidate for a challenge"
     }
 }
