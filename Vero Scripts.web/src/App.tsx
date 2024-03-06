@@ -47,7 +47,7 @@ interface Page {
 }
 
 interface PageCatalog {
-  pages: Page[];
+  hubs: Record<string, Page[]>;
 }
 
 const modalPropsStyles = { main: { maxWidth: 450 } };
@@ -55,25 +55,29 @@ const modalPropsStyles = { main: { maxWidth: 450 } };
 function App() {
   const [currentTheme, setCurrentTheme] = useState<PartialTheme>(themeDictionary[defaultThemeKey].theme);
   const [selectedTheme, setSelectedTheme] = useState<string>("dark");
+  const [selectedHub, setSelectedHub] = useState<string>();
   const [userName, setUserName] = useState<string>("");
+  const [levelOptions, setLevelOptions] = useState<IDropdownOption[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string>("none");
   const [yourName, setYourName] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [pageOptions, setPageOptions] = useState<IDropdownOption[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>("default");
-  const [customPage, setCustomPage] = useState<string>("");
   const [selectedStaffLevel, setSelectedStaffLevel] = useState<string>("mod");
   const [isFirstFeature, setIsFirstFeature] = useState<boolean>(false);
+  const [isRawTagCheckVisible, setIsRawTagCheckVisible] = useState<boolean>(false);
   const [isRawTag, setIsRawTag] = useState<boolean>(false);
+  const [isCommunityTagCheckVisible, setIsCommunityTagCheckVisible] = useState<boolean>(false);
   const [isCommunityTag, setIsCommunityTag] = useState<boolean>(false);
   const [featureScript, setFeatureScript] = useState<string>("");
   const [commentScript, setCommentScript] = useState<string>("");
   const [originalPostScript, setOriginalPostScript] = useState<string>("");
+  const [newLevelOptions, setNewLevelOptions] = useState<IDropdownOption[]>([]);
   const [selectedNewLevel, setSelectedNewLevel] = useState<string>("none");
   const [newLevelScript, setNewLevelScript] = useState<string>("");
   const [hideDialog, { toggle: toggleHideDialog }] = useBoolean(true);
   const [placeholders, setPlaceholders] = useState<Record<string, string>>({});
-  const pageCatalog = useRef<PageCatalog>({ pages: [] });
+  const pageCatalog = useRef<PageCatalog>({ hubs: {} });
   const templateCatalog = useRef<TemplateCatalog>({ pages: [], specialTemplates: [] });
   const scriptWithPlaceholders = useRef<string>("");
   const scriptWithPlaceholdersUntouched = useRef<string>("");
@@ -82,7 +86,7 @@ function App() {
     return { key, text: themeDictionary[key].name, data: themeDictionary[key].theme };
   });
 
-  const levelOptions: IDropdownOption[] = [
+  const snapLevelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
     { key: "artist", text: "Artist" },
     { key: "member", text: "Member" },
@@ -94,16 +98,44 @@ function App() {
     { key: "diamond", text: "Diamond Member" },
   ];
 
+  const clickLevelOptions: IDropdownOption[] = [
+    { key: "none", text: "None" },
+    { key: "artist", text: "Artist" },
+    { key: "member", text: "Member" },
+    { key: "bronze", text: "Bronze Member" },
+    { key: "silver", text: "Silver Member" },
+    { key: "gold", text: "Gold Member" },
+    { key: "platinum", text: "Platinum Member" },
+  ];
+
+  const defaultLevelOptions: IDropdownOption[] = [
+    { key: "none", text: "None" },
+    { key: "artist", text: "Artist" },
+  ];
+
   const staffLevelOptions: IDropdownOption[] = [
     { key: "mod", text: "Mod" },
     { key: "coadmin", text: "Co-admin" },
     { key: "admin", text: "Admin" },
   ];
 
-  const newLevelOptions: IDropdownOption[] = [
+  const snapNewLevelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
     { key: "member", text: "Member" },
-    { key: "vip", text: "VIP member" },
+    { key: "vip_member", text: "VIP member" },
+  ];
+
+  const clickNewLevelOptions: IDropdownOption[] = [
+    { key: "none", text: "None" },
+    { key: "member", text: "Member" },
+    { key: "bronze_member", text: "Bronze Member" },
+    { key: "silver_member", text: "Silver Member" },
+    { key: "gold_member", text: "Gold Member" },
+    { key: "platinum_member", text: "Platinum Member" },
+  ];
+
+  const defaultNewLevelOptions: IDropdownOption[] = [
+    { key: "none", text: "None" },
   ];
 
   useEffect(() => {
@@ -115,7 +147,6 @@ function App() {
     setYourName(localStorage.getItem("yourname") || "");
     setFirstName(localStorage.getItem("firstname") || "");
     setSelectedPage(localStorage.getItem("page") || "default");
-    setCustomPage(localStorage.getItem("custompage") || "");
     setSelectedStaffLevel(localStorage.getItem("stafflevel") || "mod");
 
     // get the page catalog
@@ -123,12 +154,25 @@ function App() {
       .get("https://vero.andydragon.com/static/data/pages.json")
       .then((result) => {
         pageCatalog.current = result.data as PageCatalog;
-        setPageOptions([
-          ...pageCatalog.current.pages.map((page) => ({
-            key: page.name,
-            text: page.name,
-          })),
-        ]);
+        const options: IDropdownOption[] = [];
+        Object.keys(pageCatalog.current.hubs).forEach(hub => {
+          options.push(...pageCatalog.current.hubs[hub].map(page => ({
+              key: hub + ":" + page.name,
+              text: hub === "other" ? page.name : hub + "_" + page.name,
+            })));
+        });
+        setPageOptions([...options.sort((a, b) => {
+          if ((a.key as string).startsWith("other:") && (b.key as string).startsWith("other:")) {
+            return (a.key as string).localeCompare(b.key as string);
+          }
+          if ((a.key as string).startsWith("other:")) {
+            return 1;
+          }
+          if ((b.key as string).startsWith("other:")) {
+            return -1;
+          }
+          return (a.key as string).localeCompare(b.key as string);
+        })]);
 
         // get the templates catalog
         axios
@@ -142,6 +186,19 @@ function App() {
   }, []);
 
   useEffect(() => {
+    setLevelOptions(levelOptionsForPage());
+    setSelectedLevel("none");
+    setNewLevelOptions(newLevelOptionsForPage());
+    setSelectedNewLevel("none");
+    setIsRawTagCheckVisible(selectedHub === "snap");
+    setIsCommunityTagCheckVisible(selectedHub === "snap");
+  }, [selectedHub]);
+
+  useEffect(() => {
+    setSelectedHub(selectedPage.split(":")[0]);
+  }, [selectedPage]);
+
+  useEffect(() => {
     setPlaceholders({});
     if (
       !pageCatalog.current ||
@@ -149,13 +206,13 @@ function App() {
       (selectedLevel || "none") === "none" ||
       !yourName ||
       !firstName ||
-      ((selectedPage || "default") === "default" && !customPage)
+      ((selectedPage || "") === "")
     ) {
       setFeatureScript("");
       setCommentScript("");
       setOriginalPostScript("");
     } else {
-      const pageName = ((selectedPage || "default") === "default" ? customPage : selectedPage) || "";
+      const pageName = selectedPage || "";
       const templatePage = templateCatalog.current.pages.find((page) => page.name === (selectedPage || "default"));
       if (templatePage) {
         setFeatureScript(prepareTemplate(getTemplate(templatePage, "feature"), pageName));
@@ -170,7 +227,7 @@ function App() {
 
     function getTemplate(page: TemplatePage, templateName: string) {
       // Check first feature and raw and community
-      if (isFirstFeature && isRawTag && isCommunityTag) {
+      if (selectedHub === "snap" && isFirstFeature && isRawTag && isCommunityTag) {
         const firstCommunityTagTemplate = page.templates.find(
           (template) => template.name === "first raw community " + templateName
         )?.template;
@@ -180,7 +237,7 @@ function App() {
       }
 
       // Next check first feature and raw
-      if (isFirstFeature && isRawTag) {
+      if (selectedHub === "snap" && isFirstFeature && isRawTag) {
         const firstCommunityTagTemplate = page.templates.find(
           (template) => template.name === "first raw " + templateName
         )?.template;
@@ -190,7 +247,7 @@ function App() {
       }
 
       // Next check first feature amd community
-      if (isFirstFeature && isCommunityTag) {
+      if (selectedHub === "snap" && isFirstFeature && isCommunityTag) {
         const firstCommunityTagTemplate = page.templates.find(
           (template) => template.name === "first community " + templateName
         )?.template;
@@ -210,7 +267,7 @@ function App() {
       }
 
       // Next check raw and community
-      if (isRawTag && isCommunityTag) {
+      if (selectedHub === "snap" && isRawTag && isCommunityTag) {
         const communityTagTemplate = page.templates.find(
           (template) => template.name === "raw community " + templateName
         )?.template;
@@ -220,7 +277,7 @@ function App() {
       }
 
       // Next check raw
-      if (isRawTag) {
+      if (selectedHub === "snap" && isRawTag) {
         const communityTagTemplate = page.templates.find(
           (template) => template.name === "raw " + templateName
         )?.template;
@@ -230,7 +287,7 @@ function App() {
       }
 
       // Next check community
-      if (isCommunityTag) {
+      if (selectedHub === "snap" && isCommunityTag) {
         const communityTagTemplate = page.templates.find(
           (template) => template.name === "community " + templateName
         )?.template;
@@ -245,12 +302,21 @@ function App() {
         return normalTemplate;
       }
 
-      // Fallback to default
-      return page.templates.find((template) => template.name === "default")?.template || "";
+      return "";
     }
 
     function prepareTemplate(template: string, pageName: string) {
-      const page = pageCatalog.current.pages.find((page) => page.name === pageName);
+      const parts = pageName.split(":");
+      let hubPart = "";
+      let pagePart = "";
+      if (parts.length === 1) {
+        hubPart = "snap";
+        pagePart = parts[0];
+      } else {
+        hubPart = parts[0];
+        pagePart = parts[1];
+      }
+      const page = pageCatalog.current.hubs[hubPart].find((page) => page.name === pagePart);
       const scriptPageName = page?.pageName || pageName;
       return (
         template
@@ -275,7 +341,6 @@ function App() {
     firstName,
     pageOptions,
     selectedPage,
-    customPage,
     selectedStaffLevel,
     isFirstFeature,
     isRawTag,
@@ -321,34 +386,44 @@ function App() {
     }
   }
 
+  function levelOptionsForPage() {
+    if (selectedHub === "snap") {
+      return snapLevelOptions;
+    } else if (selectedHub === "click") {
+      return clickLevelOptions;
+    }
+    return defaultLevelOptions;
+  }
+
+  function newLevelOptionsForPage() {
+    if (selectedHub === "snap") {
+      return snapNewLevelOptions;
+    } else if (selectedHub === "click") {
+      return clickNewLevelOptions;
+    }
+    return defaultNewLevelOptions;
+  }
+
   useEffect(() => {
     localStorage.setItem("theme", selectedTheme);
     localStorage.setItem("yourname", yourName);
     localStorage.setItem("firstname", firstName);
     localStorage.setItem("page", selectedPage);
-    localStorage.setItem("custompage", customPage);
     localStorage.setItem("stafflevel", selectedStaffLevel);
-  }, [selectedTheme, yourName, firstName, selectedPage, customPage, selectedStaffLevel]);
+  }, [selectedTheme, yourName, firstName, selectedPage, selectedStaffLevel]);
 
   useEffect(() => {
     if (selectedNewLevel === "none" || !userName) {
       setNewLevelScript("");
-    } else if (selectedNewLevel === "member") {
-      const template = templateCatalog.current.specialTemplates.find((template) => template.name === "new member");
-      const script = (template?.template || "")
-        .replaceAll("%%USERNAME%%", userName)
-        .replaceAll("%%YOURNAME%%", yourName)
-        .replaceAll("%%YOURFIRSTNAME%%", firstName);
-      setNewLevelScript(script);
-    } else if (selectedNewLevel === "vip") {
-      const template = templateCatalog.current.specialTemplates.find((template) => template.name === "new vip member");
+    } else {
+      const template = templateCatalog.current.specialTemplates.find(template => template.name == selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase())
       const script = (template?.template || "")
         .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
         .replaceAll("%%YOURFIRSTNAME%%", firstName);
       setNewLevelScript(script);
     }
-  }, [userName, yourName, firstName, selectedNewLevel]);
+  }, [selectedHub, userName, yourName, firstName, selectedNewLevel]);
 
   return (
     <ThemeProvider applyTo="body" theme={currentTheme}>
@@ -505,10 +580,8 @@ function App() {
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
                   color:
-                    (selectedPage || "default") === "default"
-                      ? !customPage
-                        ? currentTheme.semanticColors?.errorText
-                        : undefined
+                    (selectedPage || "") === ""
+                      ? currentTheme.semanticColors?.errorText
                       : currentTheme.semanticColors?.bodyText,
                 }}
               >
@@ -518,17 +591,11 @@ function App() {
                 <Dropdown
                   options={pageOptions}
                   selectedKey={selectedPage || "default"}
-                  onChange={(_, item) => setSelectedPage((item?.key as string) || "default")}
+                  onChange={(_, item) => {
+                    setSelectedPage((item?.key as string) || "default");
+                    setLevelOptions(levelOptionsForPage());
+                  }}
                   style={{ minWidth: "160px" }}
-                />
-              </Stack.Item>
-              <Stack.Item grow={1} shrink={1}>
-                <TextField
-                  value={customPage}
-                  onChange={(_, newValue) => setCustomPage(newValue || "")}
-                  style={{ minWidth: "80px" }}
-                  autoCapitalize="off"
-                  disabled={(selectedPage || "default") !== "default"}
                 />
               </Stack.Item>
             </Stack>
@@ -570,23 +637,31 @@ function App() {
                   text: { fontWeight: "bold" },
                 }}
               />
-              <Checkbox
-                label="RAW tag"
-                checked={isRawTag}
-                onChange={(_, newValue) => setIsRawTag(!!newValue)}
-                styles={{
-                  text: { fontWeight: "bold" },
-                }}
-              />
-              <Checkbox
-                label="Community tag"
-                checked={isCommunityTag}
-                onChange={(_, newValue) => setIsCommunityTag(!!newValue)}
-                styles={{
-                  text: { fontWeight: "bold" },
-                }}
-              />
-            </Stack>
+              {isRawTagCheckVisible &&
+                (
+                  <Checkbox
+                    label="RAW tag"
+                    checked={isRawTag}
+                    onChange={(_, newValue) => setIsRawTag(!!newValue)}
+                    styles={{
+                      text: { fontWeight: "bold" },
+                    }}
+                  />
+                )
+              }
+              {isCommunityTagCheckVisible &&
+                (
+                  <Checkbox
+                    label="Community tag"
+                    checked={isCommunityTag}
+                    onChange={(_, newValue) => setIsCommunityTag(!!newValue)}
+                    styles={{
+                      text: { fontWeight: "bold" },
+                    }}
+                  />
+                )
+              }
+          </Stack>
 
             <Separator />
 

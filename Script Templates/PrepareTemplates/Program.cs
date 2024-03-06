@@ -1,121 +1,108 @@
-﻿namespace PrepareTemplates;
+﻿using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+
+namespace PrepareTemplates;
 
 class Program
 {
+    static readonly Regex hubUnderscoreReplacementRegEx = new(Regex.Escape("_"));
+
     static void Main()
     {
         var originalForeground = Console.ForegroundColor;
         var cwd = Directory.GetCurrentDirectory();
         var pageCatalog = new PageCatalog();
         var templateCatalog = new TemplateCatalog();
-        var hubCatalog = new HubCatalog();
         var warnings = new List<string>();
-        foreach (var folder in Directory.EnumerateDirectories(cwd).OrderBy(dir => dir, PageDirectoryComparer.Default))
+        var templateFolders = new Dictionary<string, IDictionary<string, string>>();
+        EnumerateFolder(cwd, ref templateFolders, ref warnings);
+        foreach (var folder in templateFolders.Keys)
         {
-            var pageName = folder[(cwd.Length + 1)..];
-            var templates = new Dictionary<string, string>();
-            Console.WriteLine("Searching {0} folder...", folder);
-            foreach (var file in Directory.EnumerateFiles(folder, "*.template").Order())
-            {
-                var fileName = Path.GetFileNameWithoutExtension(file);
-                if (!string.Equals(pageName, "$"))
-                {
-                    ValidateFileName(pageName, fileName, ref warnings);
-                }
-                Console.WriteLine("\tAdding {0}...", file);
-                var template = File.ReadAllText(file);
-                templates.Add(fileName, template);
-                ValidateTemplate(pageName, fileName, template, ref warnings);
-            }
+            var pageName = folder.Split(Path.DirectorySeparatorChar).Last();
+            var templates = templateFolders[folder];
             if (templates.Count != 0)
             {
-                if (string.Equals(pageName, "$"))
+                // TODO : eventually remove the new membership scripts at the root
+                //        once the new version is around for a month or so.
+                if (folder.Contains("/$/") || folder.EndsWith("/$"))
                 {
+                    var hubName = string.Empty;
+                    if (!folder.EndsWith("/$"))
+                    {
+                        hubName = pageName;
+                    }
                     // Add special templates to template catalog.
                     foreach (var key in templates.Keys)
                     {
-                        templateCatalog.SpecialTemplates.Add(new Template(key, templates[key]));
-                    }
-                    foreach (var hubFolder in Directory.EnumerateDirectories(folder).OrderBy(dir => dir, PageDirectoryComparer.Default))
-                    {
-                        var hubName = hubFolder[(folder.Length + 1)..];
-                        var hubTemplates = new Dictionary<string, string>();
-                        Console.WriteLine("Searching {0} hub folder...", hubFolder);
-                        foreach (var hubFile in Directory.EnumerateFiles(hubFolder, "*.template").Order())
-                        {
-                            var hubFileName = Path.GetFileNameWithoutExtension(hubFile);
-                            Console.WriteLine("\tAdding hub {0}...", hubFile);
-                            var hubTemplate = File.ReadAllText(hubFile);
-                            hubTemplates.Add(hubName + ":" + hubFileName, hubTemplate);
-                            ValidateTemplate(pageName + ":" + hubName, hubFileName, hubTemplate, ref warnings);
-                        }
-                        if (hubTemplates.Count != 0)
-                        {
-                            foreach (var hubKey in hubTemplates.Keys)
-                            {
-                                templateCatalog.SpecialTemplates.Add(new Template(hubKey, hubTemplates[hubKey]));
-                            }
-                        }
+                        var templateKey = string.IsNullOrEmpty(hubName) ? key : (hubName + ":" + key);
+                        templateCatalog.SpecialTemplates.Add(new Template(templateKey, templates[key]));
                     }
                 }
                 else
                 {
                     // Add page to all the catalogs.
-                    //var pageHub = string.Empty;
-                    var foundManifest = false;
+                    var templatePageName = pageName;
                     if (File.Exists(Path.Combine(folder, "manifest.json")))
                     {
                         var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
-                        var manifest =  Newtonsoft.Json.JsonConvert.DeserializeObject<Manifest>(manifestFile);
+                        var manifest = JsonConvert.DeserializeObject<Manifest>(manifestFile);
                         var pageHub = manifest?.Hub;
                         if (!string.IsNullOrEmpty(pageHub))
                         {
-                            var hubPage = new HubPage(manifest?.Page ?? pageName)
+                            if (string.IsNullOrEmpty(manifest?.Page))
+                            {
+                                warnings.Add(string.Format("PREP0102: The page '{0}' has a manifest but the manifest is missing the Page", pageName));
+                            }
+                            var hubPage = new Page(manifest?.Page ?? pageName)
                             {
                                 PageName = manifest?.PageName,
-                                Users = new List<string>(manifest?.UserNames ?? new List<string>())
                             };
-                            if (!pageCatalog.Hubs.ContainsKey(pageHub))
+                            if (!pageCatalog.Hubs.TryGetValue(pageHub, out IList<Page>? value))
                             {
-                                pageCatalog.Hubs[pageHub] = new List<HubPage>();
+                                value = new List<Page>();
+                                pageCatalog.Hubs[pageHub] = value;
                             }
-                            pageCatalog.Hubs[pageHub].Add(hubPage);
+
+                            value.Add(hubPage);
+                            if (!string.Equals(pageName, string.Format("{0}_{1}", manifest?.Hub, manifest?.Page)))
+                            {
+                                warnings.Add(string.Format("PREP0101: The hub '{0}' page '{1}' has location '{2}' that was not expected", manifest?.Hub, manifest?.Page, pageName));
+                            }
+
                             // Fix the template name for hubs.
-                            pageName = pageName.Replace("_", ":");
+                            templatePageName = hubUnderscoreReplacementRegEx.Replace(templatePageName, ":", 1);
                         }
                         else
                         {
-                            var page = new Page(pageName)
+                            if (pageName == "default")
                             {
-                                PageName = manifest?.PageName
-                            };
-                            pageCatalog.Pages.Add(page);
+                                var page = new Page(pageName)
+                                {
+                                    PageName = manifest?.PageName
+                                };
+                                pageCatalog.Pages.Add(page);
+                            }
+                            else
+                            {
+                                warnings.Add(string.Format("PREP0103: The page '{0}' has a manifest or the manifest is missing the Hub", pageName));
+                            }
                         }
-                        foundManifest = true;
                     }
                     else
                     {
-                        var page = new Page(pageName);
-                        pageCatalog.Pages.Add(page);
+                        warnings.Add(string.Format("PREP0103: The page '{0}' is missing the manifest", pageName));
                     }
-                    templateCatalog.Pages.Add(new TemplatePage(pageName, templates));
-                    if (!foundManifest)
-                    {
-                        // Hub file (old style) does not include pages with a manifest.
-                        hubCatalog.Hubs.Add(new Hub(pageName, templates));
-                    }
+                    templateCatalog.Pages.Add(new TemplatePage(templatePageName, templates));
                 }
             }
         }
+
         using var pageCatalogFile = File.CreateText(Path.Combine(cwd, "pages.json"));
-        var pageCatalogJson = Newtonsoft.Json.JsonConvert.SerializeObject(pageCatalog/*, Newtonsoft.Json.Formatting.Indented*/); // minimize
+        var pageCatalogJson = JsonConvert.SerializeObject(pageCatalog/*, Formatting.Indented*/); // minimize
         pageCatalogFile.WriteLine(pageCatalogJson);
         using var templateCatalogFile = File.CreateText(Path.Combine(cwd, "templates.json"));
-        var templateCatalogJson = Newtonsoft.Json.JsonConvert.SerializeObject(templateCatalog, Newtonsoft.Json.Formatting.Indented);
+        var templateCatalogJson = JsonConvert.SerializeObject(templateCatalog, Formatting.Indented);
         templateCatalogFile.WriteLine(templateCatalogJson);
-        using var hubCatalogFile = File.CreateText(Path.Combine(cwd, "hubs.json"));
-        var hubCatalogJson = Newtonsoft.Json.JsonConvert.SerializeObject(hubCatalog, Newtonsoft.Json.Formatting.Indented);
-        hubCatalogFile.WriteLine(hubCatalogJson);
 
         if (warnings.Count != 0)
         {
@@ -131,6 +118,36 @@ class Program
             Console.WriteLine("No warnings found");
         }
         Console.ForegroundColor = originalForeground;
+    }
+
+    private static void EnumerateFolder(
+        string currentFolder,
+        ref Dictionary<string, IDictionary<string, string>> templateFolders,
+        ref List<string> warnings)
+    {
+        var folderName = currentFolder.Split(Path.DirectorySeparatorChar).Last();
+        foreach (var folder in Directory.EnumerateDirectories(currentFolder)
+                                        .OrderBy(dir => dir, PageDirectoryComparer.Default))
+        {
+            var pageName = folder.Split(Path.DirectorySeparatorChar).Last();
+            templateFolders.Add(folder, new Dictionary<string, string>());
+            Console.WriteLine("Searching {0} folder...", folder);
+            foreach (var file in Directory.EnumerateFiles(folder, "*.template")
+                                          .Order())
+            {
+                var fileName = Path.GetFileNameWithoutExtension(file);
+
+                if (!string.Equals(folderName, "$") && !string.Equals(pageName, "$"))
+                {
+                    ValidateFileName(pageName, fileName, ref warnings);
+                }
+                Console.WriteLine("\tAdding {0}...", file);
+                var template = File.ReadAllText(file);
+                templateFolders[folder].Add(fileName, template);
+                ValidateTemplate(pageName, fileName, template, ref warnings);
+            }
+            EnumerateFolder(folder, ref templateFolders, ref warnings);
+        }
     }
 
     private static readonly string[] validFileNames = new[]
@@ -181,14 +198,24 @@ class PageCatalog
     public PageCatalog()
     {
         Pages = new List<Page>();
-        Hubs = new Dictionary<string, IList<HubPage>>();
+        Hubs = new Dictionary<string, IList<Page>>();
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "pages")]
+    [JsonProperty(propertyName: "pages")]
     public IList<Page> Pages { get; private set; }
+    // TODO andydragon - eventually need to remove the pages property altogether
+    // public bool ShouldSerializePages()
+    // {
+    //     return Pages.Count > 0;
+    // }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "hubs")]
-    public IDictionary<string, IList<HubPage>> Hubs { get; private set; }
+    [JsonProperty(propertyName: "hubs")]
+    public IDictionary<string, IList<Page>> Hubs { get; private set; }
+    // TODO andydragon - eventually need to uncomment this
+    // public bool ShouldSerializeHubs()
+    // {
+    //     return Hubs.Count > 0;
+    // }
 }
 
 class Page
@@ -198,21 +225,11 @@ class Page
         Name = name;
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "name")]
+    [JsonProperty(propertyName: "name")]
     public string Name { get; }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "pageName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [JsonProperty(propertyName: "pageName", NullValueHandling = NullValueHandling.Ignore)]
     public string? PageName { get; set; }
-}
-
-class HubPage : Page
-{
-    public HubPage(string name) : base(name)
-    {
-    }
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "users", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-    public List<string>? Users { get; set; }
 }
 
 class Manifest
@@ -222,43 +239,14 @@ class Manifest
         PageName = pageName;
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "hub")]
+    [JsonProperty(propertyName: "hub")]
     public string Hub { get; set; } = string.Empty;
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "page")]
+    [JsonProperty(propertyName: "page")]
     public string Page { get; set; } = string.Empty;
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "pageName")]
+    [JsonProperty(propertyName: "pageName")]
     public string PageName { get; set; } = string.Empty;
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "userNames")]
-    public IList<string> UserNames { get; set; } = new List<string>();
-}
-
-class HubCatalog
-{
-    public HubCatalog()
-    {
-        Hubs = new List<Hub>();
-    }
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "hubs")]
-    public IList<Hub> Hubs { get; private set; }
-}
-
-class Hub
-{
-    public Hub(string name, IDictionary<string, string> templates)
-    {
-        Name = name;
-        Templates = templates.Keys.Select(template => new Template(template, templates[template])).ToList();
-    }
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "name")]
-    public string Name { get; }
-
-    [Newtonsoft.Json.JsonProperty(propertyName: "templates")]
-    public List<Template> Templates { get; }
 }
 
 class TemplateCatalog
@@ -269,10 +257,10 @@ class TemplateCatalog
         SpecialTemplates = new List<Template>();
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "pages")]
+    [JsonProperty(propertyName: "pages")]
     public IList<TemplatePage> Pages { get; private set; }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "specialTemplates")]
+    [JsonProperty(propertyName: "specialTemplates")]
     public IList<Template> SpecialTemplates { get; private set; }
 }
 
@@ -284,10 +272,10 @@ class TemplatePage
         Templates = templates.Keys.Select(template => new Template(template, templates[template])).ToList();
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "name")]
+    [JsonProperty(propertyName: "name")]
     public string Name { get; }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "templates")]
+    [JsonProperty(propertyName: "templates")]
     public List<Template> Templates { get; }
 }
 
@@ -299,10 +287,10 @@ class Template
         Script = script;
     }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "name")]
+    [JsonProperty(propertyName: "name")]
     public string Name { get; }
 
-    [Newtonsoft.Json.JsonProperty(propertyName: "template")]
+    [JsonProperty(propertyName: "template")]
     public string Script { get; }
 }
 

@@ -1,7 +1,62 @@
 {
   "pages": [
     {
-      "name": "abandoned",
+      "name": "click:machines",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
+        },
+        {
+          "name": "feature",
+          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n                      from\n       ⚙️ #click_machines ⚙️\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it embodies the nature of machines, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of machines and machinery!\n\n@click_%%PAGENAME%% is a community-run hub for featuring photos of machines and machinery in today's world as well as machines from our past.\n\nFor internal use only!\n#featured_on_click\n#featured_on_click_%%PAGENAME%%\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "first comment",
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫\n"
+        }
+      ]
+    },
+    {
+      "name": "default",
+      "templates": [
+        {
+          "name": "comment",
+          "template": " ✨✨ CONGRATULATIONS!!! ✨✨\n\n@%%USERNAME%%: You have been featured as part of the @snap_community\nThank you for tagging this great photo with #snap_%%PAGENAME%%\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% • \n. \n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%% \n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community \n.\nCC Snap Community Owner \n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n.\n#snap_community #vero #verofamily \n#reflections #reflectionphoto #reflectionphotos #reflectionperfection\n#reflection_addict #mirror #beautifulphotography #beautifulphoto \n#photooftheday #bestofthe_world #amazingshot #worthafollow #verofriends #verotography\n.\n For internal use only!\n\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n.\n.\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨ Featured on @snap_%%PAGENAME%% ✨\na page out of the @snap_kingdom at the @snap_community"
+        }
+      ]
+    },
+    {
+      "name": "other:sat_door_day",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "Congratulations @%%USERNAME%%. Your amazing door has been featured\non @Sat_door_day  🚪👏💫✨\n"
+        },
+        {
+          "name": "feature",
+          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @sat_door_day  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #Sat_door_day 🚪 😃 💖\n\nFor Admin Use Only\n#sat_door_day_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "original post",
+          "template": "Your Won-Door-Ful image has been featured on @Sat_Door_Day ⭐️🚪💫. Congratulations 👏"
+        }
+      ]
+    },
+    {
+      "name": "snap:abandoned",
       "templates": [
         {
           "name": "comment",
@@ -18,7 +73,7 @@
       ]
     },
     {
-      "name": "abstract",
+      "name": "snap:abstract",
       "templates": [
         {
           "name": "comment",
@@ -35,7 +90,7 @@
       ]
     },
     {
-      "name": "africa",
+      "name": "snap:africa",
       "templates": [
         {
           "name": "comment",
@@ -52,7 +107,7 @@
       ]
     },
     {
-      "name": "ai",
+      "name": "snap:ai",
       "templates": [
         {
           "name": "comment",
@@ -73,7 +128,7 @@
       ]
     },
     {
-      "name": "allblack",
+      "name": "snap:allblack",
       "templates": [
         {
           "name": "comment",
@@ -90,7 +145,7 @@
       ]
     },
     {
-      "name": "allnature",
+      "name": "snap:allnature",
       "templates": [
         {
           "name": "comment",
@@ -107,7 +162,7 @@
       ]
     },
     {
-      "name": "allsports",
+      "name": "snap:allsports",
       "templates": [
         {
           "name": "comment",
@@ -132,7 +187,7 @@
       ]
     },
     {
-      "name": "alltrees",
+      "name": "snap:alltrees",
       "templates": [
         {
           "name": "comment",
@@ -149,7 +204,7 @@
       ]
     },
     {
-      "name": "allwhite",
+      "name": "snap:allwhite",
       "templates": [
         {
           "name": "comment",
@@ -166,7 +221,7 @@
       ]
     },
     {
-      "name": "architecture",
+      "name": "snap:architecture",
       "templates": [
         {
           "name": "comment",
@@ -187,7 +242,7 @@
       ]
     },
     {
-      "name": "artgallery",
+      "name": "snap:artgallery",
       "templates": [
         {
           "name": "comment",
@@ -204,7 +259,7 @@
       ]
     },
     {
-      "name": "asia",
+      "name": "snap:asia",
       "templates": [
         {
           "name": "comment",
@@ -221,7 +276,7 @@
       ]
     },
     {
-      "name": "australia",
+      "name": "snap:australia",
       "templates": [
         {
           "name": "comment",
@@ -242,7 +297,7 @@
       ]
     },
     {
-      "name": "beaches",
+      "name": "snap:beaches",
       "templates": [
         {
           "name": "comment",
@@ -259,7 +314,7 @@
       ]
     },
     {
-      "name": "birds",
+      "name": "snap:birds",
       "templates": [
         {
           "name": "comment",
@@ -276,7 +331,7 @@
       ]
     },
     {
-      "name": "blue",
+      "name": "snap:blue",
       "templates": [
         {
           "name": "comment",
@@ -293,7 +348,7 @@
       ]
     },
     {
-      "name": "bnw",
+      "name": "snap:bnw",
       "templates": [
         {
           "name": "comment",
@@ -314,7 +369,7 @@
       ]
     },
     {
-      "name": "books",
+      "name": "snap:books",
       "templates": [
         {
           "name": "comment",
@@ -331,7 +386,7 @@
       ]
     },
     {
-      "name": "bridges",
+      "name": "snap:bridges",
       "templates": [
         {
           "name": "comment",
@@ -348,7 +403,7 @@
       ]
     },
     {
-      "name": "butterflies",
+      "name": "snap:butterflies",
       "templates": [
         {
           "name": "comment",
@@ -365,7 +420,7 @@
       ]
     },
     {
-      "name": "canada",
+      "name": "snap:canada",
       "templates": [
         {
           "name": "comment",
@@ -382,7 +437,7 @@
       ]
     },
     {
-      "name": "cats",
+      "name": "snap:cats",
       "templates": [
         {
           "name": "comment",
@@ -399,7 +454,7 @@
       ]
     },
     {
-      "name": "china",
+      "name": "snap:china",
       "templates": [
         {
           "name": "comment",
@@ -416,7 +471,7 @@
       ]
     },
     {
-      "name": "cityscape",
+      "name": "snap:cityscape",
       "templates": [
         {
           "name": "comment",
@@ -437,28 +492,7 @@
       ]
     },
     {
-      "name": "click:machines",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
-        },
-        {
-          "name": "feature",
-          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n                      from\n       ⚙️ #click_machines ⚙️\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it embodies the nature of machines, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of machines and machinery!\n\n@click_%%PAGENAME%% is a community-run hub for featuring machines and machinery in today's world as well as machines from our past.\n\nFor internal use only!\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "first comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great picture with #click_%%PAGENAME%%\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫\n"
-        }
-      ]
-    },
-    {
-      "name": "cocktails",
+      "name": "snap:cocktails",
       "templates": [
         {
           "name": "comment",
@@ -475,7 +509,7 @@
       ]
     },
     {
-      "name": "coffee",
+      "name": "snap:coffee",
       "templates": [
         {
           "name": "comment",
@@ -492,7 +526,7 @@
       ]
     },
     {
-      "name": "coffee_ai",
+      "name": "snap:coffee_ai",
       "templates": [
         {
           "name": "comment",
@@ -509,7 +543,7 @@
       ]
     },
     {
-      "name": "collage",
+      "name": "snap:collage",
       "templates": [
         {
           "name": "comment",
@@ -530,7 +564,7 @@
       ]
     },
     {
-      "name": "colorsplash",
+      "name": "snap:colorsplash",
       "templates": [
         {
           "name": "comment",
@@ -551,7 +585,7 @@
       ]
     },
     {
-      "name": "colours",
+      "name": "snap:colours",
       "templates": [
         {
           "name": "comment",
@@ -568,7 +602,7 @@
       ]
     },
     {
-      "name": "community_member",
+      "name": "snap:community_member",
       "templates": [
         {
           "name": "comment",
@@ -585,7 +619,7 @@
       ]
     },
     {
-      "name": "country",
+      "name": "snap:country",
       "templates": [
         {
           "name": "comment",
@@ -602,7 +636,7 @@
       ]
     },
     {
-      "name": "cuteness",
+      "name": "snap:cuteness",
       "templates": [
         {
           "name": "comment",
@@ -631,24 +665,7 @@
       ]
     },
     {
-      "name": "default",
-      "templates": [
-        {
-          "name": "comment",
-          "template": " ✨✨ CONGRATULATIONS!!! ✨✨\n\n@%%USERNAME%%: You have been featured as part of the @snap_community\nThank you for tagging this great photo with #snap_%%PAGENAME%%\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n. \n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%% \n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community \n.\nCC Snap Community Owner \n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n.\n#snap_community #vero #verofamily \n#reflections #reflectionphoto #reflectionphotos #reflectionperfection\n#reflection_addict #mirror #beautifulphotography #beautifulphoto \n#photooftheday #bestofthe_world #amazingshot #worthafollow #verofriends #verotography\n.\n For internal use only!\n\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n.\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨ Featured on @snap_%%PAGENAME%% ✨\na page out of the @snap_kingdom at the @snap_community"
-        }
-      ]
-    },
-    {
-      "name": "depthoffield",
+      "name": "snap:depthoffield",
       "templates": [
         {
           "name": "comment",
@@ -665,7 +682,7 @@
       ]
     },
     {
-      "name": "drone",
+      "name": "snap:drone",
       "templates": [
         {
           "name": "comment",
@@ -686,7 +703,7 @@
       ]
     },
     {
-      "name": "drops",
+      "name": "snap:drops",
       "templates": [
         {
           "name": "comment",
@@ -703,7 +720,7 @@
       ]
     },
     {
-      "name": "edit",
+      "name": "snap:edit",
       "templates": [
         {
           "name": "comment",
@@ -720,7 +737,7 @@
       ]
     },
     {
-      "name": "europe",
+      "name": "snap:europe",
       "templates": [
         {
           "name": "comment",
@@ -737,7 +754,7 @@
       ]
     },
     {
-      "name": "fishing",
+      "name": "snap:fishing",
       "templates": [
         {
           "name": "comment",
@@ -758,7 +775,7 @@
       ]
     },
     {
-      "name": "flatlays",
+      "name": "snap:flatlays",
       "templates": [
         {
           "name": "comment",
@@ -779,7 +796,7 @@
       ]
     },
     {
-      "name": "flowers",
+      "name": "snap:flowers",
       "templates": [
         {
           "name": "comment",
@@ -796,7 +813,7 @@
       ]
     },
     {
-      "name": "foggy",
+      "name": "snap:foggy",
       "templates": [
         {
           "name": "comment",
@@ -817,7 +834,7 @@
       ]
     },
     {
-      "name": "france",
+      "name": "snap:france",
       "templates": [
         {
           "name": "comment",
@@ -838,7 +855,7 @@
       ]
     },
     {
-      "name": "gardening",
+      "name": "snap:gardening",
       "templates": [
         {
           "name": "comment",
@@ -863,7 +880,7 @@
       ]
     },
     {
-      "name": "germany",
+      "name": "snap:germany",
       "templates": [
         {
           "name": "comment",
@@ -880,7 +897,7 @@
       ]
     },
     {
-      "name": "herpetology",
+      "name": "snap:herpetology",
       "templates": [
         {
           "name": "comment",
@@ -901,7 +918,7 @@
       ]
     },
     {
-      "name": "hikes",
+      "name": "snap:hikes",
       "templates": [
         {
           "name": "comment",
@@ -918,7 +935,7 @@
       ]
     },
     {
-      "name": "homestyle",
+      "name": "snap:homestyle",
       "templates": [
         {
           "name": "comment",
@@ -939,7 +956,7 @@
       ]
     },
     {
-      "name": "horses",
+      "name": "snap:horses",
       "templates": [
         {
           "name": "comment",
@@ -956,7 +973,7 @@
       ]
     },
     {
-      "name": "india",
+      "name": "snap:india",
       "templates": [
         {
           "name": "comment",
@@ -973,7 +990,7 @@
       ]
     },
     {
-      "name": "insects",
+      "name": "snap:insects",
       "templates": [
         {
           "name": "comment",
@@ -990,7 +1007,7 @@
       ]
     },
     {
-      "name": "ireland",
+      "name": "snap:ireland",
       "templates": [
         {
           "name": "comment",
@@ -1007,7 +1024,7 @@
       ]
     },
     {
-      "name": "kitchen",
+      "name": "snap:kitchen",
       "templates": [
         {
           "name": "comment",
@@ -1028,7 +1045,7 @@
       ]
     },
     {
-      "name": "landscape",
+      "name": "snap:landscape",
       "templates": [
         {
           "name": "comment",
@@ -1049,7 +1066,7 @@
       ]
     },
     {
-      "name": "lighthouses",
+      "name": "snap:lighthouses",
       "templates": [
         {
           "name": "comment",
@@ -1070,7 +1087,7 @@
       ]
     },
     {
-      "name": "longexposure",
+      "name": "snap:longexposure",
       "templates": [
         {
           "name": "comment",
@@ -1115,7 +1132,7 @@
       ]
     },
     {
-      "name": "macro",
+      "name": "snap:macro",
       "templates": [
         {
           "name": "comment",
@@ -1136,7 +1153,7 @@
       ]
     },
     {
-      "name": "minimal",
+      "name": "snap:minimal",
       "templates": [
         {
           "name": "comment",
@@ -1153,7 +1170,7 @@
       ]
     },
     {
-      "name": "mobile",
+      "name": "snap:mobile",
       "templates": [
         {
           "name": "comment",
@@ -1174,7 +1191,7 @@
       ]
     },
     {
-      "name": "moody",
+      "name": "snap:moody",
       "templates": [
         {
           "name": "comment",
@@ -1195,7 +1212,7 @@
       ]
     },
     {
-      "name": "mountains",
+      "name": "snap:mountains",
       "templates": [
         {
           "name": "comment",
@@ -1212,7 +1229,7 @@
       ]
     },
     {
-      "name": "nightshots",
+      "name": "snap:nightshots",
       "templates": [
         {
           "name": "comment",
@@ -1229,7 +1246,7 @@
       ]
     },
     {
-      "name": "nordic",
+      "name": "snap:nordic",
       "templates": [
         {
           "name": "comment",
@@ -1250,7 +1267,7 @@
       ]
     },
     {
-      "name": "numbers",
+      "name": "snap:numbers",
       "templates": [
         {
           "name": "comment",
@@ -1271,7 +1288,7 @@
       ]
     },
     {
-      "name": "oceanlife",
+      "name": "snap:oceanlife",
       "templates": [
         {
           "name": "comment",
@@ -1288,7 +1305,7 @@
       ]
     },
     {
-      "name": "people",
+      "name": "snap:people",
       "templates": [
         {
           "name": "comment",
@@ -1309,7 +1326,7 @@
       ]
     },
     {
-      "name": "pets",
+      "name": "snap:pets",
       "templates": [
         {
           "name": "comment",
@@ -1326,7 +1343,7 @@
       ]
     },
     {
-      "name": "potd",
+      "name": "snap:potd",
       "templates": [
         {
           "name": "comment",
@@ -1343,7 +1360,7 @@
       ]
     },
     {
-      "name": "reflection",
+      "name": "snap:reflection",
       "templates": [
         {
           "name": "comment",
@@ -1364,7 +1381,7 @@
       ]
     },
     {
-      "name": "reflection_bnw",
+      "name": "snap:reflection_bnw",
       "templates": [
         {
           "name": "comment",
@@ -1385,7 +1402,7 @@
       ]
     },
     {
-      "name": "seasons",
+      "name": "snap:seasons",
       "templates": [
         {
           "name": "comment",
@@ -1406,7 +1423,7 @@
       ]
     },
     {
-      "name": "silhouette",
+      "name": "snap:silhouette",
       "templates": [
         {
           "name": "comment",
@@ -1423,7 +1440,7 @@
       ]
     },
     {
-      "name": "skies",
+      "name": "snap:skies",
       "templates": [
         {
           "name": "comment",
@@ -1440,7 +1457,7 @@
       ]
     },
     {
-      "name": "street",
+      "name": "snap:street",
       "templates": [
         {
           "name": "comment",
@@ -1461,7 +1478,7 @@
       ]
     },
     {
-      "name": "surreal",
+      "name": "snap:surreal",
       "templates": [
         {
           "name": "comment",
@@ -1478,7 +1495,7 @@
       ]
     },
     {
-      "name": "symmetry",
+      "name": "snap:symmetry",
       "templates": [
         {
           "name": "comment",
@@ -1499,7 +1516,7 @@
       ]
     },
     {
-      "name": "tattoos",
+      "name": "snap:tattoos",
       "templates": [
         {
           "name": "comment",
@@ -1516,7 +1533,7 @@
       ]
     },
     {
-      "name": "thailand",
+      "name": "snap:thailand",
       "templates": [
         {
           "name": "comment",
@@ -1533,7 +1550,7 @@
       ]
     },
     {
-      "name": "toys",
+      "name": "snap:toys",
       "templates": [
         {
           "name": "comment",
@@ -1558,7 +1575,7 @@
       ]
     },
     {
-      "name": "transports",
+      "name": "snap:transports",
       "templates": [
         {
           "name": "comment",
@@ -1575,7 +1592,7 @@
       ]
     },
     {
-      "name": "uae",
+      "name": "snap:uae",
       "templates": [
         {
           "name": "comment",
@@ -1600,7 +1617,7 @@
       ]
     },
     {
-      "name": "uae_deserts",
+      "name": "snap:uae_deserts",
       "templates": [
         {
           "name": "comment",
@@ -1625,7 +1642,7 @@
       ]
     },
     {
-      "name": "uae_neighboring",
+      "name": "snap:uae_neighboring",
       "templates": [
         {
           "name": "comment",
@@ -1650,7 +1667,7 @@
       ]
     },
     {
-      "name": "uk",
+      "name": "snap:uk",
       "templates": [
         {
           "name": "comment",
@@ -1671,7 +1688,7 @@
       ]
     },
     {
-      "name": "usa",
+      "name": "snap:usa",
       "templates": [
         {
           "name": "comment",
@@ -1688,7 +1705,7 @@
       ]
     },
     {
-      "name": "waters",
+      "name": "snap:waters",
       "templates": [
         {
           "name": "comment",
@@ -1705,7 +1722,7 @@
       ]
     },
     {
-      "name": "weddings",
+      "name": "snap:weddings",
       "templates": [
         {
           "name": "comment",
@@ -1722,7 +1739,7 @@
       ]
     },
     {
-      "name": "wildlife",
+      "name": "snap:wildlife",
       "templates": [
         {
           "name": "comment",
@@ -1743,7 +1760,7 @@
       ]
     },
     {
-      "name": "world",
+      "name": "snap:world",
       "templates": [
         {
           "name": "comment",
@@ -1760,7 +1777,7 @@
       ]
     },
     {
-      "name": "writings",
+      "name": "snap:writings",
       "templates": [
         {
           "name": "comment",
@@ -1777,23 +1794,6 @@
         {
           "name": "original post",
           "template": "💫 Snap Community %%MEMBERLEVEL%% feature 💫"
-        }
-      ]
-    },
-    {
-      "name": "_sat_door_day",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "Congratulations @%%USERNAME%%. Your amazing door has been featured\non @Sat_door_day  🚪👏💫✨\n"
-        },
-        {
-          "name": "feature",
-          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @sat_door_day  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #Sat_door_day 🚪 😃 💖\n\nFor Admin Use Only\n#sat_door_day_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "Your Won-Door-Ful image has been featured on @Sat_Door_Day ⭐️🚪💫. Congratulations 👏"
         }
       ]
     }
@@ -1826,6 +1826,14 @@
     {
       "name": "click:silver_member",
       "template": "Congratulations @%%USERNAME%% on your 30th feature!\n\nWe took the time to check the number of features you have with Click and wanted to share with you that you are now a Silver Member of the Click Community!\n\nThat's an awesome achievement!\n\nPlease consider adding ✨ Click Silver Member ✨ to your bio.\n"
+    },
+    {
+      "name": "snap:member",
+      "template": "Congratulations @%%USERNAME%% on your 5th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+    },
+    {
+      "name": "snap:vip_member",
+      "template": "Congratulations @%%USERNAME%% on your 15th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
     }
   ]
 }
