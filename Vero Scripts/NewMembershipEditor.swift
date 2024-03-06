@@ -10,6 +10,7 @@ import SwiftUI
 struct NewMembershipEditor: View {
     @Binding var newMembership: NewMembershipCase
     @Binding var script: String
+    @Binding var currentPage: LoadedPage?
     var minHeight: CGFloat
     var maxHeight: CGFloat
     var onChanged: (NewMembershipCase) -> Void
@@ -23,7 +24,7 @@ struct NewMembershipEditor: View {
             Text("New membership: ")
 #endif
             Picker("New membership: ", selection: $newMembership.onChange(onChanged)) {
-                ForEach(NewMembershipCase.allCases) { level in
+                ForEach(NewMembershipCase.casesFor(hub: currentPage?.hub)) { level in
                     Text(level.rawValue)
                         .tag(level)
                         .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)

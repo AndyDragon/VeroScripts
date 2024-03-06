@@ -32,5 +32,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.30",
+        "notes": [
+            {
+                "date": "March 6, 2024",
+                "notes": [
+                    "Updated the hubs handling."
+                ]
+            }
+        ]
     }
 ]

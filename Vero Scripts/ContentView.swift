@@ -29,7 +29,6 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @Environment(\.openURL) var openURL
     @State var membership: MembershipCase = MembershipCase.none
-    @State var clickMembership: ClickMembershipCase = ClickMembershipCase.none
     @State var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var userName: String = ""
     @State var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
@@ -37,8 +36,7 @@ struct ContentView: View {
     @State var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
     @State var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? "default"
-    @State var pageName: String = UserDefaults.standard.string(forKey: "PageName") ?? ""
+    @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? ""
     @State var pageValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(
         rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue
@@ -50,6 +48,7 @@ struct ContentView: View {
     @State var commentScript: String = ""
     @State var originalPostScript: String = ""
     @State var newMembership: NewMembershipCase = NewMembershipCase.none
+    @State var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
     @State var newMembershipScript: String = ""
     @State var showingAlert = false
     @State var alertTitle: String = ""
@@ -68,12 +67,10 @@ struct ContentView: View {
     @State var scriptWithPlaceholdersInPlace = ""
     @State var scriptWithPlaceholders = ""
     @State var lastMembership = MembershipCase.none
-    @State var lastClickMembership = ClickMembershipCase.none
     @State var lastUserName = ""
     @State var lastYourName = ""
     @State var lastYourFirstName = ""
     @State var lastPage = ""
-    @State var lastPageName = ""
     @State var lastPageStaffLevel = StaffLevelCase.mod
     @State private var isShowingToast = false
     @State private var toastType = AlertToast.AlertType.regular
@@ -93,6 +90,7 @@ struct ContentView: View {
     }
     var canCopyNewMembershipScript: Bool {
         return newMembership != NewMembershipCase.none
+        && newMembershipValidation.valid
         && userNameValidation.valid
     }
     @Environment(\.colorScheme) var ColorScheme
@@ -126,68 +124,45 @@ struct ContentView: View {
                             focus: $focusedField,
                             focusField: .userName
                         )
-
+                        
                         // User level picker
                         if !membershipValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
-                                .help("Required value")
+                                .help(membershipValidation.reason ?? "unknown error")
                                 .imageScale(.small)
                                 .padding([.leading], 8)
                         }
                         Text("Level: ")
-                            .foregroundStyle(membershipValidation.valid ?
-                                             Color.TextColorPrimary :
-                                                Color.TextColorRequired, Color.TextColorSecondary)
+                            .foregroundStyle(
+                                membershipValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
+                                Color.TextColorSecondary)
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
 #else
                             .frame(width: 36, alignment: .leading)
 #endif
                             .padding([.leading], membershipValidation.valid ? 8 : 0)
-                        if currentPage?.hubName == "click" {
-                            Picker("", selection: $clickMembership.onChange { value in
-                                membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
-                                clickMembershipChanged(to: value)
-                            }) {
-                                ForEach(ClickMembershipCase.allCases) { level in
-                                    Text(level.rawValue)
-                                        .tag(level)
-                                        .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
-                                }
+                        Picker("", selection: $membership.onChange { value in
+                            membershipValidation = validateMembership(value: membership)
+                            membershipChanged(to: value)
+                        }) {
+                            ForEach(MembershipCase.casesFor(hub: currentPage?.hub)) { level in
+                                Text(level.rawValue)
+                                    .tag(level)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
                             }
-                            .tint(Color.AccentColor)
-                            .accentColor(Color.AccentColor)
-#if os(iOS)
-                            .frame(minWidth: 120, alignment: .leading)
-#endif
-                            .onAppear {
-                                membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .level)
-                        } else {
-                            Picker("", selection: $membership.onChange { value in
-                                membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
-                                membershipChanged(to: value)
-                            }) {
-                                ForEach(MembershipCase.allCases) { level in
-                                    Text(level.rawValue)
-                                        .tag(level)
-                                        .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
-                                }
-                            }
-                            .tint(Color.AccentColor)
-                            .accentColor(Color.AccentColor)
-#if os(iOS)
-                            .frame(minWidth: 120, alignment: .leading)
-#endif
-                            .onAppear {
-                                membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .level)
                         }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
+                        .onAppear {
+                            membershipValidation = validateMembership(value: membership)
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .level)
 #if os(iOS)
                         Button(action: {
                             userName = ""
@@ -195,9 +170,7 @@ struct ContentView: View {
                             userNameValidation = validateUserName(value: userName)
                             membership = MembershipCase.none
                             membershipChanged(to: membership)
-                            clickMembership = ClickMembershipCase.none
-                            clickMembershipChanged(to: clickMembership)
-                            membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
+                            membershipValidation = validateMembership(value: membership)
                             firstForPage = false
                             firstForPageChanged(to: firstForPage)
                             fromCommunityTag = false
@@ -206,6 +179,7 @@ struct ContentView: View {
                             fromRawTagChanged(to: fromRawTag)
                             newMembership = NewMembershipCase.none
                             newMembershipChanged(to: newMembership)
+                            newMembershipValidation = validateNewMembership(value: newMembership)
                             focusedField = .userName
                         }) {
                             HStack {
@@ -263,17 +237,16 @@ struct ContentView: View {
 
                     HStack {
                         // Page picker
-                        if page == "default" && pageName.count == 0 {
+                        if !pageValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
-                                .help("Page required")
+                                .help(pageValidation.reason ?? "unknown error")
                                 .imageScale(.small)
                         }
                         Text("Page: ")
-                            .foregroundStyle((page != "default" || pageName.count != 0) ?
-                                             Color.TextColorPrimary :
-                                                Color.TextColorRequired,
-                                             Color.TextColorSecondary)
+                            .foregroundStyle(
+                                pageValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
+                                Color.TextColorSecondary)
 #if os(iOS)
                             .frame(width: 60, alignment: .leading)
 #else
@@ -282,8 +255,8 @@ struct ContentView: View {
                             .lineLimit(1)
                             .truncationMode(.tail)
                         Picker("", selection: $page.onChange { value in
-                            if page == "default" && pageName.count == 0 {
-                                pageValidation = (false, "Page must not be 'default' or a page name is required")
+                            if page.isEmpty {
+                                pageValidation = (false, "Page is required")
                             } else {
                                 pageValidation = (true, nil)
                             }
@@ -303,32 +276,12 @@ struct ContentView: View {
                         .frame(minWidth: 120, alignment: .leading)
 #endif
                         .onAppear {
-                            if page == "default" && pageName.count == 0 {
+                            if page.isEmpty {
                                 pageValidation = (false, "Page must not be 'default' or a page name is required")
                             } else {
                                 pageValidation = (true, nil)
                             }
                         }
-
-                        // Page name editor
-                        TextField(
-                            "Enter page name",
-                            text: $pageName.onChange { value in
-                                if page == "default" && pageName.count == 0 {
-                                    pageValidation = (false, "Page must not be 'default' or a page name is required")
-                                } else {
-                                    pageValidation = (true, nil)
-                                }
-                                pageNameChanged(to: value)
-                            }
-                        )
-                        .disabled(page != "default")
-                        .focusable(page == "default")
-                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
-                        .focused($focusedField, equals: .page)
-#if os(iOS)
-                        .textInputAutocapitalization(.never)
-#endif
 
                         // Page staff level picker
                         Text("Page staff level: ")
@@ -362,7 +315,7 @@ struct ContentView: View {
                         .padding([.leading], 8)
                         .help("First feature on page")
 
-                        if currentPage?.hubName != "click" {
+                        if currentPage?.hub == "snap" {
                             Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
                                 Text("From RAW tag")
                                     .lineLimit(1)
@@ -529,10 +482,14 @@ struct ContentView: View {
                     NewMembershipEditor(
                         newMembership: $newMembership,
                         script: $newMembershipScript,
+                        currentPage: $currentPage,
                         minHeight: 36,
                         maxHeight: 36 * accordionHeightRatio,
-                        onChanged: newMembershipChanged,
-                        valid: userNameValidation.valid,
+                        onChanged: { newValue in
+                            newMembershipValidation = validateNewMembership(value: newMembership)
+                            newMembershipChanged(to: newValue)
+                        },
+                        valid: newMembershipValidation.valid && userNameValidation.valid,
                         canCopy: canCopyNewMembershipScript,
                         copy: {
                             copyToClipboard(newMembershipScript)
@@ -618,9 +575,7 @@ struct ContentView: View {
                         userNameValidation = validateUserName(value: userName)
                         membership = MembershipCase.none
                         membershipChanged(to: membership)
-                        clickMembership = ClickMembershipCase.none
-                        clickMembershipChanged(to: clickMembership)
-                        membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
+                        membershipValidation = validateMembership(value: membership)
                         firstForPage = false
                         firstForPageChanged(to: firstForPage)
                         fromCommunityTag = false
@@ -761,37 +716,25 @@ struct ContentView: View {
 #else
                     let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
 #endif
-                    let pagesCatalog = try await URLSession.shared.decode(PageCatalog.self, from: pagesUrl)
+                    let pagesCatalog = try await URLSession.shared.decode(SciptsCatalog.self, from: pagesUrl)
                     var pages = [LoadedPage]()
-                    pages.append(contentsOf: pagesCatalog.pages.map({ LoadedPage.from(page: $0) }))
-                    pages.append(LoadedPage(name: "community", pageName: "community", hubName: nil))
-                    let user = "\(ProcessInfo.processInfo.userName)@\(ProcessInfo.processInfo.hostName)".lowercased()
-                    let userKey = user
-                        .sha256()
-                        .hexEncodedString(options: .upperCase)
-                    for hubPair in (pagesCatalog.hubs ?? [:]) {
+                    for hubPair in (pagesCatalog.hubs) {
                         for hubPage in hubPair.value {
-                            if let pageUsers = hubPage.users {
-                                if pageUsers.includesWithoutCase(userKey) {
-                                    pages.append(LoadedPage.from(hubPage: hubPage, with: hubPair.key))
-                                }
-                            } else {
-                                pages.append(LoadedPage.from(hubPage: hubPage, with: hubPair.key))
-                            }
+                            pages.append(LoadedPage.from(hub: hubPair.key, page: hubPage))
                         }
                     }
                     loadedPages.removeAll()
                     loadedPages.append(contentsOf: pages.sorted(by: {
-                        if $0.name.starts(with: "_") && $1.name.starts(with: "_") {
+                        if $0.hub == "other" && $1.hub == "other" {
                             return $0.name < $1.name
                         }
-                        if $0.name.starts(with: "_") {
+                        if $0.hub == "other" {
                             return false
                         }
-                        if $1.name.starts(with: "_") {
+                        if $1.hub == "other" {
                             return true
                         }
-                        return "\($0.hubName ?? "snap")_\($0.name)" < "\($1.hubName ?? "snap")_\($1.name)"
+                        return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
                     }))
 
                     // Delay the start of the templates download so the window can be ready faster
@@ -912,22 +855,12 @@ struct ContentView: View {
         }
     }
 
-    func clickMembershipChanged(to value: ClickMembershipCase) {
-        if value != lastClickMembership {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
-            updateScripts()
-            lastClickMembership = value
-        }
-    }
-
-    func validateMembership(value: MembershipCase, clickValue: ClickMembershipCase, useClick: Bool) -> (valid: Bool, reason: String?) {
-        if !useClick && value == MembershipCase.none {
+    func validateMembership(value: MembershipCase) -> (valid: Bool, reason: String?) {
+        if value == MembershipCase.none {
             return (false, "Required value")
         }
-        if useClick && clickValue == ClickMembershipCase.none {
-            return (false, "Required value")
+        if !MembershipCase.caseValidFor(hub: currentPage?.hub, value) {
+            return (false, "Not a valid value")
         }
         return (true, nil)
     }
@@ -989,17 +922,6 @@ struct ContentView: View {
         }
     }
 
-    func pageNameChanged(to value: String) {
-        if value != lastPageName {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
-            UserDefaults.standard.set(pageName, forKey: "PageName")
-            updateScripts()
-            lastPageName = value
-        }
-    }
-
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
             featureScriptPlaceholders.placeholderDict.removeAll()
@@ -1025,6 +947,13 @@ struct ContentView: View {
 
     func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
+    }
+
+    func validateNewMembership(value: NewMembershipCase) -> (valid: Bool, reason: String?) {
+        if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
+            return (false, "Not a valid value")
+        }
+        return (true, nil)
     }
 
     func copyScript(
@@ -1111,10 +1040,10 @@ struct ContentView: View {
     }
 
     func updateScripts() -> Void {
-        var currentPageName = page == "default" ? pageName : page
+        var currentPageName = page
         var scriptPageName = currentPageName
-        let oldHubName = currentPage?.hubName
-        if currentPageName != "default" {
+        let currentHubName = currentPage?.hub
+        if currentPageName != "" {
             let pageSource = loadedPages.first(where: { needle in needle.id == page })
             if pageSource != nil {
                 currentPageName = pageSource?.name ?? page
@@ -1127,9 +1056,14 @@ struct ContentView: View {
         } else {
             currentPage = nil
         }
-        // There was a hub change, re-validate the membership
-        if currentPage?.hubName != oldHubName {
-            membershipValidation = validateMembership(value: membership, clickValue: clickMembership, useClick: currentPage?.hubName == "click")
+        // There was a hub change, re-validate the membership and new membership
+        if currentPage?.hub != currentHubName {
+            membership = MembershipCase.none
+            lastMembership = membership
+            membershipValidation = validateMembership(value: membership)
+            newMembership = NewMembershipCase.none
+            newMembershipValidation = validateNewMembership(value: newMembership)
+            newMembershipChanged(to: newMembership)
         }
         if !canCopyScripts {
             var validationErrors = ""
@@ -1173,31 +1107,31 @@ struct ContentView: View {
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: currentPage?.hubName == "click" ? clickMembership.rawValue : membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: currentPage?.hubName == "click" ? clickMembership.rawValue : membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: currentPage?.hubName == "click" ? clickMembership.rawValue : membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-            // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
                 .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
@@ -1274,16 +1208,6 @@ struct ContentView: View {
             })
         }
 
-        // fallback to default
-        if template == nil {
-            let defaultTemplatePage = templatesCatalog.pages.first(where: { page in
-                page.name == "default"
-            });
-            template = defaultTemplatePage?.templates.first(where: { template in
-                template.name == templateName
-            })
-        }
-
         return template?.template
     }
 
@@ -1294,25 +1218,19 @@ struct ContentView: View {
         }
         if !canCopyNewMembershipScript {
             var validationErrors = ""
-            if !userNameValidation.valid {
-                validationErrors += "User: " + userNameValidation.reason! + "\n"
+            if newMembership != NewMembershipCase.none {
+                if !userNameValidation.valid {
+                    validationErrors += "User: " + userNameValidation.reason! + "\n"
+                }
+                if !newMembershipValidation.valid {
+                    validationErrors += "New level: " + newMembershipValidation.reason! + "\n"
+                }
             }
             newMembershipScript = validationErrors
-        } else if newMembership == NewMembershipCase.member {
+        } else {
+            let templateName = "\(currentPage?.hub ?? ""):\(newMembership.rawValue.replacingOccurrences(of: " ", with: "_").lowercased())"
             let template = templatesCatalog.specialTemplates.first(where: { template in
-                template.name == "new member"
-            })
-            if template == nil {
-                newMembershipScript = ""
-                return
-            }
-            newMembershipScript = template!.template
-                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-        } else if newMembership == NewMembershipCase.vipMember {
-            let template = templatesCatalog.specialTemplates.first(where: { template in
-                template.name == "new vip member"
+                template.name == templateName
             })
             if template == nil {
                 newMembershipScript = ""

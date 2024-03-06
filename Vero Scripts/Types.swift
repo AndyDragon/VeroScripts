@@ -23,33 +23,150 @@ enum FocusedField: Hashable {
 
 enum MembershipCase: String, CaseIterable, Identifiable {
     case none = "None",
-         artist = "Artist",
-         member = "Member",
-         vipMember = "VIP Member",
-         goldMember = "VIP Gold Member",
-         platinumMember = "Platinum Member",
-         eliteMember = "Elite Member",
-         hallOfFameMember = "Hall of Fame Member",
-         diamondMember = "Diamond Member"
-    var id: Self { self }
-}
 
-enum ClickMembershipCase: String, CaseIterable, Identifiable {
-    case none = "None",
-         artist = "Artist",
-         member = "Member",
-         bronzeMember = "Bronze Member",
-         silverMember = "Silver Member",
-         goldMember = "Gold Member",
-         platinumMember = "Platinum Member"
+         commonArtist = "Artist",
+         commonMember = "Member",
+         commonPlatinumMember = "Platinum Member",
+
+         // snap
+         snapVipMember = "VIP Member",
+         snapVipGoldMember = "VIP Gold Member",
+         snapEliteMember = "Elite Member",
+         snapHallOfFameMember = "Hall of Fame Member",
+         snapDiamondMember = "Diamond Member",
+    
+         // click
+         clickBronzeMember = "Bronze Member",
+         clickSilverMember = "Silver Member",
+         clickGoldMember = "Gold Member"
+
     var id: Self { self }
+    
+    static func casesFor(hub: String?) -> [MembershipCase] {
+        if hub == "snap" {
+            return [
+                .none,
+                .commonArtist,
+                .commonMember,
+                .snapVipMember,
+                .snapVipGoldMember,
+                .commonPlatinumMember,
+                .snapEliteMember,
+                .snapHallOfFameMember,
+                .snapDiamondMember
+            ]
+        }
+        if hub == "click" {
+            return [
+                .none,
+                .commonArtist,
+                .commonMember,
+                .clickBronzeMember,
+                .clickSilverMember,
+                .clickGoldMember,
+                .commonPlatinumMember
+            ]
+        }
+        return [
+            .none,
+            .commonArtist
+        ]
+    }
+    
+    static func caseValidFor(hub: String?, _ value: MembershipCase) -> Bool {
+        if hub == "snap" {
+            return [
+                none,
+                commonArtist,
+                commonMember,
+                snapVipMember,
+                snapVipGoldMember,
+                commonPlatinumMember,
+                snapEliteMember,
+                snapHallOfFameMember,
+                snapDiamondMember
+            ].contains(value)
+        }
+        if hub == "click" {
+            return [
+                none,
+                commonArtist,
+                commonMember,
+                clickBronzeMember,
+                clickSilverMember,
+                clickGoldMember,
+                commonPlatinumMember
+            ].contains(value)
+        }
+        return [
+            none,
+            commonArtist
+        ].contains(value)
+    }
 }
 
 enum NewMembershipCase: String, CaseIterable, Identifiable {
     case none = "None",
-         member = "Member",
-         vipMember = "VIP Member"
+
+         // common
+         commonMember = "Member",
+         
+         // snap
+         snapVipMember = "VIP Member",
+    
+         // click
+         clickBronzeMember = "Bronze Member",
+         clickSilverMember = "Silver Member",
+         clickGoldMember = "Gold Member",
+         clickPlatinumMember = "Platinum Member"
+    
     var id: Self { self }
+    
+    static func casesFor(hub: String?) -> [NewMembershipCase] {
+        if hub == "snap" {
+            return [
+                .none,
+                .commonMember,
+                .snapVipMember
+            ]
+        }
+        if hub == "click" {
+            return [
+                .none,
+                .commonMember,
+                .clickBronzeMember,
+                .clickSilverMember,
+                .clickGoldMember,
+                .clickPlatinumMember
+            ]
+        }
+        return [
+            .none
+        ]
+    }
+    
+    static func caseValidFor(hub: String?, _ value: NewMembershipCase) -> Bool {
+        if hub == "snap" {
+            return [
+                none,
+                commonMember,
+                snapVipMember
+            ].contains(value)
+        } 
+        if hub == "click" {
+            return [
+                none,
+                commonMember,
+                clickBronzeMember,
+                clickSilverMember,
+                clickGoldMember,
+                clickPlatinumMember
+            ].contains(value)
+        }
+        return [
+            none
+        ].contains(value)
+    }
 }
 
 enum StaffLevelCase: String, CaseIterable, Identifiable {
@@ -65,9 +182,8 @@ enum PlaceholderSheetCase {
          originalPostScript
 }
 
-struct PageCatalog: Codable {
-    var pages: [Page]
-    var hubs: [String: [HubPage]]?
+struct SciptsCatalog: Codable {
+    var hubs: [String: [Page]]
 }
 
 struct Page: Codable {
@@ -76,36 +192,25 @@ struct Page: Codable {
     let pageName: String?
 }
 
-struct HubPage: Codable {
-    var id: String { self.name }
-    let name: String
-    let pageName: String?
-    let users: [String]?
-}
-
 struct LoadedPage: Codable, Identifiable {
     var id: String {
-        if let hub = self.hubName {
-            return "\(hub):\(self.name)"
+        if self.hub.isEmpty {
+            return self.name
         }
-        return self.name
+        return "\(self.hub):\(self.name)"
     }
+    let hub: String
     let name: String
     let pageName: String?
-    let hubName: String?
     var displayName: String {
-        if let hub = hubName {
-            return "\(hub)_\(name)"
+        if hub == "other" {
+            return name
         }
-        return name;
+        return "\(hub)_\(name)"
     }
 
-    static func from(page: Page) -> LoadedPage {
-        return LoadedPage(name: page.name, pageName: page.pageName, hubName: nil)
-    }
-    
-    static func from(hubPage: HubPage, with name: String) -> LoadedPage {
-        return LoadedPage(name: hubPage.name, pageName: hubPage.pageName, hubName: name)
+    static func from(hub: String, page: Page) -> LoadedPage {
+        return LoadedPage(hub: hub, name: page.name, pageName: page.pageName)
     }
 }
 
