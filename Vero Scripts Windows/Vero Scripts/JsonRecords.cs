@@ -1,16 +1,13 @@
 ﻿namespace VeroScripts
 {
-    public class PagesCatalog
+    public class ScriptsCatalog
     {
-        public PagesCatalog()
+        public ScriptsCatalog()
         {
-            Pages = [];
-            Hubs = new Dictionary<string, IList<HubPageEntry>>();
+            Hubs = new Dictionary<string, IList<PageEntry>>();
         }
 
-        public PageEntry[] Pages { get; set; }
-
-        public IDictionary<string, IList<HubPageEntry>> Hubs { get; set; }
+        public IDictionary<string, IList<PageEntry>> Hubs { get; set; }
     }
 
     public class PageEntry
@@ -24,56 +21,31 @@
         public string? PageName { get; set; }
     }
 
-    public class HubPageEntry
+    public class LoadedPage(string hubName, PageEntry page)
     {
-        public HubPageEntry()
-        {
-            Name = string.Empty;
-        }
-
-        public string Name { get; set; }
-        public string? PageName { get; set; }
-        public IList<string>? Users { get; set; }
-    }
-
-    public class LoadedPage
-    {
-        public LoadedPage(PageEntry page)
-        {
-            Name = page.Name;
-            PageName = page.PageName;
-        }
-
-        public LoadedPage(string hubName, HubPageEntry page)
-        {
-            HubName = hubName;
-            Name = page.Name;
-            PageName = page.PageName;
-        }
-
         public string Id
         {
             get
             {
-                if (!string.IsNullOrEmpty(HubName))
+                if (string.IsNullOrEmpty(HubName))
                 {
-                    return $"{HubName}:{Name}";
+                    return Name;
                 }
-                return Name;
+                return $"{HubName}:{Name}";
             }
         }
-        public string Name { get; private set; }
-        public string? PageName { get; private set; }
-        public string? HubName { get; private set; }
+        public string HubName { get; private set; } = hubName;
+        public string Name { get; private set; } = page.Name;
+        public string? PageName { get; private set; } = page.PageName;
         public string DisplayName
         {
             get
             {
-                if (!string.IsNullOrEmpty(HubName))
+                if (string.IsNullOrEmpty(HubName) || HubName == "other")
                 {
-                    return $"{HubName}_{Name}";
+                    return Name;
                 }
-                return Name;
+                return $"{HubName}_{Name}";
             }
         }
     }
@@ -133,24 +105,19 @@
             {
                 return 1;
             }
-            if (x.Id.StartsWith('_') && y.Id.StartsWith('_'))
+            if (x.HubName == "other" && y.HubName == "other")
             {
                 return string.Compare(x.Id, y.Id, true);
             }
-            if (x.Id.StartsWith('_'))
+            if (x.HubName == "other")
             {
                 return 1;
             }
-            if (y.Id.StartsWith('_'))
+            if (y.HubName == "other")
             {
                 return -1;
             }
-            int hubCompare = string.Compare(x.HubName ?? "snap", y.HubName ?? "snap", true);
-            if (hubCompare == 0)
-            {
-                return string.Compare(x.Name, y.Name, true);
-            }
-            return hubCompare;
+            return string.Compare(x.DisplayName, y.DisplayName, true);
         }
 
         public static readonly LoadedPageComparer Default = new();

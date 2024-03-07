@@ -178,7 +178,6 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -207,13 +206,12 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <TextBox Grid.Column="2" Text="{Binding PageName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding PageNameEnabled, Mode=OneWay}" IsReadOnly="{Binding PageNameDisabled, Mode=OneWay}" Margin="8,0,0,0" Height="20" />
-                <Label Grid.Column="3" VerticalAlignment="Center" FontSize="11" Margin="10,0,4,0">
+                <Label Grid.Column="2" VerticalAlignment="Center" FontSize="11" Margin="10,0,4,0">
                     <TextBlock Text="Page staff level:" FontWeight="Bold" />
                 </Label>
-                <ComboBox Grid.Column="4" ItemsSource="{Binding StaffLevels}" SelectedItem="{Binding StaffLevel, Mode=TwoWay}" />
+                <ComboBox Grid.Column="3" ItemsSource="{Binding StaffLevels}" SelectedItem="{Binding StaffLevel, Mode=TwoWay}" />
                 <CheckBox 
-                    Grid.Column="5" 
+                    Grid.Column="4" 
                     IsChecked="{Binding FirstForPage}" 
                     Content="First feature on page" 
                     FontWeight="Bold" 
@@ -221,23 +219,23 @@
                     Margin="16,0,0,0" 
                     VerticalAlignment="Center" />
                 <CheckBox 
-                    Grid.Column="6" 
+                    Grid.Column="5" 
                     IsChecked="{Binding RawTag}" 
                     Content="From RAW tag" 
                     FontWeight="Bold" 
                     FontSize="11" 
                     Margin="16,0,0,0" 
                     VerticalAlignment="Center"
-                    Visibility="{Binding NonClickHubVisibility}" />
+                    Visibility="{Binding SnapHubVisibility}" />
                 <CheckBox 
-                    Grid.Column="7" 
+                    Grid.Column="6" 
                     IsChecked="{Binding CommunityTag}" 
                     Content="From community tag" 
                     FontWeight="Bold" 
                     FontSize="11" 
                     Margin="16,0,0,0" 
                     VerticalAlignment="Center"
-                    Visibility="{Binding NonClickHubVisibility}" />
+                    Visibility="{Binding SnapHubVisibility}" />
             </Grid>
 
             <!-- Feature script header -->

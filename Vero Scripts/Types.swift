@@ -182,7 +182,7 @@ enum PlaceholderSheetCase {
          originalPostScript
 }
 
-struct SciptsCatalog: Codable {
+struct ScriptsCatalog: Codable {
     var hubs: [String: [Page]]
 }
 

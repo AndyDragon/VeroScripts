@@ -6,9 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Security.Principal;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -152,28 +150,14 @@ namespace VeroScripts
                 if (!string.IsNullOrEmpty(content))
                 {
                     var loadedPages = new List<LoadedPage>();
-                    var pagesCatalog = JsonConvert.DeserializeObject<PagesCatalog>(content) ?? new PagesCatalog();
-                    foreach (var page in pagesCatalog.Pages)
-                    {
-                        loadedPages.Add(new LoadedPage(page));
-                    }
+                    var pagesCatalog = JsonConvert.DeserializeObject<ScriptsCatalog>(content) ?? new ScriptsCatalog();
                     if (pagesCatalog.Hubs != null)
                     {
-                        var currentUser = WindowsIdentity.GetCurrent().User?.Value ?? "unknown";
-                        var currentUserHash = ComputeSHA256(currentUser);
                         foreach (var hubPair in pagesCatalog.Hubs)
                         {
                             foreach (var hubPage in hubPair.Value)
                             {
-                                var canAddPage = true;
-                                if (hubPage.Users != null)
-                                {
-                                    canAddPage = hubPage.Users.FirstOrDefault(user => string.Equals(user, currentUserHash, StringComparison.OrdinalIgnoreCase)) != null;
-                                }
-                                if (canAddPage)
-                                {
-                                    loadedPages.Add(new LoadedPage(hubPair.Key, hubPage));
-                                }
+                                loadedPages.Add(new LoadedPage(hubPair.Key, hubPage));
                             }
                         }
                     }
@@ -356,7 +340,7 @@ namespace VeroScripts
 
         #region Membership level
 
-        private static string[] Memberships => [
+        private static string[] SnapMemberships => [
             "None",
             "Artist",
             "Member",
@@ -378,7 +362,15 @@ namespace VeroScripts
             "Platinum Member",
         ];
 
-        public string[] HubMemberships => SelectedPage?.HubName == "click" ? ClickMemberships : Memberships;
+        private static string[] OtherMemberships => [
+            "None",
+            "Artist",
+        ];
+
+        public string[] HubMemberships => 
+            SelectedPage?.HubName == "click" ? ClickMemberships : 
+            SelectedPage?.HubName == "snap" ? SnapMemberships :
+            OtherMemberships;
 
         private string membership = "None";
 
@@ -510,31 +502,36 @@ namespace VeroScripts
                         Membership = "None";
                         OnPropertyChanged(nameof(HubMemberships));
                         OnPropertyChanged(nameof(ClickHubVisibility));
-                        OnPropertyChanged(nameof(NonClickHubVisibility));
+                        OnPropertyChanged(nameof(SnapHubVisibility));
                         NewMembership = "None";
                         OnPropertyChanged(nameof(HubNewMemberships));
                     }
                 }
             }
         }
-
         public Visibility ClickHubVisibility => SelectedPage?.HubName == "click" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility NonClickHubVisibility => SelectedPage?.HubName == "click" ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility SnapHubVisibility => SelectedPage?.HubName == "snap" ? Visibility.Visible : Visibility.Collapsed;
 
         #endregion
 
         #region Page
 
-        private static ValidationResult CalculatePageValidation(string page, string pageName)
+        private static ValidationResult CalculatePageValidation(string page)
         {
-            if (string.IsNullOrEmpty(page) || string.Equals(page, "default", StringComparison.OrdinalIgnoreCase))
-            {
-                return ValidateValueNotEmpty(pageName);
-            }
-            return new ValidationResult(true);
+            return ValidateValueNotEmpty(page);
         }
 
-        private string page = UserSettings.Get(nameof(Page), "default");
+        static string FixPageHub(string page)
+        {
+            var parts = page.Split(':', 2);
+            if (parts.Length > 1)
+            {
+                return page;
+            }
+            return "snap:" + page;
+        }
+
+        private string page = FixPageHub(UserSettings.Get(nameof(Page), ""));
 
         public string Page
         {
@@ -544,9 +541,7 @@ namespace VeroScripts
                 if (Set(ref page, value))
                 {
                     UserSettings.Store(nameof(Page), Page);
-                    OnPropertyChanged(nameof(PageNameEnabled));
-                    OnPropertyChanged(nameof(PageNameDisabled));
-                    PageValidation = CalculatePageValidation(Page, PageName);
+                    PageValidation = CalculatePageValidation(Page);
                     PlaceholdersMap[Script.Feature].Clear();
                     PlaceholdersMap[Script.Comment].Clear();
                     PlaceholdersMap[Script.OriginalPost].Clear();
@@ -555,7 +550,7 @@ namespace VeroScripts
             }
         }
 
-        private ValidationResult pageValidation = CalculatePageValidation(UserSettings.Get(nameof(Page), "default"), UserSettings.Get(nameof(PageName), ""));
+        private ValidationResult pageValidation = CalculatePageValidation(UserSettings.Get(nameof(Page), ""));
 
         public ValidationResult PageValidation
         {
@@ -565,28 +560,6 @@ namespace VeroScripts
                 if (Set(ref pageValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
-                }
-            }
-        }
-
-        public bool PageNameDisabled => !PageNameEnabled;
-        public bool PageNameEnabled => Page == "default";
-
-        private string pageName = UserSettings.Get(nameof(PageName), "");
-
-        public string PageName
-        {
-            get => pageName;
-            set
-            {
-                if (Set(ref pageName, value))
-                {
-                    UserSettings.Store(nameof(PageName), PageName);
-                    PageValidation = CalculatePageValidation(Page, PageName);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
-                    UpdateScripts();
                 }
             }
         }
@@ -739,7 +712,7 @@ namespace VeroScripts
 
         #region New membership level
 
-        private static string[] NewMemberships => [
+        private static string[] SnapNewMemberships => [
             "None",
             "Member",
             "VIP Member",
@@ -754,7 +727,14 @@ namespace VeroScripts
             "Platinum Member",
         ];
 
-        public string[] HubNewMemberships => SelectedPage?.HubName == "click" ? ClickNewMemberships : NewMemberships;
+        private static string[] OtherNewMemberships => [
+            "None",
+        ];
+
+        public string[] HubNewMemberships => 
+            SelectedPage?.HubName == "click" ? ClickNewMemberships : 
+            SelectedPage?.HubName == "snap" ? SnapNewMemberships :
+            OtherNewMemberships;
 
         private string newMembership = "None";
 
@@ -874,29 +854,22 @@ namespace VeroScripts
 
         private void UpdateScripts()
         {
-            var pageName = Page == "default" || string.IsNullOrEmpty(Page) ? PageName : Page;
+            var pageName = Page;
             var pageId = pageName;
             var scriptPageName = pageName;
             var oldHubName = selectedPage?.HubName;
-            if (Page != "default")
+            var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
+            if (sourcePage != null)
             {
-                var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
-                if (sourcePage != null)
+                pageId = sourcePage.Id;
+                pageName = sourcePage.Name;
+                scriptPageName = pageName;
+                if (sourcePage.PageName != null)
                 {
-                    pageId = sourcePage.Id;
-                    pageName = sourcePage.Name;
-                    scriptPageName = pageName;
-                    if (sourcePage.PageName != null)
-                    {
-                        scriptPageName = sourcePage.PageName;
-                    }
+                    scriptPageName = sourcePage.PageName;
                 }
-                SelectedPage = sourcePage;
             }
-            else
-            {
-                SelectedPage = null; // ??
-            }
+            SelectedPage = sourcePage;
             if (SelectedPage?.HubName != oldHubName) 
             {
                 MembershipValidation = ValidateValueNotDefault(Membership, "None");
@@ -972,19 +945,19 @@ namespace VeroScripts
             var templatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == pageName);
 
             // Check first feature and raw and community
-            if (firstForPage && rawTag && communityTag)
+            if (selectedPage?.HubName == "snap" && firstForPage && rawTag && communityTag)
             {
                 template = templatePage?.Templates.FirstOrDefault(template => template.Name == "first raw community " + templateName);
             }
 
             // Next check first feature and raw
-            if (firstForPage && rawTag)
+            if (selectedPage?.HubName == "snap" && firstForPage && rawTag)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first raw " + templateName);
             }
 
             // Next check first feature and community
-            if (firstForPage && communityTag)
+            if (selectedPage?.HubName == "snap" && firstForPage && communityTag)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "first community " + templateName);
             }
@@ -996,28 +969,25 @@ namespace VeroScripts
             }
 
             // Next check raw and community
-            if (rawTag && communityTag)
+            if (selectedPage?.HubName == "snap" && rawTag && communityTag)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "raw community " + templateName);
             }
 
             // Next check raw
-            if (rawTag)
+            if (selectedPage?.HubName == "snap" && rawTag)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "raw " + templateName);
             }
 
             // Next check community
-            if (communityTag)
+            if (selectedPage?.HubName == "snap" && communityTag)
             {
                 template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == "community " + templateName);
             }
 
             // Last check standard
             template ??= templatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
-
-            // Fallback to default
-            template ??= defaultTemplatePage?.Templates.FirstOrDefault(template => template.Name == templateName);
 
             return template?.Template ?? "";
         }
@@ -1035,7 +1005,10 @@ namespace VeroScripts
                     }
                 }
 
-                CheckValidation("User", UserNameValidation);
+                if (newMembership != "None")
+                {
+                    CheckValidation("User", UserNameValidation);
+                }
 
                 NewMembershipScript = validationErrors;
             }
@@ -1148,21 +1121,6 @@ namespace VeroScripts
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
         private static partial Regex PlaceholderRegex();
-
-        private static string ComputeSHA256(string s)
-        {
-            // Compute the hash of the given string
-            byte[] hashValue = SHA256.HashData(Encoding.UTF8.GetBytes(s));
-
-            // Convert the byte array to string format
-            string hash = string.Empty;
-            foreach (byte b in hashValue)
-            {
-                hash += $"{b:X2}";
-            }
-
-            return hash;
-        }
     }
 
     public class ThemeOption(Theme theme, bool isSelected = false)

@@ -716,7 +716,7 @@ struct ContentView: View {
 #else
                     let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
 #endif
-                    let pagesCatalog = try await URLSession.shared.decode(SciptsCatalog.self, from: pagesUrl)
+                    let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
                     var pages = [LoadedPage]()
                     for hubPair in (pagesCatalog.hubs) {
                         for hubPage in hubPair.value {
