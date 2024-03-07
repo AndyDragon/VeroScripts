@@ -62,18 +62,20 @@ function App() {
   const [yourName, setYourName] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [pageOptions, setPageOptions] = useState<IDropdownOption[]>([]);
-  const [selectedPage, setSelectedPage] = useState<string>("default");
+  const [selectedPage, setSelectedPage] = useState<string>("none");
   const [selectedStaffLevel, setSelectedStaffLevel] = useState<string>("mod");
   const [isFirstFeature, setIsFirstFeature] = useState<boolean>(false);
   const [isRawTagCheckVisible, setIsRawTagCheckVisible] = useState<boolean>(false);
   const [isRawTag, setIsRawTag] = useState<boolean>(false);
   const [isCommunityTagCheckVisible, setIsCommunityTagCheckVisible] = useState<boolean>(false);
   const [isCommunityTag, setIsCommunityTag] = useState<boolean>(false);
+  const [scriptValidationFailed, setScriptValidationFailed] = useState<boolean>(false);
   const [featureScript, setFeatureScript] = useState<string>("");
   const [commentScript, setCommentScript] = useState<string>("");
   const [originalPostScript, setOriginalPostScript] = useState<string>("");
   const [newLevelOptions, setNewLevelOptions] = useState<IDropdownOption[]>([]);
   const [selectedNewLevel, setSelectedNewLevel] = useState<string>("none");
+  const [newLevelScriptValidationFailed, setNewLevelScriptValidationFailed] = useState<boolean>(false);
   const [newLevelScript, setNewLevelScript] = useState<string>("");
   const [hideDialog, { toggle: toggleHideDialog }] = useBoolean(true);
   const [placeholders, setPlaceholders] = useState<Record<string, string>>({});
@@ -146,7 +148,7 @@ function App() {
     setCurrentTheme(themeDictionary[themeKey].theme || themeDictionary[defaultThemeKey].theme);
     setYourName(localStorage.getItem("yourname") || "");
     setFirstName(localStorage.getItem("firstname") || "");
-    setSelectedPage(localStorage.getItem("page") || "default");
+    setSelectedPage(localStorage.getItem("page") || "None");
     setSelectedStaffLevel(localStorage.getItem("stafflevel") || "mod");
 
     // get the page catalog
@@ -155,6 +157,7 @@ function App() {
       .then((result) => {
         pageCatalog.current = result.data as PageCatalog;
         const options: IDropdownOption[] = [];
+        options.push({ key: "none", text: "None" });
         Object.keys(pageCatalog.current.hubs).forEach(hub => {
           options.push(...pageCatalog.current.hubs[hub].map(page => ({
               key: hub + ":" + page.name,
@@ -170,6 +173,15 @@ function App() {
           }
           if ((b.key as string).startsWith("other:")) {
             return -1;
+          }
+          if ((a.key as string) === "none" && (b.key as string) === "none") {
+            return 0;
+          }
+          if ((a.key as string) === "none") {
+            return -1;
+          }
+          if ((b.key as string) === "none") {
+            return 1;
           }
           return (a.key as string).localeCompare(b.key as string);
         })]);
@@ -200,26 +212,41 @@ function App() {
 
   useEffect(() => {
     setPlaceholders({});
-    if (
-      !pageCatalog.current ||
-      !userName ||
-      (selectedLevel || "none") === "none" ||
-      !yourName ||
-      !firstName ||
-      ((selectedPage || "") === "")
-    ) {
-      setFeatureScript("");
+    const validationErrors: string[] = [];
+    if (!userName) {
+      validationErrors.push("User name is required");
+    } else if (userName.startsWith("@")) {
+      validationErrors.push("User name should not start with '@'");
+    }
+    if (!selectedLevel || selectedLevel === "none") {
+      validationErrors.push("Member level is required");
+    }
+    if (!yourName) {
+      validationErrors.push("Your user name is required");
+    } else if (yourName.startsWith("@")) {
+      validationErrors.push("Your user name should not start with '@'");
+    }
+    if (!firstName) {
+      validationErrors.push("Your first name is required");
+    }
+    if (!selectedPage || selectedPage === "none") {
+      validationErrors.push("Page is required");
+    }
+    setScriptValidationFailed(!!validationErrors.length);
+    if (!pageCatalog.current || validationErrors.length !== 0) {
+      const allErrors = validationErrors.join("\n");
+      setFeatureScript(allErrors);
       setCommentScript("");
       setOriginalPostScript("");
     } else {
       const pageName = selectedPage || "";
-      const templatePage = templateCatalog.current.pages.find((page) => page.name === (selectedPage || "default"));
+      const templatePage = templateCatalog.current.pages.find((page) => page.name === selectedPage);
       if (templatePage) {
         setFeatureScript(prepareTemplate(getTemplate(templatePage, "feature"), pageName));
         setCommentScript(prepareTemplate(getTemplate(templatePage, "comment"), pageName));
         setOriginalPostScript(prepareTemplate(getTemplate(templatePage, "original post"), pageName));
       } else {
-        setFeatureScript("");
+        setFeatureScript("Missing template page");
         setCommentScript("");
         setOriginalPostScript("");
       }
@@ -317,11 +344,12 @@ function App() {
         pagePart = parts[1];
       }
       const page = pageCatalog.current.hubs[hubPart].find((page) => page.name === pagePart);
-      const scriptPageName = page?.pageName || pageName;
+      const scriptPageName = page?.pageName || pagePart;
+      console.log("PageName: " + scriptPageName + ", FullPageName: " + pagePart);
       return (
         template
           .replaceAll("%%PAGENAME%%", scriptPageName)
-          .replaceAll("%%FULLPAGENAME%%", pageName)
+          .replaceAll("%%FULLPAGENAME%%", pagePart)
           .replaceAll("%%MEMBERLEVEL%%", levelOptions.find((option) => option.key === selectedLevel)?.text || "")
           .replaceAll("%%USERNAME%%", userName)
           .replaceAll("%%YOURNAME%%", yourName)
@@ -347,23 +375,26 @@ function App() {
     isCommunityTag,
   ]);
 
-  function checkForPlaceholders(scripts: string[], forceEdit?: boolean) {
+  function checkForPlaceholders(script: string, additionalScripts: string[], forceEdit?: boolean) {
     const placeholdersFound: string[] = [];
-    scripts.forEach((script) => {
-      const matches = script.matchAll(/\[\[([^\]]*)\]\]/g);
+    const matches = script.matchAll(/\[\[([^\]]*)\]\]/g);
+    [...matches].forEach((match) => {
+      placeholdersFound.push(match[1]);
+    });
+    const placeholdersInScript = !!placeholdersFound.length;
+    additionalScripts.forEach(additionalScript => {
+      const matches = additionalScript.matchAll(/\[\[([^\]]*)\]\]/g);
       [...matches].forEach((match) => {
         placeholdersFound.push(match[1]);
       });
     });
-    if (placeholdersFound.length) {
-      let needEditor = false;
+    if (placeholdersInScript) {
       placeholdersFound.forEach((placeholderFound) => {
         if (!Object.keys(placeholders).includes(placeholderFound)) {
-          needEditor = true;
           placeholders[placeholderFound] = "";
         }
       });
-      if (needEditor || forceEdit) {
+      if (forceEdit) {
         toggleHideDialog();
         return true;
       }
@@ -374,14 +405,7 @@ function App() {
   async function copyScript(script: string, additionalScripts: string[], forceEdit?: boolean) {
     scriptWithPlaceholders.current = script;
     scriptWithPlaceholdersUntouched.current = script;
-    Object.keys(placeholders).forEach((placeholder) => {
-      const placeholderRegEx = new RegExp("\\[\\[" + placeholder + "\\]\\]", "g");
-      scriptWithPlaceholders.current = scriptWithPlaceholders.current.replaceAll(
-        placeholderRegEx,
-        placeholders[placeholder]
-      );
-    });
-    if (!checkForPlaceholders([scriptWithPlaceholders.current, ...additionalScripts], forceEdit)) {
+    if (!checkForPlaceholders(scriptWithPlaceholders.current, additionalScripts, forceEdit)) {
       await navigator.clipboard.writeText(scriptWithPlaceholders.current);
     }
   }
@@ -413,10 +437,16 @@ function App() {
   }, [selectedTheme, yourName, firstName, selectedPage, selectedStaffLevel]);
 
   useEffect(() => {
+    const validationErrors: string[] = [];
+    if (selectedNewLevel !== "none" && !userName) {
+      validationErrors.push("User name is required");
+    }
+    setNewLevelScriptValidationFailed(!!validationErrors.length);
     if (selectedNewLevel === "none" || !userName) {
-      setNewLevelScript("");
+      const allErrors = validationErrors.join("\n");
+      setNewLevelScript(allErrors);
     } else {
-      const template = templateCatalog.current.specialTemplates.find(template => template.name == selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase())
+      const template = templateCatalog.current.specialTemplates.find(template => template.name === selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase())
       const script = (template?.template || "")
         .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
@@ -474,7 +504,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !userName ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+                  color: !userName || userName.startsWith("@") ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 User:
@@ -485,7 +515,7 @@ function App() {
                   onChange={(_, newValue) => setUserName(newValue || "")}
                   style={{ minWidth: "200px" }}
                   autoCapitalize="off"
-                  placeholder="Enter the user name"
+                  placeholder="Enter the user name (do not include '@')"
                 />
               </Stack.Item>
             </Stack>
@@ -528,7 +558,7 @@ function App() {
                   textAlign: "left",
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
-                  color: !yourName ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+                  color: !yourName || yourName.startsWith("@") ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
                 }}
               >
                 You:
@@ -539,7 +569,7 @@ function App() {
                   onChange={(_, newValue) => setYourName(newValue || "")}
                   style={{ minWidth: "200px" }}
                   autoCapitalize="off"
-                  placeholder="Enter your user name"
+                  placeholder="Enter your user name (do not include '@')"
                 />
               </Stack.Item>
             </Stack>
@@ -580,7 +610,7 @@ function App() {
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
                   color:
-                    (selectedPage || "") === ""
+                    ((selectedPage || "none") === "none" || !selectedPage)
                       ? currentTheme.semanticColors?.errorText
                       : currentTheme.semanticColors?.bodyText,
                 }}
@@ -590,9 +620,9 @@ function App() {
               <Stack.Item grow={1} shrink={1}>
                 <Dropdown
                   options={pageOptions}
-                  selectedKey={selectedPage || "default"}
+                  selectedKey={selectedPage || "None"}
                   onChange={(_, item) => {
-                    setSelectedPage((item?.key as string) || "default");
+                    setSelectedPage((item?.key as string) || "None");
                     setLevelOptions(levelOptionsForPage());
                   }}
                   style={{ minWidth: "160px" }}
@@ -681,17 +711,9 @@ function App() {
                 iconProps={{ iconName: "Copy" }}
                 text="Copy"
                 onClick={async () => {
-                  await copyScript(featureScript, [commentScript, originalPostScript]);
-                }}
-                disabled={!featureScript}
-              />
-              <CommandButton
-                iconProps={{ iconName: "Copy" }}
-                text="Copy (edit placeholders)"
-                onClick={async () => {
                   await copyScript(featureScript, [commentScript, originalPostScript], true);
                 }}
-                disabled={!featureScript}
+                disabled={scriptValidationFailed || !featureScript}
               />
             </Stack>
             <TextField
@@ -699,6 +721,10 @@ function App() {
               rows={12}
               value={featureScript}
               onChange={(_, newValue) => setFeatureScript(newValue || "")}
+              readOnly={scriptValidationFailed || !featureScript}
+              style={{
+                color: scriptValidationFailed ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+              }}
             />
 
             <Separator />
@@ -719,17 +745,9 @@ function App() {
                 iconProps={{ iconName: "Copy" }}
                 text="Copy"
                 onClick={async () => {
-                  await copyScript(commentScript, [featureScript, originalPostScript]);
-                }}
-                disabled={!commentScript}
-              />
-              <CommandButton
-                iconProps={{ iconName: "Copy" }}
-                text="Copy (edit placeholders)"
-                onClick={async () => {
                   await copyScript(commentScript, [featureScript, originalPostScript], true);
                 }}
-                disabled={!commentScript}
+                disabled={scriptValidationFailed || !commentScript}
               />
             </Stack>
             <TextField
@@ -737,6 +755,10 @@ function App() {
               rows={6}
               value={commentScript}
               onChange={(_, newValue) => setCommentScript(newValue || "")}
+              readOnly={scriptValidationFailed || !commentScript}
+              style={{
+                color: scriptValidationFailed ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+              }}
             />
 
             <Separator />
@@ -757,17 +779,9 @@ function App() {
                 iconProps={{ iconName: "Copy" }}
                 text="Copy"
                 onClick={async () => {
-                  await copyScript(originalPostScript, [featureScript, commentScript]);
-                }}
-                disabled={!originalPostScript}
-              />
-              <CommandButton
-                iconProps={{ iconName: "Copy" }}
-                text="Copy (edit placeholders)"
-                onClick={async () => {
                   await copyScript(originalPostScript, [featureScript, commentScript], true);
                 }}
-                disabled={!originalPostScript}
+                disabled={scriptValidationFailed || !originalPostScript}
               />
             </Stack>
             <TextField
@@ -775,6 +789,10 @@ function App() {
               rows={3}
               value={originalPostScript}
               onChange={(_, newValue) => setOriginalPostScript(newValue || "")}
+              readOnly={scriptValidationFailed || !originalPostScript}
+              style={{
+                color: scriptValidationFailed ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+              }}
             />
 
             <Separator />
@@ -803,14 +821,18 @@ function App() {
                 iconProps={{ iconName: "Copy" }}
                 text="Copy"
                 onClick={async () => await navigator.clipboard.writeText(newLevelScript)}
-                disabled={!newLevelScript}
-              />
+                disabled={newLevelScriptValidationFailed || !newLevelScript}
+                />
             </Stack>
             <TextField
               multiline
               rows={6}
               value={newLevelScript}
               onChange={(_, newValue) => setNewLevelScript(newValue || "")}
+              readOnly={newLevelScriptValidationFailed || !newLevelScript}
+              style={{
+                color: newLevelScriptValidationFailed ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+              }}
             />
             <Separator />
           </Stack>
