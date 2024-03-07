@@ -941,7 +941,6 @@ namespace VeroScripts
             bool communityTag)
         {
             TemplateEntry? template = null;
-            var defaultTemplatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == "default");
             var templatePage = TemplatesCatalog.Pages.FirstOrDefault(page => page.Name == pageName);
 
             // Check first feature and raw and community
