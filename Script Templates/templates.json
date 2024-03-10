@@ -90,6 +90,23 @@
       ]
     },
     {
+      "name": "other:fresh_breeze_club",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "Fresh Breeze Photography Club\n@%%PAGENAME%%\n✨✨Congratulations on your feature! [[PERSONALIZED MESSAGE]] Thank you for tagging our hub and sharing your beautiful art with us! ✨✨\n"
+        },
+        {
+          "name": "feature",
+          "template": " #%%PAGENAME%%\n\n🌟 FEATURED ARTIST: @%%USERNAME%%\n\n\n🌌Congratulations🌌\n\n☑️Selected by moderator @%%YOURNAME%%\n\nFor the chance to be featured in our gallery,  use the hashtag #%%PAGENAME%% ☺\n\n🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.\n🙏🏻 Good luck!\n\n\n#fbpc_featured_%%USERNAME%%\n\n#spring\n#flowerbuds\n#pussywillows\n#plants\n#shrubs\n#photography\n#grayscale\n"
+        },
+        {
+          "name": "original post",
+          "template": "🌟🌟FEATURED!!🌟🌟"
+        }
+      ]
+    },
+    {
       "name": "other:sat_door_day",
       "templates": [
         {
