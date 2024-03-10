@@ -112,6 +112,114 @@ struct ContentView: View {
             VStack {
                 Group {
                     HStack {
+                        // Page picker
+                        if !pageValidation.valid {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
+                                .help(pageValidation.reason ?? "unknown error")
+                                .imageScale(.small)
+                        }
+                        Text("Page: ")
+                            .foregroundStyle(
+                                pageValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
+                                Color.TextColorSecondary)
+#if os(iOS)
+                            .frame(width: 60, alignment: .leading)
+#else
+                            .frame(width: 36, alignment: .leading)
+#endif
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Picker("", selection: $page.onChange { value in
+                            if page.isEmpty {
+                                pageValidation = (false, "Page is required")
+                            } else {
+                                pageValidation = (true, nil)
+                            }
+                            pageChanged(to: value)
+                        }) {
+                            ForEach(loadedPages) { page in
+                                Text(page.displayName)
+                                    .tag(page.id)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
+                            }
+                        }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
+                        .focusable()
+                        .focused($focusedField, equals: .page)
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
+                        .onAppear {
+                            if page.isEmpty {
+                                pageValidation = (false, "Page must not be 'default' or a page name is required")
+                            } else {
+                                pageValidation = (true, nil)
+                            }
+                        }
+                        
+                        // Page staff level picker
+                        Text("Page staff level: ")
+                            .padding([.leading], 8)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
+                            ForEach(StaffLevelCase.allCases) { staffLevelCase in
+                                Text(staffLevelCase.rawValue)
+                                    .tag(staffLevelCase)
+                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
+                            }
+                        }
+                        .tint(Color.AccentColor)
+                        .accentColor(Color.AccentColor)
+                        .focusable()
+                        .focused($focusedField, equals: .staffLevel)
+#if os(iOS)
+                        .frame(minWidth: 120, alignment: .leading)
+#endif
+                    }
+
+                    HStack {
+                        // Your name editor
+                        FieldEditor(
+                            title: "You:",
+                            titleWidth: [42, 60],
+                            placeholder: "Enter your user name without '@'",
+                            field: $yourName,
+                            fieldChanged: yourNameChanged,
+                            fieldValidation: $yourNameValidation,
+                            validate: { value in
+                                if value.count == 0 {
+                                    return (false, "Required value")
+                                } else if value.first! == "@" {
+                                    return (false, "Don't include the '@' in user names")
+                                }
+                                return (true, nil)
+                            },
+                            focus: $focusedField,
+                            focusField: .yourName
+                        )
+
+                        // Your first name editor
+                        FieldEditor(
+                            title: "Your first name:",
+                            placeholder: "Enter your first name (capitalized)",
+                            field: $yourFirstName,
+                            fieldChanged: yourFirstNameChanged,
+                            fieldValidation: $yourFirstNameValidation,
+                            validate: { value in
+                                if value.count == 0 {
+                                    return (false, "Required value")
+                                }
+                                return (true, nil)
+                            },
+                            focus: $focusedField,
+                            focusField: .yourFirstName
+                        ).padding([.leading], 8)
+                    }
+
+                    HStack {
                         // User name editor
                         FieldEditor(
                             title: "User: ",
@@ -163,6 +271,43 @@ struct ContentView: View {
                         }
                         .focusable()
                         .focused($focusedField, equals: .level)
+#if !os(iOS)
+                        // Options
+                        Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
+                            Text("First feature on page")
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                        .focusable()
+                        .focused($focusedField, equals: .firstFeature)
+                        .padding([.leading], 8)
+                        .help("First feature on page")
+                        
+                        if currentPage?.hub == "snap" {
+                            Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
+                                Text("From RAW tag")
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            .focusable()
+                            .focused($focusedField, equals: .rawTag)
+                            .padding([.leading], 8)
+                            .help("From RAW tag")
+                            
+                            Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                                Text("From community tag")
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            .focusable()
+                            .focused($focusedField, equals: .communityTag)
+                            .padding([.leading], 8)
+                            .help("From community tag")
+                        }
+#else
+                        Spacer()
+#endif
+
 #if os(iOS)
                         Button(action: {
                             userName = ""
@@ -194,151 +339,6 @@ struct ContentView: View {
                         }.disabled(isAnyToastShowing)
 #endif
                         Spacer()
-                    }
-
-                    HStack {
-                        // Your name editor
-                        FieldEditor(
-                            title: "You:",
-                            titleWidth: [42, 60],
-                            placeholder: "Enter your user name without '@'",
-                            field: $yourName,
-                            fieldChanged: yourNameChanged,
-                            fieldValidation: $yourNameValidation,
-                            validate: { value in
-                                if value.count == 0 {
-                                    return (false, "Required value")
-                                } else if value.first! == "@" {
-                                    return (false, "Don't include the '@' in user names")
-                                }
-                                return (true, nil)
-                            },
-                            focus: $focusedField,
-                            focusField: .yourName
-                        )
-
-                        // Your first name editor
-                        FieldEditor(
-                            title: "Your first name:",
-                            placeholder: "Enter your first name (capitalized)",
-                            field: $yourFirstName,
-                            fieldChanged: yourFirstNameChanged,
-                            fieldValidation: $yourFirstNameValidation,
-                            validate: { value in
-                                if value.count == 0 {
-                                    return (false, "Required value")
-                                }
-                                return (true, nil)
-                            },
-                            focus: $focusedField,
-                            focusField: .yourFirstName
-                        ).padding([.leading], 8)
-                    }
-
-                    HStack {
-                        // Page picker
-                        if !pageValidation.valid {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
-                                .help(pageValidation.reason ?? "unknown error")
-                                .imageScale(.small)
-                        }
-                        Text("Page: ")
-                            .foregroundStyle(
-                                pageValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
-                                Color.TextColorSecondary)
-#if os(iOS)
-                            .frame(width: 60, alignment: .leading)
-#else
-                            .frame(width: 36, alignment: .leading)
-#endif
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Picker("", selection: $page.onChange { value in
-                            if page.isEmpty {
-                                pageValidation = (false, "Page is required")
-                            } else {
-                                pageValidation = (true, nil)
-                            }
-                            pageChanged(to: value)
-                        }) {
-                            ForEach(loadedPages) { page in
-                                Text(page.displayName)
-                                    .tag(page.id)
-                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
-                            }
-                        }
-                        .tint(Color.AccentColor)
-                        .accentColor(Color.AccentColor)
-                        .focusable()
-                        .focused($focusedField, equals: .page)
-#if os(iOS)
-                        .frame(minWidth: 120, alignment: .leading)
-#endif
-                        .onAppear {
-                            if page.isEmpty {
-                                pageValidation = (false, "Page must not be 'default' or a page name is required")
-                            } else {
-                                pageValidation = (true, nil)
-                            }
-                        }
-
-                        // Page staff level picker
-                        Text("Page staff level: ")
-                            .padding([.leading], 8)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
-                            ForEach(StaffLevelCase.allCases) { staffLevelCase in
-                                Text(staffLevelCase.rawValue)
-                                    .tag(staffLevelCase)
-                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
-                            }
-                        }
-                        .tint(Color.AccentColor)
-                        .accentColor(Color.AccentColor)
-                        .focusable()
-                        .focused($focusedField, equals: .staffLevel)
-#if os(iOS)
-                        .frame(minWidth: 120, alignment: .leading)
-#endif
-
-#if !os(iOS)
-                        // Options
-                        Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
-                            Text("First feature on page")
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        }
-                        .focusable()
-                        .focused($focusedField, equals: .firstFeature)
-                        .padding([.leading], 8)
-                        .help("First feature on page")
-
-                        if currentPage?.hub == "snap" {
-                            Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
-                                Text("From RAW tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .rawTag)
-                            .padding([.leading], 8)
-                            .help("From RAW tag")
-
-                            Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                                Text("From community tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .communityTag)
-                            .padding([.leading], 8)
-                            .help("From community tag")
-                        }
-#else
-                        Spacer()
-#endif
                     }
                 }
 

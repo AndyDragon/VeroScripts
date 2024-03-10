@@ -43,5 +43,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.31",
+        "notes": [
+            {
+                "date": "March 10, 2024",
+                "notes": [
+                    "Rearranged the field layout at the top."
+                ]
+            }
+        ]
     }
 ]

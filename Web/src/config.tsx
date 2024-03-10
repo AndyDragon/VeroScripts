@@ -12,6 +12,8 @@ export const applicationDetails = (
 );
 export const macScreenshotWidth = 1200;
 export const macScreenshotHeight = 820;
+export const windowsScreenshotWidth = 1200;
+export const windowsScreenshotHeight = 800;
 
 export const deploymentWebLocation = "/app/veroscripts";
 
