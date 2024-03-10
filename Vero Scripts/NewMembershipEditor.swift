@@ -17,7 +17,9 @@ struct NewMembershipEditor: View {
     var valid: Bool
     var canCopy: Bool
     var copy: () -> Void
-    
+    var focus: FocusState<FocusedField?>.Binding
+    var focusField: FocusedField
+
     var body: some View {
         HStack {
 #if os(iOS)
@@ -51,19 +53,39 @@ struct NewMembershipEditor: View {
         .frame(alignment: .leading)
         .padding([.top], 4)
 
-        TextEditor(text: $script)
-            .font(.system(size: 14))
+        if #available(macOS 14.0, *) {
+            TextEditor(text: $script)
+                .font(.system(size: 14))
 #if os(iOS)
-            .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-            .border(.gray)
+                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
 #else
-            .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-            .padding(2)
-            .border(Color.windowBackground)
-            .cornerRadius(5)
+                .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
 #endif
-            .foregroundColor(valid ? .TextColorPrimary : .TextColorRequired)
-            .scrollContentBackground(.hidden)
-            .background(Color.BackgroundColorEditor)
+                .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
+                .padding(.all, 4)
+                .scrollContentBackground(.hidden)
+                .background(Color.BackgroundColorEditor)
+                .border(Color.gray.opacity(0.25))
+                .cornerRadius(5)
+                .focused(focus, equals: focusField)
+#if !os(iOS)
+                .textEditorStyle(.plain)
+#endif
+        } else {
+            TextEditor(text: $script)
+                .font(.system(size: 14))
+#if os(iOS)
+                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
+#else
+                .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
+#endif
+                .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
+                .padding(.all, 4)
+                .scrollContentBackground(.hidden)
+                .background(Color.BackgroundColorEditor)
+                .border(Color.gray.opacity(0.25))
+                .cornerRadius(5)
+                .focused(focus, equals: focusField)
+        }
     }
 }

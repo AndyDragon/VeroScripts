@@ -66,6 +66,7 @@ struct FieldEditor: View {
             })
             .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
             .focused(focus, equals: focusField)
+            .lineLimit(1)
 #if os(iOS)
             .textInputAutocapitalization(.never)
 #endif

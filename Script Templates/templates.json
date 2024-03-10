@@ -43,7 +43,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "@%%USERNAME%% Hi [[USER'S FIRST NAME]], %%YOURFIRSTNAME%% @%%YOURNAME%% here, commenting on your magnificent feature, I’m very happy to showcase your amazing bench. 🫶🏽 Many congratulations and welcome onboard of our feed. {{PERSONALIZED MESSAGE}} It's truly a work of art and thanks a lot for sharing it! 🤍\n"
+          "template": "@%%USERNAME%% Hi [[USER'S FIRST NAME]], %%YOURFIRSTNAME%% @%%YOURNAME%% here, commenting on your magnificent feature, I’m very happy to showcase your amazing bench. 🫶🏽 Many congratulations and welcome onboard of our feed. [{PERSONALIZED MESSAGE}] It's truly a work of art and thanks a lot for sharing it! 🤍\n"
         },
         {
           "name": "feature",
@@ -64,7 +64,7 @@
         },
         {
           "name": "feature",
-          "template": "✨✨ @%%PAGENAME%% ✨✨\n\nCONGRATULATIONS!  👏👏👏\n\n🦅 Your amazing BIF photograph has been chosen for a feature!   🦅\n\nWhy was it featured?\n{{PERSONALIZED MESSAGE}}\n\n✨BIRDS IN FLIGHT FEATURES ✨\n    ✨  Featured Photographer :  @%%USERNAME%%\n\nSelected by hub host:  @%%YOURNAME%%\n\n🦅🦅🦅🦅🦅🦅🦅🦅🦅\n\nThank you for using our hashtag #BIFFeatures\nPlease Follow @%%PAGENAME%%\n\n🩵🩵🩵🩵🩵🩵🩵🩵🩵\n\n#bird #birds #BIF  #%%PAGENAME%%  #wildlife #avian\n\nFor Hub Host Use Only\n#BIFFeatured_%%USERNAME%%\n"
+          "template": "✨✨ @%%PAGENAME%% ✨✨\n\nCONGRATULATIONS!  👏👏👏\n\n🦅 Your amazing BIF photograph has been chosen for a feature!   🦅\n\nWhy was it featured?\n[{PERSONALIZED MESSAGE}]\n\n✨BIRDS IN FLIGHT FEATURES ✨\n    ✨  Featured Photographer :  @%%USERNAME%%\n\nSelected by hub host:  @%%YOURNAME%%\n\n🦅🦅🦅🦅🦅🦅🦅🦅🦅\n\nThank you for using our hashtag #BIFFeatures\nPlease Follow @%%PAGENAME%%\n\n🩵🩵🩵🩵🩵🩵🩵🩵🩵\n\n#bird #birds #BIF  #%%PAGENAME%%  #wildlife #avian\n\nFor Hub Host Use Only\n#BIFFeatured_%%USERNAME%%\n"
         },
         {
           "name": "original post",
@@ -98,7 +98,7 @@
         },
         {
           "name": "feature",
-          "template": " #%%PAGENAME%%\n\n🌟 FEATURED ARTIST: @%%USERNAME%%\n\n\n🌌Congratulations🌌\n\n☑️Selected by moderator @%%YOURNAME%%\n\nFor the chance to be featured in our gallery,  use the hashtag #%%PAGENAME%% ☺\n\n🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.\n🙏🏻 Good luck!\n\n\n#fbpc_featured_%%USERNAME%%\n\n#spring\n#flowerbuds\n#pussywillows\n#plants\n#shrubs\n#photography\n#grayscale\n"
+          "template": " #%%PAGEHASH%%\n\n🌟 FEATURED ARTIST: @%%USERNAME%%\n\n\n🌌Congratulations🌌\n\n☑️Selected by moderator @%%YOURNAME%%\n\nFor the chance to be featured in our gallery,  use the hashtag #%%PAGEHASH%% ☺\n\n🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.\n🙏🏻 Good luck!\n\n\n#fbpc_featured_%%USERNAME%%\n\n[{PHOTO HASH TAGS}]\n"
         },
         {
           "name": "original post",

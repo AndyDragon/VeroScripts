@@ -500,7 +500,9 @@ struct ContentView: View {
                                     subTitle: "Copied the new membership script to the clipboard",
                                     duration: .short)
                             }
-                        })
+                        },
+                        focus: $focusedField,
+                        focusField: .newMembershipScript)
                 }
             }
             .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
@@ -844,12 +846,19 @@ struct ContentView: View {
             optionInstruction
         }
     }
+    
+    func clearPlaceholders() {
+        featureScriptPlaceholders.placeholderDict.removeAll()
+        featureScriptPlaceholders.longPlaceholderDict.removeAll()
+        commentScriptPlaceholders.placeholderDict.removeAll()
+        commentScriptPlaceholders.longPlaceholderDict.removeAll()
+        originalPostScriptPlaceholders.placeholderDict.removeAll()
+        originalPostScriptPlaceholders.longPlaceholderDict.removeAll()
+    }
 
     func membershipChanged(to value: MembershipCase) {
         if value != lastMembership {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             updateScripts()
             lastMembership = value
         }
@@ -867,9 +876,7 @@ struct ContentView: View {
 
     func userNameChanged(to value: String) {
         if value != lastUserName {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             updateScripts()
             updateNewMembershipScripts()
             lastUserName = value
@@ -889,9 +896,7 @@ struct ContentView: View {
 
     func yourNameChanged(to value: String) {
         if value != lastYourName {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             UserDefaults.standard.set(yourName, forKey: "YourName")
             updateScripts()
             updateNewMembershipScripts()
@@ -901,9 +906,7 @@ struct ContentView: View {
 
     func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             UserDefaults.standard.set(yourFirstName, forKey: "YourFirstName")
             updateScripts()
             updateNewMembershipScripts()
@@ -913,9 +916,7 @@ struct ContentView: View {
 
     func pageChanged(to value: String) {
         if value != lastPage {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             UserDefaults.standard.set(page, forKey: "Page")
             updateScripts()
             lastPage = value
@@ -924,9 +925,7 @@ struct ContentView: View {
 
     func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
-            featureScriptPlaceholders.placeholderDict.removeAll()
-            commentScriptPlaceholders.placeholderDict.removeAll()
-            originalPostScriptPlaceholders.placeholderDict.removeAll()
+            clearPlaceholders()
             UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
             updateScripts()
             lastPageStaffLevel = value
@@ -969,6 +968,10 @@ struct ContentView: View {
             scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
                 of: placeholder.key, with: placeholder.value.value)
         })
+        placeholders.longPlaceholderDict.forEach({ placeholder in
+            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                of: placeholder.key, with: placeholder.value.value)
+        })
         if withPlaceholders {
             copyToClipboard(scriptWithPlaceholdersInPlace)
             return true
@@ -996,10 +999,18 @@ struct ContentView: View {
                 }
             }
         }
+        scriptPlaceholders.longPlaceholderDict.forEach { placeholder in
+            otherPlaceholders.forEach { destinationPlaceholders in
+                let destinationPlaceholderEntry = destinationPlaceholders.longPlaceholderDict[placeholder.key]
+                if destinationPlaceholderEntry != nil {
+                    destinationPlaceholderEntry!.value = placeholder.value.value
+                }
+            }
+        }
     }
 
     func scriptHasPlaceholders(_ script: String) -> Bool {
-        return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty
+        return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty || !matches(of: "\\[\\{([^\\}]*)\\}\\]", in: script).isEmpty
     }
 
     func checkForPlaceholders(
@@ -1008,10 +1019,10 @@ struct ContentView: View {
         _ otherPlaceholders: [PlaceholderList],
         force: Bool = false
     ) -> Bool {
+        var needEditor: Bool = false
         var foundPlaceholders: [String] = [];
         foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))
         if foundPlaceholders.count != 0 {
-            var needEditor: Bool = false
             for placeholder in foundPlaceholders {
                 let placeholderEntry = placeholders.placeholderDict[placeholder]
                 if placeholderEntry == nil {
@@ -1031,6 +1042,31 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+        var foundLongPlaceholders: [String] = [];
+        foundLongPlaceholders.append(contentsOf: matches(of: "\\[\\{([^\\}]*)\\}\\]", in: script))
+        if foundLongPlaceholders.count != 0 {
+            for placeholder in foundLongPlaceholders {
+                let placeholderEntry = placeholders.longPlaceholderDict[placeholder]
+                if placeholderEntry == nil {
+                    needEditor = true
+                    var value: String? = nil
+                    otherPlaceholders.forEach { sourcePlaceholders in
+                        let sourcePlaceholderEntry = sourcePlaceholders.longPlaceholderDict[placeholder]
+                        if (value == nil || value!.isEmpty)
+                            && sourcePlaceholderEntry != nil
+                            && !(sourcePlaceholderEntry?.value ?? "").isEmpty {
+                            value = sourcePlaceholderEntry?.value
+                        }
+                    }
+                    placeholders.longPlaceholderDict[placeholder] = PlaceholderValue()
+                    if value != nil {
+                        placeholders.longPlaceholderDict[placeholder]?.value = value!
+                    }
+                }
+            }
+        }
+        if foundPlaceholders.count != 0 || foundLongPlaceholders.count != 0 {
             if (force || needEditor) && !showingPlaceholderSheet {
                 showingPlaceholderSheet.toggle()
                 return true
@@ -1042,14 +1078,19 @@ struct ContentView: View {
     func updateScripts() -> Void {
         var currentPageName = page
         var scriptPageName = currentPageName
+        var scriptPageHash = currentPageName
         let currentHubName = currentPage?.hub
         if currentPageName != "" {
             let pageSource = loadedPages.first(where: { needle in needle.id == page })
             if pageSource != nil {
                 currentPageName = pageSource?.name ?? page
                 scriptPageName = currentPageName
+                scriptPageHash = currentPageName
                 if pageSource?.pageName != nil {
                     scriptPageName = (pageSource?.pageName)!
+                }
+                if pageSource?.hashTag != nil {
+                    scriptPageHash = (pageSource?.hashTag)!
                 }
             }
             currentPage = pageSource
@@ -1107,6 +1148,7 @@ struct ContentView: View {
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
@@ -1117,6 +1159,7 @@ struct ContentView: View {
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
@@ -1127,6 +1170,7 @@ struct ContentView: View {
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)

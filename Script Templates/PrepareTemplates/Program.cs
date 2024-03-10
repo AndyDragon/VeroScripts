@@ -56,6 +56,7 @@ class Program
                             var hubPage = new Page(manifest?.Page ?? pageName)
                             {
                                 PageName = manifest?.PageName,
+                                HashTag = manifest?.HashTag,
                             };
                             if (!pageCatalog.Hubs.TryGetValue(pageHub, out IList<Page>? value))
                             {
@@ -78,7 +79,8 @@ class Program
                             {
                                 var page = new Page(pageName)
                                 {
-                                    PageName = manifest?.PageName
+                                    PageName = manifest?.PageName,
+                                    HashTag = manifest?.HashTag,
                                 };
                                 pageCatalog.Pages.Add(page);
                             }
@@ -176,6 +178,7 @@ class Program
         var result = template
             .Replace("%%USERNAME%%", "aabbcc")
             .Replace("%%PAGENAME%%", "somepage")
+            .Replace("%%PAGEHASH%%", "somepage")
             .Replace("%%FULLPAGENAME%%", "somepage")
             .Replace("%%YOURNAME%%", "ddeeff")
             .Replace("%%YOURFIRSTNAME%%", "Gghhii")
@@ -228,15 +231,17 @@ class Page
     [JsonProperty(propertyName: "name")]
     public string Name { get; }
 
-    [JsonProperty(propertyName: "pageName", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonProperty(propertyName: "pageName", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     public string? PageName { get; set; }
+
+    [JsonProperty(propertyName: "hashTag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? HashTag { get; set; }
 }
 
 class Manifest
 {
-    public Manifest(string pageName)
+    public Manifest()
     {
-        PageName = pageName;
     }
 
     [JsonProperty(propertyName: "hub")]
@@ -246,7 +251,10 @@ class Manifest
     public string Page { get; set; } = string.Empty;
 
     [JsonProperty(propertyName: "pageName")]
-    public string PageName { get; set; } = string.Empty;
+    public string? PageName { get; set; }
+
+    [JsonProperty(propertyName: "hashTag")]
+    public string? HashTag { get; set; }
 }
 
 class TemplateCatalog

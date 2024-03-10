@@ -18,7 +18,8 @@ enum FocusedField: Hashable {
          communityTag,
          featureScript,
          commentScript,
-         originalPostScript
+         originalPostScript,
+         newMembershipScript
 }
 
 enum MembershipCase: String, CaseIterable, Identifiable {
@@ -190,6 +191,7 @@ struct Page: Codable {
     var id: String { self.name }
     let name: String
     let pageName: String?
+    let hashTag: String?
 }
 
 struct LoadedPage: Codable, Identifiable {
@@ -202,6 +204,7 @@ struct LoadedPage: Codable, Identifiable {
     let hub: String
     let name: String
     let pageName: String?
+    let hashTag: String?
     var displayName: String {
         if hub == "other" {
             return name
@@ -210,7 +213,7 @@ struct LoadedPage: Codable, Identifiable {
     }
 
     static func from(hub: String, page: Page) -> LoadedPage {
-        return LoadedPage(hub: hub, name: page.name, pageName: page.pageName)
+        return LoadedPage(hub: hub, name: page.name, pageName: page.pageName, hashTag: page.hashTag)
     }
 }
 

@@ -13,64 +13,69 @@ final class PlaceholderValue: ObservableObject {
 
 final class PlaceholderList: ObservableObject {
     @Published var placeholderDict = [String: PlaceholderValue]()
+    @Published var longPlaceholderDict = [String: PlaceholderValue]()
 }
 
 struct PlaceholderView: View {
     let element: [String: PlaceholderValue].Element
     var editorName = ""
+    var editorLongForm = false
     @State var editorValue: String
 
     var body: some View {
-        if #available(macOS 13.0, *) {
-            HStack {
-                Text(editorName.capitalized)
-                    .frame(minWidth: 200)
-                TextField(
-                    "leave blank to remove placeholder",
+        HStack(alignment: editorLongForm ? .top : .center) {
+            Text(editorName.capitalized)
+                .frame(minWidth: 200)
+                .padding([.top], editorLongForm ? 4 : 0)
+            if editorLongForm {
+                TextEditor(
                     text: $editorValue.onChange(editorValueChanged)
                 )
+                .font(.body)
+                .frame(height: 48)
                 .frame(minWidth: 320)
-                .padding(.all, 2)
+                .padding(.all, 4)
+                .scrollContentBackground(.hidden)
+                .background(Color.BackgroundColorEditor)
+                .border(Color.windowBackground)
+                .cornerRadius(5)
 #if os(iOS)
                 .textInputAutocapitalization(.never)
 #endif
-                Spacer()
-                    .background(Color.yellow)
-            }
-            .frame(maxWidth: .infinity)
-#if !os(iOS)
-            .textFieldStyle(.roundedBorder)
-#endif
-            .listRowSeparator(.hidden)
-        } else {
-            HStack {
-                Text(element.key.capitalized)
-                    .frame(minWidth: 200)
+            } else {
                 TextField(
-                    "leave blank to remove placeholder",
+                    "",
                     text: $editorValue.onChange(editorValueChanged)
                 )
+                .lineLimit(1)
+                .font(.body)
                 .frame(minWidth: 320)
-                .padding(.all, 2)
+                .padding(.all, 4)
+                .scrollContentBackground(.hidden)
+                .background(Color.BackgroundColorEditor)
+                .border(Color.windowBackground)
+                .cornerRadius(5)
 #if os(iOS)
                 .textInputAutocapitalization(.never)
 #endif
-                Spacer()
-                    .background(Color.yellow)
             }
-            .frame(maxWidth: .infinity)
-#if !os(iOS)
-            .textFieldStyle(.roundedBorder)
-#endif
+            Spacer()
+                .background(Color.yellow)
         }
+        .frame(maxWidth: .infinity)
+#if !os(iOS)
+        .textFieldStyle(.plain)
+#endif
+        .listRowSeparator(.hidden)
     }
 
-    init(_ element: [String: PlaceholderValue].Element) {
+    init(_ element: [String: PlaceholderValue].Element, isLongForm: Bool) {
         self.element = element
         let start = element.key.index(element.key.startIndex, offsetBy: 2)
         let end = element.key.index(element.key.endIndex, offsetBy: -3)
         editorName = String(element.key[start...end]);
         editorValue = element.value.value
+        editorLongForm = isLongForm
     }
 
     func editorValueChanged(to: String) {
@@ -90,11 +95,20 @@ struct PlaceholderSheet: View {
         ZStack {
             VStack {
                 Text("There are manual placeholders that need to be filled out:")
+                Text("(leave any fields blank to remove placeholder)")
                 List() {
                     ForEach(placeholders.placeholderDict.sorted(by: { entry1, entry2 in
                         entry1.key < entry2.key
                     }), id: \.key) { entry in
-                        PlaceholderView(entry)
+                        PlaceholderView(entry, isLongForm: false)
+#if os(iOS)
+                            .padding(.horizontal, 20)
+#endif
+                    }
+                    ForEach(placeholders.longPlaceholderDict.sorted(by: { entry1, entry2 in
+                        entry1.key < entry2.key
+                    }), id: \.key) { entry in
+                        PlaceholderView(entry, isLongForm: true)
 #if os(iOS)
                             .padding(.horizontal, 20)
 #endif
@@ -105,6 +119,11 @@ struct PlaceholderSheet: View {
                     Button(action: {
                         scriptWithPlaceholders = scriptWithPlaceholdersInPlace
                         placeholders.placeholderDict.forEach({ placeholder in
+                            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                                of: placeholder.key,
+                                with: placeholder.value.value)
+                        })
+                        placeholders.longPlaceholderDict.forEach({ placeholder in
                             scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
                                 of: placeholder.key,
                                 with: placeholder.value.value)

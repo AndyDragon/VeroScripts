@@ -1,4 +1,4 @@
- #%%PAGENAME%%
+ #%%PAGEHASH%%
 
 🌟 FEATURED ARTIST: @%%USERNAME%%
 
@@ -7,7 +7,7 @@
 
 ☑️Selected by moderator @%%YOURNAME%%
 
-For the chance to be featured in our gallery,  use the hashtag #%%PAGENAME%% ☺
+For the chance to be featured in our gallery,  use the hashtag #%%PAGEHASH%% ☺
 
 🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.
 🙏🏻 Good luck!
@@ -15,10 +15,4 @@ For the chance to be featured in our gallery,  use the hashtag #%%PAGENAME%% ☺
 
 #fbpc_featured_%%USERNAME%%
 
-#spring
-#flowerbuds
-#pussywillows
-#plants
-#shrubs
-#photography
-#grayscale
+[{PHOTO HASH TAGS}]
