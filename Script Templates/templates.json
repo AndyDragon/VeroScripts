@@ -39,19 +39,87 @@
       ]
     },
     {
+      "name": "other:bench_wednesday",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "@%%USERNAME%% Hi [[USER'S FIRST NAME]], %%YOURFIRSTNAME%% @%%YOURNAME%% here, commenting on your magnificent feature, I’m very happy to showcase your amazing bench. 🫶🏽 Many congratulations and welcome onboard of our feed. {{PERSONALIZED MESSAGE}} It's truly a work of art and thanks a lot for sharing it! 🤍\n"
+        },
+        {
+          "name": "feature",
+          "template": "#%%PAGENAME%%\nCONGRATULATIONS\n🌟 🎉 [[USER'S FIRST NAME]] @%%USERNAME%% 🎉 🌟\nFeatured by @%%YOURNAME%%\nEnjoy a lovely Wednesday🫶\n🌟🫶🌟\n#%%PAGENAME%%_%%USERNAME%%\n•\n🌟🫶🌟\n#Sky #Tranquility #Winter #TranquilScene #ScenicsNature #bench\n"
+        },
+        {
+          "name": "original post",
+          "template": "🤍⭐️Congratulations [[USER'S FIRST NAME]], [[DESCRIPTION]] has been featured on @%%PAGENAME%% ⭐️🤍"
+        }
+      ]
+    },
+    {
+      "name": "other:birdsinflight",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "✨✨ Congratulations!  Your BIF photo has been selected for a feature by @%%PAGENAME%% !\nThank you for using our hashtag #BIFFeatures\n"
+        },
+        {
+          "name": "feature",
+          "template": "✨✨ @%%PAGENAME%% ✨✨\n\nCONGRATULATIONS!  👏👏👏\n\n🦅 Your amazing BIF photograph has been chosen for a feature!   🦅\n\nWhy was it featured?\n{{PERSONALIZED MESSAGE}}\n\n✨BIRDS IN FLIGHT FEATURES ✨\n    ✨  Featured Photographer :  @%%USERNAME%%\n\nSelected by hub host:  @%%YOURNAME%%\n\n🦅🦅🦅🦅🦅🦅🦅🦅🦅\n\nThank you for using our hashtag #BIFFeatures\nPlease Follow @%%PAGENAME%%\n\n🩵🩵🩵🩵🩵🩵🩵🩵🩵\n\n#bird #birds #BIF  #%%PAGENAME%%  #wildlife #avian\n\nFor Hub Host Use Only\n#BIFFeatured_%%USERNAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨✨  BIF FEATURED!  ✨✨  on  @%%PAGENAME%%   🦅 ✨✨\nThank you for using our hashtag #BIFFeatures"
+        }
+      ]
+    },
+    {
+      "name": "other:desert_worlds",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "Congratulations on your feature on @%%PAGENAME%%!  [[PERSONALIZED MESSAGE]]\n"
+        },
+        {
+          "name": "feature",
+          "template": "🏜️ #%%PAGENAME%% 🏜️\n.\n🏜️🌵☀️ Featured Desert Adventurer☀️🌵🏜️\n\n🔆🌞☀️ @%%USERNAME%% ☀️🌞🔆\n.\n__________________________________\n\n🏜️🌵☀️CONGRATULATIONS ☀️🌵🏜️\n__________________________________\n.\nSelected by: @%%YOURNAME%%\nYour host at @%%PAGENAME%%\n.\nPlease follow @%%PAGENAME%% and tag your photos #%%PAGENAME%% ... If it happens in the desert, we want to feature it in @%%PAGENAME%%... landscapes, plants, animals, pretty much anything as long as it's in the desert! 🏜️🌵🔆\n.\nCreated by your hosts @lorirowland & @ms2thdr 🏜️☀️🌵😎\n.\n\n#%%PAGENAME%%\n#desert\n#desert_landscapes\n#desert_life\n#desert_flowers\n#desert_adventures\n#utah_landscapes\n#arizona_landscapes\n#sahara\n#saharadesert\n#deathvalley\n#atacama\n#atacamadesert\n#mojavedesert\n#desert_southwest\n#sonorandesert\n#badlands\n\nPAGE HASHTAGS\n.\nFor internal use only!\n#%%PAGENAME%%_%%USERNAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "🔆🏜️ Featured @%%PAGENAME%% 🏜️🔆"
+        }
+      ]
+    },
+    {
       "name": "other:sat_door_day",
       "templates": [
         {
           "name": "comment",
-          "template": "Congratulations @%%USERNAME%%. Your amazing door has been featured\non @Sat_door_day  🚪👏💫✨\n"
+          "template": "Congratulations @%%USERNAME%%. Your amazing door has been featured\non @%%PAGENAME%% 🚪👏💫✨\n"
         },
         {
           "name": "feature",
-          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @sat_door_day  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #Sat_door_day 🚪 😃 💖\n\nFor Admin Use Only\n#sat_door_day_%%USERNAME%%\n.\n"
+          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @%%PAGENAME%%  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #%%PAGENAME%% 🚪 😃 💖\n\nFor Admin Use Only\n#%%PAGENAME%%_%%USERNAME%%\n"
         },
         {
           "name": "original post",
-          "template": "Your Won-Door-Ful image has been featured on @Sat_Door_Day ⭐️🚪💫. Congratulations 👏"
+          "template": "Your Won-Door-Ful image has been featured on @%%PAGENAME%% ⭐️🚪💫. Congratulations 👏"
+        }
+      ]
+    },
+    {
+      "name": "other:unseen_worlds",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "Congratulations @%%USERNAME%% your otherworldly infrared image has been featured on @%%PAGENAME%% ✨⭐️💫\n"
+        },
+        {
+          "name": "feature",
+          "template": "Todays Featured Infrared Artist is @%%USERNAME%%\n\n✨✨ CONGRATULATIONS!!!\n\n✨✨ 🏆 🌟✨💫 Your amazing Infrared image has been featured by your host today @%%YOURNAME%% 💫✨🌟🏆 ⭐\n\n\nThank you for following @%%PAGENAME%% and tagging #%%PAGENAME%%! ⭐️\n\n@%%PAGENAME%%, the best in IR and UV photography on VERO, is brought to you by your hosts @ms2thdr and @lorirowland\n\n\n#infrared #IR #Infrared_landscape #infrared_portrait #infrared550nm #infrared665nm #infrared590nm #infrared720nm #infrared850nm #infraredblackwhite #infrared_image #infrared_moments #infrared_bnw #infrared_images #UV #UVIR #UV_Photography #UVIR_Flowers\n\nFor admin use\n\n#%%PAGENAME%%_%%USERNAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "Your fabulous infrared image has been featured on @%%PAGENAME%% 🌟✨💫"
         }
       ]
     },
