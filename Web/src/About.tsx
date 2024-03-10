@@ -59,6 +59,7 @@ export default function About(props: GeneralProps) {
             <br /><br />
             <div style={{ textAlign: "center"}}>
                 <Image alt="macOS Screenshot" src={process.env.PUBLIC_URL + "/MacOS.png"} width={macScreenshotWidth} height={macScreenshotHeight} />
+                <br />
                 <Image alt="Windows Screenshot" src={process.env.PUBLIC_URL + "/Windows.png"} width={windowsScreenshotWidth} height={windowsScreenshotHeight} />
             </div>
             <br /><br />
