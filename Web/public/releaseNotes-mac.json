@@ -54,5 +54,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.32",
+        "notes": [
+            {
+                "date": "March 11, 2024",
+                "notes": [
+                    "Added support for page hash replacements."
+                ]
+            }
+        ]
     }
 ]
