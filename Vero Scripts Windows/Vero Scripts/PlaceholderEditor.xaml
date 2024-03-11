@@ -24,20 +24,36 @@
         <TextBlock Grid.Row="0" Grid.Column="0" Margin="10,10,10,2" HorizontalAlignment="Center">There are manual placeholders that need to be filled out:</TextBlock>
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="10,2,10,10" HorizontalAlignment="Center">(leave field blank to remove the placeholder)</TextBlock>
         <Border Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}" Margin="10,10,20,10">
-            <ItemsControl ItemsSource="{Binding Placeholders}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="local:Placeholder">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="2*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" FontWeight="{Binding FontWeight, Mode=OneWay}" VerticalAlignment="Center" />
-                            <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center" />
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{Binding Placeholders}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="local:Placeholder">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" FontWeight="{Binding FontWeight, Mode=OneWay}" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding LongPlaceholders}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="local:Placeholder">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" FontWeight="{Binding FontWeight, Mode=OneWay}" VerticalAlignment="Top" />
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" Margin="8,0,0,0" FontSize="14" TextWrapping="Wrap" Height="48" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </Border>
         <StackPanel Grid.RowSpan="3" Grid.Column="1" Margin="0,10,10,10">
             <Button Content="Copy" IsDefault="True" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="152" Height="29" Click="OnCopyClick"/>

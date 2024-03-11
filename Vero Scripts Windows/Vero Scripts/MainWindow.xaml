@@ -14,12 +14,12 @@
     Icon="pack://application:,,,/Vero Scripts;component/App.ico"
     Height="800" Width="1200" MinHeight="720" MinWidth="960"
     GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
-    ResizeMode="CanResizeWithGrip">
+    ResizeMode="CanResizeWithGrip" Activated="OnActivatedChanged" Deactivated="OnActivatedChanged">
 
     <Window.DataContext>
         <local:ScriptsViewModel />
     </Window.DataContext>
-    
+
     <Window.Resources>
         <local:ValidationResultColorConverter x:Key="validationResultColorConverter"></local:ValidationResultColorConverter>
         <local:ValidationBooleanColorConverter x:Key="validationBooleanColorConverter"></local:ValidationBooleanColorConverter>
@@ -387,12 +387,9 @@
 
             <notifications:NotificationArea Grid.Row="0" Grid.RowSpan="10" x:Name="WindowArea" Position="TopRight" MaxItems="3" />
         </Grid>
-        
+
         <!-- Footer -->
-        <Grid Margin="0,8,0,0" Grid.Row="1">
-            <Grid.Background>
-                <SolidColorBrush Color="{DynamicResource MahApps.Colors.Accent2}"/>
-            </Grid.Background>
+        <Grid Margin="0,8,0,0" Grid.Row="1" Background="{Binding StatusBarBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -456,5 +453,5 @@
             </StackPanel>
         </Grid>
     </Grid>
-    
+
 </mah:MetroWindow>

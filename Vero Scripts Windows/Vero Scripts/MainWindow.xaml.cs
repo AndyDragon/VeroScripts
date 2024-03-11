@@ -9,5 +9,13 @@
         {
             InitializeComponent();
         }
+
+        private void OnActivatedChanged(object sender, EventArgs e)
+        {
+            if (this.DataContext is ScriptsViewModel viewModel)
+            {
+                viewModel.WindowActive = IsActive;
+            }
+        }
     }
 }

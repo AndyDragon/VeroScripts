@@ -10,6 +10,7 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace VeroScripts
 {
@@ -91,6 +92,12 @@ namespace VeroScripts
                 { Script.OriginalPost, "" }
             };
             PlaceholdersMap = new Dictionary<Script, ObservableCollection<Placeholder>>
+            {
+                { Script.Feature, new ObservableCollection<Placeholder>() },
+                { Script.Comment, new ObservableCollection<Placeholder>() },
+                { Script.OriginalPost, new ObservableCollection<Placeholder>() }
+            };
+            LongPlaceholdersMap = new Dictionary<Script, ObservableCollection<Placeholder>>
             {
                 { Script.Feature, new ObservableCollection<Placeholder>() },
                 { Script.Comment, new ObservableCollection<Placeholder>() },
@@ -281,6 +288,8 @@ namespace VeroScripts
                         OnPropertyChanged(nameof(PageValidation));
                         OnPropertyChanged(nameof(CanCopyScripts));
                         OnPropertyChanged(nameof(CanCopyNewMembershipScript));
+                        OnPropertyChanged(nameof(StatusBarBrush));
+                        OnPropertyChanged(nameof(Themes));
                     }
                 }
             }
@@ -289,6 +298,23 @@ namespace VeroScripts
         public ThemeOption[] Themes => [.. ThemeManager.Current.Themes.OrderBy(theme => theme.Name).Select(theme => new ThemeOption(theme, theme == Theme))];
 
         public static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "---";
+
+        private bool windowActive = false;
+        public bool WindowActive
+        {
+            get => windowActive;
+            set
+            {
+                if (Set(ref windowActive, value))
+                {
+                    OnPropertyChanged(nameof(StatusBarBrush));
+                }
+            }
+        }
+
+        public Brush? StatusBarBrush => WindowActive 
+            ? Theme?.Resources["MahApps.Brushes.Accent2"] as Brush
+            : Theme?.Resources["MahApps.Brushes.WindowTitle.NonActive"] as Brush;
 
         #region User name
 
@@ -312,9 +338,7 @@ namespace VeroScripts
                 if (Set(ref userName, value))
                 {
                     UserNameValidation = ValidateUser(UserName);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
                 }
@@ -382,9 +406,7 @@ namespace VeroScripts
                 if (Set(ref membership, value))
                 {
                     MembershipValidation = ValidateValueNotDefault(Membership, "None");
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                 }
             }
@@ -419,9 +441,7 @@ namespace VeroScripts
                 {
                     UserSettings.Store(nameof(YourName), YourName);
                     YourNameValidation = ValidateUserName(YourName);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
                 }
@@ -457,9 +477,7 @@ namespace VeroScripts
                 {
                     UserSettings.Store(nameof(YourFirstName), YourFirstName);
                     YourFirstNameValidation = ValidateValueNotEmpty(YourFirstName);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
                 }
@@ -542,9 +560,7 @@ namespace VeroScripts
                 {
                     UserSettings.Store(nameof(Page), Page);
                     PageValidation = CalculatePageValidation(Page);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                 }
             }
@@ -584,9 +600,7 @@ namespace VeroScripts
                 if (Set(ref staffLevel, value))
                 {
                     UserSettings.Store(nameof(StaffLevel), StaffLevel);
-                    PlaceholdersMap[Script.Feature].Clear();
-                    PlaceholdersMap[Script.Comment].Clear();
-                    PlaceholdersMap[Script.OriginalPost].Clear();
+                    ClearAllPlaceholders();
                     UpdateScripts();
                 }
             }
@@ -764,14 +778,27 @@ namespace VeroScripts
         #region Placeholder management
 
         public Dictionary<Script, ObservableCollection<Placeholder>> PlaceholdersMap { get; private set; }
+        public Dictionary<Script, ObservableCollection<Placeholder>> LongPlaceholdersMap { get; private set; }
+
+        private void ClearAllPlaceholders()
+        {
+            PlaceholdersMap[Script.Feature].Clear();
+            PlaceholdersMap[Script.Comment].Clear();
+            PlaceholdersMap[Script.OriginalPost].Clear();
+            LongPlaceholdersMap[Script.Feature].Clear();
+            LongPlaceholdersMap[Script.Comment].Clear();
+            LongPlaceholdersMap[Script.OriginalPost].Clear();
+        }
 
         public bool ScriptHasPlaceholder(Script script)
         {
-            return PlaceholderRegex().Matches(Scripts[script]).Count != 0;
+            return PlaceholderRegex().Matches(Scripts[script]).Count != 0 || LongPlaceholderRegex().Matches(Scripts[script]).Count != 0;
         }
 
         public bool CheckForPlaceholders(Script script, bool force = false)
         {
+            var needEditor = false;
+
             var placeholders = new List<string>();
             var matches = PlaceholderRegex().Matches(Scripts[script]);
             foreach (Match match in matches.Cast<Match>())
@@ -780,7 +807,6 @@ namespace VeroScripts
             }
             if (placeholders.Count != 0)
             {
-                var needEditor = false;
                 foreach (var placeholderName in placeholders)
                 {
                     if (PlaceholdersMap[script].FirstOrDefault(placeholder => placeholder.Name == placeholderName) == null)
@@ -801,6 +827,39 @@ namespace VeroScripts
                         PlaceholdersMap[script].Add(new Placeholder(placeholderName, placeholderValue));
                     }
                 }
+            }
+
+            var longPlaceholders = new List<string>();
+            var longMatches = LongPlaceholderRegex().Matches(Scripts[script]);
+            foreach (Match match in longMatches.Cast<Match>())
+            {
+                longPlaceholders.Add(match.Captures.First().Value.Trim(['[', '{', '}', ']']));
+            }
+            if (longPlaceholders.Count != 0)
+            {
+                foreach (var longPlaceholderName in longPlaceholders)
+                {
+                    if (LongPlaceholdersMap[script].FirstOrDefault(longPlaceholder => longPlaceholder.Name == longPlaceholderName) == null)
+                    {
+                        var longPlaceholderValue = "";
+                        foreach (var otherScript in Enum.GetValues<Script>())
+                        {
+                            if (otherScript != script)
+                            {
+                                var otherLongPlaceholder = LongPlaceholdersMap[otherScript].FirstOrDefault(otherLongPlaceholder => otherLongPlaceholder.Name == longPlaceholderName);
+                                if (otherLongPlaceholder != null && !string.IsNullOrEmpty(otherLongPlaceholder.Value))
+                                {
+                                    longPlaceholderValue = otherLongPlaceholder.Value;
+                                }
+                            }
+                        }
+                        needEditor = true;
+                        LongPlaceholdersMap[script].Add(new Placeholder(longPlaceholderName, longPlaceholderValue));
+                    }
+                }
+            }
+            if (placeholders.Count != 0 || longPlaceholders.Count != 0) 
+            {
                 return needEditor || force;
             }
             return false;
@@ -825,6 +884,23 @@ namespace VeroScripts
                     }
                 }
             }
+            foreach (var longPlaceholder in LongPlaceholdersMap[script])
+            {
+                if (!string.IsNullOrEmpty(longPlaceholder.Value))
+                {
+                    foreach (Script otherScript in Enum.GetValues(typeof(Script)))
+                    {
+                        if (otherScript != script)
+                        {
+                            var otherLongPlaceholder = LongPlaceholdersMap[otherScript].FirstOrDefault(otherLongPlaceholder => otherLongPlaceholder.Name == longPlaceholder.Name);
+                            if (otherLongPlaceholder != null)
+                            {
+                                otherLongPlaceholder.Value = longPlaceholder.Value;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public string ProcessPlaceholders(Script script)
@@ -833,6 +909,10 @@ namespace VeroScripts
             foreach (var placeholder in PlaceholdersMap[script])
             {
                 result = result.Replace("[[" + placeholder.Name + "]]", placeholder.Value.Trim());
+            }
+            foreach (var longPlaceholder in LongPlaceholdersMap[script])
+            {
+                result = result.Replace("[{" + longPlaceholder.Name + "}]", longPlaceholder.Value.Trim());
             }
             return result;
         }
@@ -857,6 +937,7 @@ namespace VeroScripts
             var pageName = Page;
             var pageId = pageName;
             var scriptPageName = pageName;
+            var scriptPageHash = pageName;
             var oldHubName = selectedPage?.HubName;
             var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
             if (sourcePage != null)
@@ -864,9 +945,14 @@ namespace VeroScripts
                 pageId = sourcePage.Id;
                 pageName = sourcePage.Name;
                 scriptPageName = pageName;
+                scriptPageHash = pageName;
                 if (sourcePage.PageName != null)
                 {
                     scriptPageName = sourcePage.PageName;
+                }
+                if (sourcePage.HashTag != null)
+                {
+                    scriptPageHash = sourcePage.HashTag;
                 }
             }
             SelectedPage = sourcePage;
@@ -903,6 +989,7 @@ namespace VeroScripts
                 FeatureScript = featureScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
@@ -913,6 +1000,7 @@ namespace VeroScripts
                 CommentScript = commentScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
@@ -923,6 +1011,7 @@ namespace VeroScripts
                 OriginalPostScript = originalPostScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
@@ -1120,6 +1209,9 @@ namespace VeroScripts
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
         private static partial Regex PlaceholderRegex();
+
+        [GeneratedRegex("\\[\\{([^\\}]*)\\}\\]")]
+        private static partial Regex LongPlaceholderRegex();
     }
 
     public class ThemeOption(Theme theme, bool isSelected = false)
