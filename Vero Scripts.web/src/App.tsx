@@ -494,33 +494,7 @@ function App() {
 
         <div className="App-body">
           <Stack>
-            {/* User name editor */}
-            <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
-              <Label
-                style={{
-                  width: "auto",
-                  minWidth: "40px",
-                  margin: "4px 8px",
-                  textAlign: "left",
-                  whiteSpace: "nowrap",
-                  fontWeight: "bold",
-                  color: !userName || userName.startsWith("@") ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
-                }}
-              >
-                User:
-              </Label>
-              <Stack.Item grow={1} shrink={1}>
-                <TextField
-                  value={userName}
-                  onChange={(_, newValue) => setUserName(newValue || "")}
-                  style={{ minWidth: "200px" }}
-                  autoCapitalize="off"
-                  placeholder="Enter the user name (do not include '@')"
-                />
-              </Stack.Item>
-            </Stack>
-
-            {/* User level editor */}
+            {/* Page editor */}
             <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
               <Label
                 style={{
@@ -531,18 +505,48 @@ function App() {
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
                   color:
-                    (selectedLevel || "none") === "none"
+                    ((selectedPage || "none") === "none" || !selectedPage)
                       ? currentTheme.semanticColors?.errorText
                       : currentTheme.semanticColors?.bodyText,
                 }}
               >
-                Level:
+                Page:
               </Label>
               <Stack.Item grow={1} shrink={1}>
                 <Dropdown
-                  options={levelOptions}
-                  selectedKey={selectedLevel || "none"}
-                  onChange={(_, item) => setSelectedLevel((item?.key as string) || "none")}
+                  options={pageOptions}
+                  selectedKey={selectedPage || "None"}
+                  onChange={(_, item) => {
+                    setSelectedPage((item?.key as string) || "None");
+                    setLevelOptions(levelOptionsForPage());
+                  }}
+                  style={{ minWidth: "160px" }}
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* Page staff level editor */}
+            <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "60px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !selectedStaffLevel
+                    ? currentTheme.semanticColors?.errorText
+                    : currentTheme.semanticColors?.bodyText,
+                }}
+              >
+                Staff level:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <Dropdown
+                  options={staffLevelOptions}
+                  selectedKey={selectedStaffLevel || "mod"}
+                  onChange={(_, item) => setSelectedStaffLevel((item?.key as string) || "mod")}
                   style={{ minWidth: "200px" }}
                 />
               </Stack.Item>
@@ -599,7 +603,33 @@ function App() {
               </Stack.Item>
             </Stack>
 
-            {/* Page editor */}
+            {/* User name editor */}
+            <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
+              <Label
+                style={{
+                  width: "auto",
+                  minWidth: "40px",
+                  margin: "4px 8px",
+                  textAlign: "left",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  color: !userName || userName.startsWith("@") ? currentTheme.semanticColors?.errorText : currentTheme.semanticColors?.bodyText,
+                }}
+              >
+                User:
+              </Label>
+              <Stack.Item grow={1} shrink={1}>
+                <TextField
+                  value={userName}
+                  onChange={(_, newValue) => setUserName(newValue || "")}
+                  style={{ minWidth: "200px" }}
+                  autoCapitalize="off"
+                  placeholder="Enter the user name (do not include '@')"
+                />
+              </Stack.Item>
+            </Stack>
+
+            {/* User level editor */}
             <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
               <Label
                 style={{
@@ -610,48 +640,18 @@ function App() {
                   whiteSpace: "nowrap",
                   fontWeight: "bold",
                   color:
-                    ((selectedPage || "none") === "none" || !selectedPage)
+                    (selectedLevel || "none") === "none"
                       ? currentTheme.semanticColors?.errorText
                       : currentTheme.semanticColors?.bodyText,
                 }}
               >
-                Page:
+                Level:
               </Label>
               <Stack.Item grow={1} shrink={1}>
                 <Dropdown
-                  options={pageOptions}
-                  selectedKey={selectedPage || "None"}
-                  onChange={(_, item) => {
-                    setSelectedPage((item?.key as string) || "None");
-                    setLevelOptions(levelOptionsForPage());
-                  }}
-                  style={{ minWidth: "160px" }}
-                />
-              </Stack.Item>
-            </Stack>
-
-            {/* Page staff level editor */}
-            <Stack horizontal style={{ width: "100%" }} tokens={{ childrenGap: "8px" }}>
-              <Label
-                style={{
-                  width: "auto",
-                  minWidth: "60px",
-                  margin: "4px 8px",
-                  textAlign: "left",
-                  whiteSpace: "nowrap",
-                  fontWeight: "bold",
-                  color: !selectedStaffLevel
-                    ? currentTheme.semanticColors?.errorText
-                    : currentTheme.semanticColors?.bodyText,
-                }}
-              >
-                Staff level:
-              </Label>
-              <Stack.Item grow={1} shrink={1}>
-                <Dropdown
-                  options={staffLevelOptions}
-                  selectedKey={selectedStaffLevel || "mod"}
-                  onChange={(_, item) => setSelectedStaffLevel((item?.key as string) || "mod")}
+                  options={levelOptions}
+                  selectedKey={selectedLevel || "none"}
+                  onChange={(_, item) => setSelectedLevel((item?.key as string) || "none")}
                   style={{ minWidth: "200px" }}
                 />
               </Stack.Item>
