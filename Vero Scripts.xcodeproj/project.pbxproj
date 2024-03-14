@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4919020E2B8D502000D0CB93 /* SystemColors in Frameworks */ = {isa = PBXBuildFile; productRef = 4919020D2B8D502000D0CB93 /* SystemColors */; };
 		4923C2332B4A833F0057D781 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4923C2322B4A833F0057D781 /* Assets.xcassets */; };
+		49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49498D212BA296F600F125E7 /* VersionCheckAppState.swift */; };
 		495CCC4C2B45E3AA00BBA415 /* VeroScriptsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495CCC4B2B45E3AA00BBA415 /* VeroScriptsApp.swift */; };
 		495CCC4E2B45E3AA00BBA415 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495CCC4D2B45E3AA00BBA415 /* ContentView.swift */; };
 		496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA282B7861A1001D36C1 /* ScriptEditor.swift */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		4923C2322B4A833F0057D781 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		49498D212BA296F600F125E7 /* VersionCheckAppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCheckAppState.swift; sourceTree = "<group>"; };
 		495CCC482B45E3AA00BBA415 /* Vero Scripts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vero Scripts.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		495CCC4B2B45E3AA00BBA415 /* VeroScriptsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeroScriptsApp.swift; sourceTree = "<group>"; };
 		495CCC4D2B45E3AA00BBA415 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				496BEA282B7861A1001D36C1 /* ScriptEditor.swift */,
 				49C546D52B78750A0048DEDA /* Helpers.swift */,
 				49C546D32B7874C60048DEDA /* Types.swift */,
+				49498D212BA296F600F125E7 /* VersionCheckAppState.swift */,
 				495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */,
 				4923C2322B4A833F0057D781 /* Assets.xcassets */,
 				49E1A4592B7ED16D003C3272 /* Testing.xcconfig */,
@@ -163,6 +166,7 @@
 				49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */,
 				49C546D62B78750A0048DEDA /* Helpers.swift in Sources */,
 				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
+				49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */,
 				496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */,
 				495CCC4C2B45E3AA00BBA415 /* VeroScriptsApp.swift in Sources */,
 				49C546D42B7874C60048DEDA /* Types.swift in Sources */,

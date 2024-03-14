@@ -244,17 +244,6 @@ struct Template: Codable, Identifiable {
     let template: String
 }
 
-struct VersionManifest: Codable {
-    let macOS: VersionEntry
-    let windows: VersionEntry
-}
-
-struct VersionEntry: Codable {
-    let current: String
-    let link: String
-    let vital: Bool
-}
-
 enum ToastDuration: Int {
     case disabled = 0,
          short = 3,
