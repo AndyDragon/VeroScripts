@@ -14,6 +14,7 @@
 		495CCC4E2B45E3AA00BBA415 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495CCC4D2B45E3AA00BBA415 /* ContentView.swift */; };
 		496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA282B7861A1001D36C1 /* ScriptEditor.swift */; };
 		496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA2A2B78682F001D36C1 /* FieldEditor.swift */; };
+		498FBACD2BA5FF30000F5507 /* Themes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 498FBACC2BA5FF30000F5507 /* Themes.swift */; };
 		49C546D42B7874C60048DEDA /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D32B7874C60048DEDA /* Types.swift */; };
 		49C546D62B78750A0048DEDA /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D52B78750A0048DEDA /* Helpers.swift */; };
 		49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D72B7875630048DEDA /* PlaceholderEditor.swift */; };
@@ -30,6 +31,7 @@
 		495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Vero_Scripts.entitlements; sourceTree = "<group>"; };
 		496BEA282B7861A1001D36C1 /* ScriptEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptEditor.swift; sourceTree = "<group>"; };
 		496BEA2A2B78682F001D36C1 /* FieldEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldEditor.swift; sourceTree = "<group>"; };
+		498FBACC2BA5FF30000F5507 /* Themes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Themes.swift; sourceTree = "<group>"; };
 		49C546D32B7874C60048DEDA /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		49C546D52B78750A0048DEDA /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		49C546D72B7875630048DEDA /* PlaceholderEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderEditor.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				496BEA282B7861A1001D36C1 /* ScriptEditor.swift */,
 				49C546D52B78750A0048DEDA /* Helpers.swift */,
 				49C546D32B7874C60048DEDA /* Types.swift */,
+				498FBACC2BA5FF30000F5507 /* Themes.swift */,
 				49498D212BA296F600F125E7 /* VersionCheckAppState.swift */,
 				495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */,
 				4923C2322B4A833F0057D781 /* Assets.xcassets */,
@@ -165,6 +168,7 @@
 				495CCC4E2B45E3AA00BBA415 /* ContentView.swift in Sources */,
 				49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */,
 				49C546D62B78750A0048DEDA /* Helpers.swift in Sources */,
+				498FBACD2BA5FF30000F5507 /* Themes.swift in Sources */,
 				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
 				49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */,
 				496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */,
@@ -308,7 +312,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -330,11 +334,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -349,7 +352,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -371,11 +374,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
@@ -448,7 +450,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 33;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -471,11 +473,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME) (Script Testing)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Testing;
 		};

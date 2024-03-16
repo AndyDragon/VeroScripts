@@ -27,45 +27,48 @@ struct PlaceholderView: View {
             Text(editorName.capitalized)
                 .frame(minWidth: 200)
                 .padding([.top], editorLongForm ? 4 : 0)
+            
             if editorLongForm {
-                TextEditor(
-                    text: $editorValue.onChange(editorValueChanged)
-                )
-                .font(.body)
-                .frame(height: 48)
-                .frame(minWidth: 320)
-                .padding(.all, 4)
-                .scrollContentBackground(.hidden)
-                .background(Color.BackgroundColorEditor)
-                .border(Color.windowBackground)
-                .cornerRadius(5)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
+                if #available(macOS 14.0, *) {
+                    TextEditor(text: $editorValue.onChange(editorValueChanged))
+                    .font(.body)
+                    .frame(height: 48)
+                    .frame(minWidth: 320)
+                    .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                    .scrollContentBackground(.hidden)
+                    .padding(4)
+                    .background(Color.BackgroundColorEditor)
+                    .border(Color.gray.opacity(0.25))
+                    .cornerRadius(4)
+                    .textEditorStyle(.plain)
+                } else {
+                    TextEditor(text: $editorValue.onChange(editorValueChanged))
+                    .font(.body)
+                    .frame(height: 48)
+                    .frame(minWidth: 320)
+                    .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                    .scrollContentBackground(.hidden)
+                    .padding(4)
+                    .background(Color.BackgroundColorEditor)
+                    .border(Color.gray.opacity(0.25))
+                    .cornerRadius(4)
+                }
             } else {
-                TextField(
-                    "",
-                    text: $editorValue.onChange(editorValueChanged)
-                )
+                TextField("", text: $editorValue.onChange(editorValueChanged))
                 .lineLimit(1)
                 .font(.body)
                 .frame(minWidth: 320)
-                .padding(.all, 4)
-                .scrollContentBackground(.hidden)
+                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                .textFieldStyle(.plain)
+                .padding(4)
                 .background(Color.BackgroundColorEditor)
-                .border(Color.windowBackground)
-                .cornerRadius(5)
-#if os(iOS)
-                .textInputAutocapitalization(.never)
-#endif
+                .border(Color.gray.opacity(0.25))
+                .cornerRadius(4)
             }
             Spacer()
                 .background(Color.yellow)
         }
         .frame(maxWidth: .infinity)
-#if !os(iOS)
-        .textFieldStyle(.plain)
-#endif
         .listRowSeparator(.hidden)
     }
 
@@ -93,28 +96,31 @@ struct PlaceholderSheet: View {
     
     var body: some View {
         ZStack {
+            Color.BackgroundColor.edgesIgnoringSafeArea(.all)
+            
             VStack {
                 Text("There are manual placeholders that need to be filled out:")
                 Text("(leave any fields blank to remove placeholder)")
+
                 List() {
                     ForEach(placeholders.placeholderDict.sorted(by: { entry1, entry2 in
                         entry1.key < entry2.key
                     }), id: \.key) { entry in
                         PlaceholderView(entry, isLongForm: false)
-#if os(iOS)
-                            .padding(.horizontal, 20)
-#endif
                     }
                     ForEach(placeholders.longPlaceholderDict.sorted(by: { entry1, entry2 in
                         entry1.key < entry2.key
                     }), id: \.key) { entry in
                         PlaceholderView(entry, isLongForm: true)
-#if os(iOS)
-                            .padding(.horizontal, 20)
-#endif
                     }
                 }
                 .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .padding(4)
+                .background(Color.BackgroundColorList)
+                .border(Color.gray.opacity(0.25))
+                .cornerRadius(4)
+
                 HStack {
                     Button(action: {
                         scriptWithPlaceholders = scriptWithPlaceholdersInPlace
@@ -146,8 +152,9 @@ struct PlaceholderSheet: View {
                     })
                 }
             }
+            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .frame(minWidth: 800, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
+            .padding()
         }
-        .frame(minWidth: 800, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
-        .padding()
     }
 }

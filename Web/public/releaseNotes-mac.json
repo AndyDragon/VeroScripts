@@ -65,5 +65,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.33",
+        "notes": [
+            {
+                "date": "March 16, 2024",
+                "notes": [
+                    "Tweaks to themes and themed placeholder editor."
+                ]
+            }
+        ]
     }
 ]

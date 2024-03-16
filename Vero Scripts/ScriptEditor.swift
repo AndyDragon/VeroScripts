@@ -48,39 +48,28 @@ struct ScriptEditor: View {
         if #available(macOS 14.0, *) {
             TextEditor(text: $script)
                 .font(.system(size: 14))
-#if os(iOS)
-                .frame(maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#else
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#endif
+                .focused(focus, equals: focusField)
+                .textEditorStyle(.plain)
                 .foregroundStyle(canCopy ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
-                .padding(.all, 4)
                 .scrollContentBackground(.hidden)
+                .padding(4)
                 .background(Color.BackgroundColorEditor)
                 .border(Color.gray.opacity(0.25))
-                .cornerRadius(5)
+                .cornerRadius(4)
                 .padding([.bottom], 6)
-                .focused(focus, equals: focusField)
-#if !os(iOS)
-                .textEditorStyle(.plain)
-#endif
         } else {
             TextEditor(text: $script)
                 .font(.system(size: 14))
-#if os(iOS)
-                .frame(maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#else
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#endif
+                .focused(focus, equals: focusField)
                 .foregroundStyle(canCopy ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
-                .padding(.all, 4)
-
                 .scrollContentBackground(.hidden)
+                .padding(4)
                 .background(Color.BackgroundColorEditor)
                 .border(Color.gray.opacity(0.25))
-                .cornerRadius(5)
+                .cornerRadius(4)
                 .padding([.bottom], 6)
-                .focused(focus, equals: focusField)
         }
     }
 }

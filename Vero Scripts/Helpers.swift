@@ -56,13 +56,9 @@ extension URLSession {
 }
 
 func copyToClipboard(_ text: String) -> Void {
-#if os(iOS)
-        UIPasteboard.general.string = text
-#else
         let pasteBoard = NSPasteboard.general
         pasteBoard.clearContents()
         pasteBoard.writeObjects([text as NSString])
-#endif
 }
 
 extension Bundle {
@@ -100,86 +96,6 @@ extension Array<String> {
     
     func includesWithoutCase(_ element: String) -> Bool {
         return self.contains(where: { item in item.lowercased() == element.lowercased() })
-    }
-}
-
-import SystemColors
-
-extension Color {
-    static var currentTheme = ""
-
-    static var theme: Color  {
-        return Color("theme")
-    }
-    static var BackgroundColor: Color  {
-        if currentTheme.isEmpty {
-            return .windowBackground
-        }
-        return Color("\(currentTheme)/BackgroundColor")
-    }
-    static var BackgroundColorEditor: Color  {
-        if currentTheme.isEmpty {
-            return .controlBackground.opacity(0.5)
-        }
-        return Color("\(currentTheme)/BackgroundColorEditor")
-    }
-    static var BackgroundColorList: Color  {
-        if currentTheme.isEmpty {
-            return .controlBackground
-        }
-        return Color("\(currentTheme)/BackgroundColorList")
-    }
-    static var BackgroundColorNavigationBar: Color  {
-        if currentTheme.isEmpty {
-            return .windowBackground
-        }
-        return Color("\(currentTheme)/BackgroundColorNavigationBar")
-    }
-    static var ColorPrimary: Color  {
-        if currentTheme.isEmpty {
-            return .highlight
-        }
-        return Color("\(currentTheme)/ColorPrimary")
-    }
-    static var AccentColor: Color  {
-        if currentTheme.isEmpty {
-            return .accentColor
-        }
-        return Color("\(currentTheme)/AccentColor")
-    }
-    static var TextColorPrimary: Color  {
-        if currentTheme.isEmpty {
-            return .label
-        }
-        return Color("\(currentTheme)/TextColorPrimary")
-    }
-    static var TextColorRequired: Color  {
-        if currentTheme.isEmpty {
-            return .red
-        }
-        return Color("\(currentTheme)/TextColorRequired")
-    }
-    static var TextColorSecondary: Color  {
-        if currentTheme.isEmpty {
-            return .secondaryLabel
-        }
-        return Color("\(currentTheme)/TextColorSecondary")
-    }
-}
-
-class Constants {
-    public static let THEME = "THEME"
-}
-
-class UserDefaultsUtils {
-    static var shared = UserDefaultsUtils()
-
-    func setTheme(theme: Theme) {
-        UserDefaults.standard.set(theme.rawValue, forKey: Constants.THEME)
-    }
-
-    func getTheme() -> Theme {
-        return Theme(rawValue: UserDefaults.standard.string(forKey: Constants.THEME) ?? Theme.systemDark.rawValue) ?? Theme.systemDark
     }
 }
 

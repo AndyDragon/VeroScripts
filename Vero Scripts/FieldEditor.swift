@@ -47,11 +47,7 @@ struct FieldEditor: View {
                         .foregroundStyle(fieldValidation.valid ?
                                          Color.TextColorPrimary : Color.TextColorRequired,
                                          Color.TextColorSecondary)
-#if os(iOS)
-                        .frame(width: titleWidth[1], alignment: .leading)
-#else
                         .frame(width: titleWidth[0], alignment: .leading)
-#endif
                         .lineLimit(1)
                         .truncationMode(.tail)
                 }
@@ -64,12 +60,14 @@ struct FieldEditor: View {
             }).onAppear(perform: {
                 fieldValidation = validate(field)
             })
-            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
             .focused(focus, equals: focusField)
             .lineLimit(1)
-#if os(iOS)
-            .textInputAutocapitalization(.never)
-#endif
+            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .textFieldStyle(.plain)
+            .padding(4)
+            .background(Color.BackgroundColorEditor)
+            .border(Color.gray.opacity(0.25))
+            .cornerRadius(4)
         }
     }
 }

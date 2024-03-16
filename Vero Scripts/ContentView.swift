@@ -7,94 +7,80 @@
 
 import SwiftUI
 import CloudKit
-
 import AlertToast
 
-var ThemeDetails: [Theme:(colorTheme:String,darkTheme:Bool)] = [
-    Theme.systemDark: (colorTheme: "", darkTheme: true),
-    Theme.darkSubtleGray: (colorTheme: "SubtleGray", darkTheme: true),
-    Theme.darkBlue: (colorTheme: "Blue", darkTheme: true),
-    Theme.darkGreen: (colorTheme: "Green", darkTheme: true),
-    Theme.darkRed: (colorTheme: "Red", darkTheme: true),
-    Theme.darkViolet: (colorTheme: "Violet", darkTheme: true),
-    Theme.systemLight: (colorTheme: "", darkTheme: false),
-    Theme.lightSubtleGray: (colorTheme: "SubtleGray", darkTheme: false),
-    Theme.lightBlue: (colorTheme: "Blue", darkTheme: false),
-    Theme.lightGreen: (colorTheme: "Green", darkTheme: false),
-    Theme.lightRed: (colorTheme: "Red", darkTheme: false),
-    Theme.lightViolet: (colorTheme: "Violet", darkTheme: false)
-]
-
 struct ContentView: View {
+    // THEME
+    @State private var theme = Theme.notSet
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
-    @Environment(\.openURL) var openURL
-    @State var membership: MembershipCase = MembershipCase.none
-    @State var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var userName: String = ""
-    @State var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var yourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
-    @State var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
-    @State var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var page: String = UserDefaults.standard.string(forKey: "Page") ?? ""
-    @State var pageValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var pageStaffLevel: StaffLevelCase = StaffLevelCase(
+    @State private var isDarkModeOn = true
+
+    @Environment(\.openURL) private var openURL
+    @State private var membership: MembershipCase = MembershipCase.none
+    @State private var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var userName: String = ""
+    @State private var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var yourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State private var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+    @State private var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var page: String = UserDefaults.standard.string(forKey: "Page") ?? ""
+    @State private var pageValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var pageStaffLevel: StaffLevelCase = StaffLevelCase(
         rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue
     ) ?? StaffLevelCase.mod
-    @State var firstForPage: Bool = false
-    @State var fromCommunityTag: Bool = false
-    @State var fromRawTag: Bool = false
-    @State var featureScript: String = ""
-    @State var commentScript: String = ""
-    @State var originalPostScript: String = ""
-    @State var newMembership: NewMembershipCase = NewMembershipCase.none
-    @State var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State var newMembershipScript: String = ""
-    @State var showingAlert = false
-    @State var alertTitle: String = ""
-    @State var alertMessage: String = ""
-    @State var terminalAlert = false
-    @State var placeholderSheetCase = PlaceholderSheetCase.featureScript
-    @State var showingPlaceholderSheet = false
-    @State var loadedPages = [LoadedPage]()
-    @State var currentPage: LoadedPage? = nil
-    @State var waitingForTemplates: Bool = true
-    @State var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
-    @State var disallowList = [String]()
-    @ObservedObject var featureScriptPlaceholders = PlaceholderList()
-    @ObservedObject var commentScriptPlaceholders = PlaceholderList()
-    @ObservedObject var originalPostScriptPlaceholders = PlaceholderList()
-    @State var scriptWithPlaceholdersInPlace = ""
-    @State var scriptWithPlaceholders = ""
-    @State var lastMembership = MembershipCase.none
-    @State var lastUserName = ""
-    @State var lastYourName = ""
-    @State var lastYourFirstName = ""
-    @State var lastPage = ""
-    @State var lastPageStaffLevel = StaffLevelCase.mod
+    @State private var firstForPage: Bool = false
+    @State private var fromCommunityTag: Bool = false
+    @State private var fromRawTag: Bool = false
+    @State private var featureScript: String = ""
+    @State private var commentScript: String = ""
+    @State private var originalPostScript: String = ""
+    @State private var newMembership: NewMembershipCase = NewMembershipCase.none
+    @State private var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var newMembershipScript: String = ""
+    @State private var showingAlert = false
+    @State private var alertTitle: String = ""
+    @State private var alertMessage: String = ""
+    @State private var terminalAlert = false
+    @State private var placeholderSheetCase = PlaceholderSheetCase.featureScript
+    @State private var showingPlaceholderSheet = false
+    @State private var loadedPages = [LoadedPage]()
+    @State private var currentPage: LoadedPage? = nil
+    @State private var waitingForTemplates: Bool = true
+    @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
+    @State private var disallowList = [String]()
+    @ObservedObject private var featureScriptPlaceholders = PlaceholderList()
+    @ObservedObject private var commentScriptPlaceholders = PlaceholderList()
+    @ObservedObject private var originalPostScriptPlaceholders = PlaceholderList()
+    @State private var scriptWithPlaceholdersInPlace = ""
+    @State private var scriptWithPlaceholders = ""
+    @State private var lastMembership = MembershipCase.none
+    @State private var lastUserName = ""
+    @State private var lastYourName = ""
+    @State private var lastYourFirstName = ""
+    @State private var lastPage = ""
+    @State private var lastPageStaffLevel = StaffLevelCase.mod
     @State private var isShowingToast = false
     @State private var toastType = AlertToast.AlertType.regular
     @State private var toastDuration = 0.0
     @State private var toastText = ""
     @State private var toastSubTitle = ""
     @State private var toastTapAction: () -> Void = {}
-    @FocusState var focusedField: FocusedField?
-    @State private var theme = Theme.notSet
-    @State private var isDarkModeOn = true
-    var canCopyScripts: Bool {
+    @FocusState private var focusedField: FocusedField?
+
+    private var canCopyScripts: Bool {
         return membershipValidation.valid
         && userNameValidation.valid
         && yourNameValidation.valid
         && yourFirstNameValidation.valid
         && pageValidation.valid
     }
-    var canCopyNewMembershipScript: Bool {
+    private var canCopyNewMembershipScript: Bool {
         return newMembership != NewMembershipCase.none
         && newMembershipValidation.valid
         && userNameValidation.valid
     }
-    @Environment(\.colorScheme) var ColorScheme
-    var appState: VersionCheckAppState
+    private var appState: VersionCheckAppState
     private var isAnyToastShowing: Bool {
         isShowingToast
         || appState.isShowingVersionAvailableToast.wrappedValue
@@ -109,6 +95,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             Color.BackgroundColor.edgesIgnoringSafeArea(.all)
+
             VStack {
                 Group {
                     HStack {
@@ -123,11 +110,7 @@ struct ContentView: View {
                             .foregroundStyle(
                                 pageValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
                                 Color.TextColorSecondary)
-#if os(iOS)
-                            .frame(width: 60, alignment: .leading)
-#else
                             .frame(width: 36, alignment: .leading)
-#endif
                             .lineLimit(1)
                             .truncationMode(.tail)
                         Picker("", selection: $page.onChange { value in
@@ -146,11 +129,9 @@ struct ContentView: View {
                         }
                         .tint(Color.AccentColor)
                         .accentColor(Color.AccentColor)
+                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
                         .focusable()
                         .focused($focusedField, equals: .page)
-#if os(iOS)
-                        .frame(minWidth: 120, alignment: .leading)
-#endif
                         .onAppear {
                             if page.isEmpty {
                                 pageValidation = (false, "Page must not be 'default' or a page name is required")
@@ -173,11 +154,9 @@ struct ContentView: View {
                         }
                         .tint(Color.AccentColor)
                         .accentColor(Color.AccentColor)
+                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
                         .focusable()
                         .focused($focusedField, equals: .staffLevel)
-#if os(iOS)
-                        .frame(minWidth: 120, alignment: .leading)
-#endif
                     }
 
                     HStack {
@@ -245,11 +224,7 @@ struct ContentView: View {
                             .foregroundStyle(
                                 membershipValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
                                 Color.TextColorSecondary)
-#if os(iOS)
-                            .frame(width: 60, alignment: .leading)
-#else
                             .frame(width: 36, alignment: .leading)
-#endif
                             .padding([.leading], membershipValidation.valid ? 8 : 0)
                         Picker("", selection: $membership.onChange { value in
                             membershipValidation = validateMembership(value: membership)
@@ -263,15 +238,13 @@ struct ContentView: View {
                         }
                         .tint(Color.AccentColor)
                         .accentColor(Color.AccentColor)
-#if os(iOS)
-                        .frame(minWidth: 120, alignment: .leading)
-#endif
+                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
                         .onAppear {
                             membershipValidation = validateMembership(value: membership)
                         }
                         .focusable()
                         .focused($focusedField, equals: .level)
-#if !os(iOS)
+
                         // Options
                         Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
                             Text("First feature on page")
@@ -304,83 +277,10 @@ struct ContentView: View {
                             .padding([.leading], 8)
                             .help("From community tag")
                         }
-#else
-                        Spacer()
-#endif
 
-#if os(iOS)
-                        Button(action: {
-                            userName = ""
-                            userNameChanged(to: userName)
-                            userNameValidation = validateUserName(value: userName)
-                            membership = MembershipCase.none
-                            membershipChanged(to: membership)
-                            membershipValidation = validateMembership(value: membership)
-                            firstForPage = false
-                            firstForPageChanged(to: firstForPage)
-                            fromCommunityTag = false
-                            fromCommunityTagChanged(to: fromCommunityTag)
-                            fromRawTag = false
-                            fromRawTagChanged(to: fromRawTag)
-                            newMembership = NewMembershipCase.none
-                            newMembershipChanged(to: newMembership)
-                            newMembershipValidation = validateNewMembership(value: newMembership)
-                            focusedField = .userName
-                        }) {
-                            HStack {
-                                Image(systemName: "xmark")
-                                    .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
-                                Text("Clear user")
-                                    .font(.system(.body, design: .rounded).bold())
-                                    .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
-                            }
-                            .padding(4)
-                            .buttonStyle(.plain)
-                        }.disabled(isAnyToastShowing)
-#endif
                         Spacer()
                     }
                 }
-
-#if os(iOS)
-                HStack {
-                    // Options
-                    Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
-                        Text("First feature on page")
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
-                    .focusable()
-                    Spacer()
-                        .frame(width: 20)
-                    Rectangle()
-                        .frame(width: 1, height: 24)
-                        .background(Color.gray)
-                        .opacity(0.2)
-                    Spacer()
-                        .frame(width: 20)
-                    Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
-                        Text("From RAW tag")
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
-                    .focusable()
-                    Spacer()
-                        .frame(width: 20)
-                    Rectangle()
-                        .frame(width: 1, height: 24)
-                        .background(Color.gray)
-                        .opacity(0.2)
-                    Spacer()
-                        .frame(width: 20)
-                    Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                        Text("From community tag")
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
-                    .focusable()
-                }
-#endif
 
                 Group {
                     // Feature script output
@@ -507,7 +407,6 @@ struct ContentView: View {
             }
             .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
             .padding()
-            .textFieldStyle(.roundedBorder)
             .alert(
                 alertTitle,
                 isPresented: $showingAlert,
@@ -568,7 +467,6 @@ struct ContentView: View {
                         }
                     })
             }
-#if !os(iOS)
             .toolbar {
                 ToolbarItem {
                     Button(action: {
@@ -615,7 +513,6 @@ struct ContentView: View {
                     .disabled(isAnyToastShowing)
                 }
             }
-#endif
             .allowsHitTesting(!isAnyToastShowing)
             if isAnyToastShowing {
                 VStack {
@@ -631,11 +528,7 @@ struct ContentView: View {
             }
         }
         .blur(radius: isAnyToastShowing ? 4 : 0)
-#if os(iOS)
-        .frame(minHeight: 600)
-#else
         .frame(minWidth: 1024, minHeight: 600)
-#endif
         .background(Color.BackgroundColor)
         .toast(
             isPresenting: $isShowingToast,
@@ -689,9 +582,7 @@ struct ContentView: View {
             onTap: {
                 if let url = URL(string: appState.versionCheckToast.wrappedValue.linkToCurrentVersion) {
                     openURL(url)
-#if !os(iOS)
                     NSApplication.shared.terminate(nil)
-#endif
                 }
             },
             completion: {
@@ -713,8 +604,7 @@ struct ContentView: View {
 
                 do {
 #if TESTING
-                    let pagesUrl = URL(
-                        string: "https://vero.andydragon.com/static/data/testing/pages.json")!
+                    let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
 #else
                     let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
 #endif
@@ -743,8 +633,7 @@ struct ContentView: View {
                     try await Task.sleep(nanoseconds: 1_000_000_000)
 
 #if TESTING
-                    let templatesUrl = URL(
-                        string: "https://vero.andydragon.com/static/data/testing/templates.json")!
+                    let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
 #else
                     let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
 #endif
@@ -758,8 +647,7 @@ struct ContentView: View {
                         try await Task.sleep(nanoseconds: 1_000_000_000)
 
 #if TESTING
-                        let disallowListUrl = URL(
-                            string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
+                        let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
 #else
                         let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
 #endif
@@ -791,7 +679,7 @@ struct ContentView: View {
             .preferredColorScheme(isDarkModeOn ? /*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/ : .light)
     }
 
-    func setTheme(_ newTheme: Theme) {
+    private func setTheme(_ newTheme: Theme) {
         if (newTheme == .notSet) {
             isDarkModeOn = colorScheme == .dark
         } else {
@@ -804,7 +692,7 @@ struct ContentView: View {
         }
     }
 
-    func showToast(
+    private func showToast(
         _ type: AlertToast.AlertType,
         _ text: String,
         subTitle: String = "",
@@ -826,7 +714,7 @@ struct ContentView: View {
         }
     }
 
-    func getVersionToastSubtitle() -> String {
+    private func getVersionToastSubtitle() -> String {
         let appVersion = appState.versionCheckToast.wrappedValue.appVersion
         let currentVersion = appState.versionCheckToast.wrappedValue.currentVersion
         let linkAvailable = appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty
@@ -847,7 +735,7 @@ struct ContentView: View {
         }
     }
     
-    func clearPlaceholders() {
+    private func clearPlaceholders() {
         featureScriptPlaceholders.placeholderDict.removeAll()
         featureScriptPlaceholders.longPlaceholderDict.removeAll()
         commentScriptPlaceholders.placeholderDict.removeAll()
@@ -856,7 +744,7 @@ struct ContentView: View {
         originalPostScriptPlaceholders.longPlaceholderDict.removeAll()
     }
 
-    func membershipChanged(to value: MembershipCase) {
+    private func membershipChanged(to value: MembershipCase) {
         if value != lastMembership {
             clearPlaceholders()
             updateScripts()
@@ -864,7 +752,7 @@ struct ContentView: View {
         }
     }
 
-    func validateMembership(value: MembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateMembership(value: MembershipCase) -> (valid: Bool, reason: String?) {
         if value == MembershipCase.none {
             return (false, "Required value")
         }
@@ -874,7 +762,7 @@ struct ContentView: View {
         return (true, nil)
     }
 
-    func userNameChanged(to value: String) {
+    private func userNameChanged(to value: String) {
         if value != lastUserName {
             clearPlaceholders()
             updateScripts()
@@ -883,7 +771,7 @@ struct ContentView: View {
         }
     }
 
-    func validateUserName(value: String) -> (valid: Bool, reason: String?) {
+    private func validateUserName(value: String) -> (valid: Bool, reason: String?) {
         if value.count == 0 {
             return (false, "Required value")
         } else if value.first! == "@" {
@@ -894,7 +782,7 @@ struct ContentView: View {
         return (true, nil)
     }
 
-    func yourNameChanged(to value: String) {
+    private func yourNameChanged(to value: String) {
         if value != lastYourName {
             clearPlaceholders()
             UserDefaults.standard.set(yourName, forKey: "YourName")
@@ -904,7 +792,7 @@ struct ContentView: View {
         }
     }
 
-    func yourFirstNameChanged(to value: String) {
+    private func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
             clearPlaceholders()
             UserDefaults.standard.set(yourFirstName, forKey: "YourFirstName")
@@ -914,7 +802,7 @@ struct ContentView: View {
         }
     }
 
-    func pageChanged(to value: String) {
+    private func pageChanged(to value: String) {
         if value != lastPage {
             clearPlaceholders()
             UserDefaults.standard.set(page, forKey: "Page")
@@ -923,7 +811,7 @@ struct ContentView: View {
         }
     }
 
-    func pageStaffLevelChanged(to value: StaffLevelCase) {
+    private func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
             clearPlaceholders()
             UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
@@ -932,30 +820,30 @@ struct ContentView: View {
         }
     }
 
-    func firstForPageChanged(to value: Bool) {
+    private func firstForPageChanged(to value: Bool) {
         updateScripts()
     }
 
-    func fromCommunityTagChanged(to value: Bool) {
+    private func fromCommunityTagChanged(to value: Bool) {
         updateScripts()
     }
 
-    func fromRawTagChanged(to value: Bool) {
+    private func fromRawTagChanged(to value: Bool) {
         updateScripts()
     }
 
-    func newMembershipChanged(to value: NewMembershipCase) {
+    private func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
 
-    func validateNewMembership(value: NewMembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateNewMembership(value: NewMembershipCase) -> (valid: Bool, reason: String?) {
         if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
             return (false, "Not a valid value")
         }
         return (true, nil)
     }
 
-    func copyScript(
+    private func copyScript(
         _ script: String,
         _ placeholders: PlaceholderList,
         _ otherPlaceholders: [PlaceholderList],
@@ -987,7 +875,7 @@ struct ContentView: View {
         return false
     }
 
-    func transferPlaceholderValues(
+    private func transferPlaceholderValues(
         _ scriptPlaceholders: PlaceholderList,
         _ otherPlaceholders: [PlaceholderList]
     ) -> Void {
@@ -1009,11 +897,11 @@ struct ContentView: View {
         }
     }
 
-    func scriptHasPlaceholders(_ script: String) -> Bool {
+    private func scriptHasPlaceholders(_ script: String) -> Bool {
         return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty || !matches(of: "\\[\\{([^\\}]*)\\}\\]", in: script).isEmpty
     }
 
-    func checkForPlaceholders(
+    private func checkForPlaceholders(
         _ script: String,
         _ placeholders: PlaceholderList,
         _ otherPlaceholders: [PlaceholderList],
@@ -1075,7 +963,7 @@ struct ContentView: View {
         return false
     }
 
-    func updateScripts() -> Void {
+    private func updateScripts() -> Void {
         var currentPageName = page
         var scriptPageName = currentPageName
         var scriptPageHash = currentPageName
@@ -1181,7 +1069,7 @@ struct ContentView: View {
         }
     }
 
-    func getTemplateFromCatalog(
+    private func getTemplateFromCatalog(
         _ templateName: String,
         from pageId: String,
         firstFeature: Bool,
@@ -1255,7 +1143,7 @@ struct ContentView: View {
         return template?.template
     }
 
-    func updateNewMembershipScripts() -> Void {
+    private func updateNewMembershipScripts() -> Void {
         if waitingForTemplates {
             newMembershipScript = ""
             return

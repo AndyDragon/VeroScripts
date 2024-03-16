@@ -22,10 +22,9 @@ struct NewMembershipEditor: View {
 
     var body: some View {
         HStack {
-#if os(iOS)
-            Text("New membership: ")
-#endif
-            Picker("New membership: ", selection: $newMembership.onChange(onChanged)) {
+            Text("New membership:")
+
+            Picker("", selection: $newMembership.onChange(onChanged)) {
                 ForEach(NewMembershipCase.casesFor(hub: currentPage?.hub)) { level in
                     Text(level.rawValue)
                         .tag(level)
@@ -34,11 +33,8 @@ struct NewMembershipEditor: View {
             }
             .tint(Color.AccentColor)
             .accentColor(Color.AccentColor)
-#if os(iOS)
-            .frame(minWidth: 120, alignment: .leading)
-#else
+            .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
             .frame(width: 320)
-#endif
 
             Button(action: {
                 copy()
@@ -56,36 +52,26 @@ struct NewMembershipEditor: View {
         if #available(macOS 14.0, *) {
             TextEditor(text: $script)
                 .font(.system(size: 14))
-#if os(iOS)
-                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-#else
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#endif
+                .focused(focus, equals: focusField)
+                .textEditorStyle(.plain)
                 .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
-                .padding(.all, 4)
                 .scrollContentBackground(.hidden)
+                .padding(4)
                 .background(Color.BackgroundColorEditor)
                 .border(Color.gray.opacity(0.25))
-                .cornerRadius(5)
-                .focused(focus, equals: focusField)
-#if !os(iOS)
-                .textEditorStyle(.plain)
-#endif
+                .cornerRadius(4)
         } else {
             TextEditor(text: $script)
                 .font(.system(size: 14))
-#if os(iOS)
-                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
-#else
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
-#endif
+                .focused(focus, equals: focusField)
                 .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
-                .padding(.all, 4)
                 .scrollContentBackground(.hidden)
+                .padding(4)
                 .background(Color.BackgroundColorEditor)
                 .border(Color.gray.opacity(0.25))
-                .cornerRadius(5)
-                .focused(focus, equals: focusField)
+                .cornerRadius(4)
         }
     }
 }
