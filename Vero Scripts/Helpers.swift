@@ -93,7 +93,7 @@ extension Array<String> {
     func includes(_ element: String) -> Bool {
         return self.contains(where: { item in item == element })
     }
-    
+
     func includesWithoutCase(_ element: String) -> Bool {
         return self.contains(where: { item in item.lowercased() == element.lowercased() })
     }
@@ -115,7 +115,7 @@ extension Data {
         let rawValue: Int
         static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
     }
-    
+
     func hexEncodedString(options: HexEncodingOptions = []) -> String {
         let hexDigits = options.contains(.upperCase) ? "0123456789ABCDEF" : "0123456789abcdef"
         if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {

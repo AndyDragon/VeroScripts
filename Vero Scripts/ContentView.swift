@@ -139,7 +139,7 @@ struct ContentView: View {
                                 pageValidation = (true, nil)
                             }
                         }
-                        
+
                         // Page staff level picker
                         Text("Page staff level: ")
                             .padding([.leading], 8)
@@ -211,7 +211,7 @@ struct ContentView: View {
                             focus: $focusedField,
                             focusField: .userName
                         )
-                        
+
                         // User level picker
                         if !membershipValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
@@ -255,7 +255,7 @@ struct ContentView: View {
                         .focused($focusedField, equals: .firstFeature)
                         .padding([.leading], 8)
                         .help("First feature on page")
-                        
+
                         if currentPage?.hub == "snap" {
                             Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
                                 Text("From RAW tag")
@@ -266,7 +266,7 @@ struct ContentView: View {
                             .focused($focusedField, equals: .rawTag)
                             .padding([.leading], 8)
                             .help("From RAW tag")
-                            
+
                             Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
                                 Text("From community tag")
                                     .lineLimit(1)
@@ -676,7 +676,7 @@ struct ContentView: View {
                     showingAlert = true
                 }
             }
-            .preferredColorScheme(isDarkModeOn ? /*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/ : .light)
+            .preferredColorScheme(isDarkModeOn ? .dark : .light)
     }
 
     private func setTheme(_ newTheme: Theme) {
@@ -734,7 +734,7 @@ struct ContentView: View {
             optionInstruction
         }
     }
-    
+
     private func clearPlaceholders() {
         featureScriptPlaceholders.placeholderDict.removeAll()
         featureScriptPlaceholders.longPlaceholderDict.removeAll()
