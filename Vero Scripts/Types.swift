@@ -250,3 +250,13 @@ enum ToastDuration: Int {
          medium = 10,
          long = 20
 }
+
+struct CodableFeatureUser: Codable {
+    var page: String
+    var userName: String
+    var userAlias: String
+    var userLevel: String
+    var tagSource: String
+    var firstFeature: Bool
+    var newLevel: String
+}

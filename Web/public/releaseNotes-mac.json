@@ -76,5 +76,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.34",
+        "notes": [
+            {
+                "date": "March 29, 2024",
+                "notes": [
+                    "Added ability to populate by pasting data for the Feature Logging app."
+                ]
+            }
+        ]
     }
 ]

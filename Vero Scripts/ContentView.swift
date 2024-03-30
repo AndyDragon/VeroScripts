@@ -470,6 +470,23 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem {
                     Button(action: {
+                        populateFromClipboard()
+                    }) {
+                        HStack {
+                            Image(systemName: "list.clipboard")
+                                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                            Text("From Logging")
+                                .font(.system(.body, design: .rounded).bold())
+                                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                        }
+                        .padding(4)
+                        .buttonStyle(.plain)
+                    }
+                    .disabled(isAnyToastShowing)
+                }
+
+                ToolbarItem {
+                    Button(action: {
                         userName = ""
                         userNameChanged(to: userName)
                         userNameValidation = validateUserName(value: userName)
@@ -498,6 +515,7 @@ struct ContentView: View {
                     }
                     .disabled(isAnyToastShowing)
                 }
+                
                 ToolbarItem {
                     Menu("Theme", systemImage: "paintpalette") {
                         Picker("Theme:", selection: $theme.onChange(setTheme)) {
@@ -711,6 +729,101 @@ struct ContentView: View {
                     isShowingToast.toggle()
                 }
             })
+        }
+    }
+    
+    private func populateFromClipboard() {
+        do {
+            let json = pasteFromClipboard()
+            let decoder = JSONDecoder()
+            let featureUser = try decoder.decode(CodableFeatureUser.self, from: json.data(using: .utf8)!)
+            if let loadedPage = loadedPages.first(where: { $0.id == featureUser.page }) {
+                currentPage = loadedPage
+                page = currentPage!.id
+                pageChanged(to: currentPage!.id)
+                if page.isEmpty {
+                    pageValidation = (false, "Page is required")
+                } else {
+                    pageValidation = (true, nil)
+                }
+
+                userName = featureUser.userAlias
+                userNameChanged(to: userName)
+                userNameValidation = validateUserName(value: userName)
+                
+                membership = MembershipCase(rawValue: featureUser.userLevel) ?? MembershipCase.none
+                membershipChanged(to: membership)
+                membershipValidation = validateMembership(value: membership)
+                
+                firstForPage = featureUser.firstFeature
+                firstForPageChanged(to: firstForPage)
+                
+                if loadedPage.hub == "click" {
+                    if featureUser.tagSource == "Page tag" {
+                        // TODO need to handle these...
+                    } else if featureUser.tagSource == "Click community tag" {
+                        // TODO need to handle these...
+                    } else if featureUser.tagSource == "Click hub tag" {
+                        // TODO need to handle these...
+                    }
+                } else if loadedPage.hub == "snap" {
+                    if featureUser.tagSource == "Page tag" {
+                        fromCommunityTag = false
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = false
+                        fromRawTagChanged(to: fromRawTag)
+                    } else if featureUser.tagSource == "RAW page tag" {
+                        fromCommunityTag = false
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = true
+                        fromRawTagChanged(to: fromRawTag)
+                    } else if featureUser.tagSource == "Snap community tag" {
+                        fromCommunityTag = true
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = false
+                        fromRawTagChanged(to: fromRawTag)
+                    } else if featureUser.tagSource == "RAW community tag" {
+                        fromCommunityTag = true
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = true
+                        fromRawTagChanged(to: fromRawTag)
+                    } else if featureUser.tagSource == "Snap membership tag" {
+                        // TODO need to handle this...
+                        fromCommunityTag = false
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = false
+                        fromRawTagChanged(to: fromRawTag)
+                    } else {
+                        fromCommunityTag = false
+                        fromCommunityTagChanged(to: fromCommunityTag)
+                        fromRawTag = false
+                        fromRawTagChanged(to: fromRawTag)
+                    }
+                }
+                
+                newMembership = NewMembershipCase(rawValue: featureUser.newLevel) ?? .none
+                newMembershipChanged(to: newMembership)
+                
+                focusedField = .userName
+            } else {
+                userName = ""
+                userNameChanged(to: userName)
+                userNameValidation = validateUserName(value: userName)
+                membership = MembershipCase.none
+                membershipChanged(to: membership)
+                membershipValidation = validateMembership(value: membership)
+                firstForPage = false
+                firstForPageChanged(to: firstForPage)
+                fromCommunityTag = false
+                fromCommunityTagChanged(to: fromCommunityTag)
+                fromRawTag = false
+                fromRawTagChanged(to: fromRawTag)
+                newMembership = NewMembershipCase.none
+                newMembershipChanged(to: newMembership)
+                focusedField = .userName
+            }
+        } catch {
+            debugPrint(error)
         }
     }
 
