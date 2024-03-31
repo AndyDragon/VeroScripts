@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 import CommonCrypto
 
 extension Binding {
@@ -20,6 +21,17 @@ extension Binding {
     }
 }
 
+extension View {
+    @ViewBuilder func onValueChanged<T: Equatable>(value: T, onChange: @escaping (T) -> Void) -> some View {
+        if #available(macOS 14.0, *) {
+            self.onChange(of: value, perform: onChange)
+        } else {
+            self.onReceive(Just(value)) { (value) in
+                onChange(value)
+            }
+        }
+    }
+}
 func matches(of regex: String, in text: String) -> [String] {
     do {
         let regex = try NSRegularExpression(pattern: regex)

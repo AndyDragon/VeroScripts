@@ -87,5 +87,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.35",
+        "notes": [
+            {
+                "date": "March 31, 2024",
+                "notes": [
+                    "Added ability to populate by sharing data for the Feature Logging app."
+                ]
+            }
+        ]
     }
 ]

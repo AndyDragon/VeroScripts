@@ -14,6 +14,12 @@ struct ContentView: View {
     @State private var theme = Theme.notSet
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = true
+    
+    // SHARED FEATURE
+    @AppStorage(
+        "feature",
+        store: UserDefaults(suiteName: "group.com.andydragon.VeroTools")
+    ) var sharedFeature = ""
 
     @Environment(\.openURL) private var openURL
     @State private var membership: MembershipCase = MembershipCase.none
@@ -515,7 +521,7 @@ struct ContentView: View {
                     }
                     .disabled(isAnyToastShowing)
                 }
-                
+
                 ToolbarItem {
                     Menu("Theme", systemImage: "paintpalette") {
                         Picker("Theme:", selection: $theme.onChange(setTheme)) {
@@ -612,6 +618,14 @@ struct ContentView: View {
 #if TESTING
             .navigationTitle("Vero Scripts - Script Testing")
 #endif
+            .onAppear {
+//                alertTitle = "onAppear"
+//                alertMessage = "here"
+//                showingAlert.toggle()
+            }
+            .onValueChanged(value: sharedFeature) { newValue in
+                loadSharedFeature()
+            }
             .task {
                 // Hack for page staff level to handle changes (otherwise they are not persisted)
                 lastPageStaffLevel = pageStaffLevel
@@ -647,8 +661,10 @@ struct ContentView: View {
                         return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
                     }))
 
+                    loadSharedFeature()
+                    
                     // Delay the start of the templates download so the window can be ready faster
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
+                    try await Task.sleep(nanoseconds: 200_000_000)
 
 #if TESTING
                     let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
@@ -696,7 +712,7 @@ struct ContentView: View {
             }
             .preferredColorScheme(isDarkModeOn ? .dark : .light)
     }
-
+    
     private func setTheme(_ newTheme: Theme) {
         if (newTheme == .notSet) {
             isDarkModeOn = colorScheme == .dark
@@ -731,99 +747,119 @@ struct ContentView: View {
             })
         }
     }
+
+    private func loadSharedFeature() {
+        if !sharedFeature.isEmpty {
+            // Store this before we clear the value
+            let sharedFeatureJson = sharedFeature
+            
+            // Clear the feature
+            UserDefaults(suiteName: "group.com.andydragon.VeroTools")?.removeObject(forKey: "feature")
+            
+            // Load the feature
+            let featureUser = CodableFeatureUser(json: sharedFeatureJson.data(using: .utf8)!)
+            if !featureUser.page.isEmpty {
+                populateFromFeatureUser(featureUser)
+            }
+        }
+    }
     
     private func populateFromClipboard() {
         do {
             let json = pasteFromClipboard()
             let decoder = JSONDecoder()
             let featureUser = try decoder.decode(CodableFeatureUser.self, from: json.data(using: .utf8)!)
-            if let loadedPage = loadedPages.first(where: { $0.id == featureUser.page }) {
-                currentPage = loadedPage
-                page = currentPage!.id
-                pageChanged(to: currentPage!.id)
-                if page.isEmpty {
-                    pageValidation = (false, "Page is required")
-                } else {
-                    pageValidation = (true, nil)
-                }
-
-                userName = featureUser.userAlias
-                userNameChanged(to: userName)
-                userNameValidation = validateUserName(value: userName)
-                
-                membership = MembershipCase(rawValue: featureUser.userLevel) ?? MembershipCase.none
-                membershipChanged(to: membership)
-                membershipValidation = validateMembership(value: membership)
-                
-                firstForPage = featureUser.firstFeature
-                firstForPageChanged(to: firstForPage)
-                
-                if loadedPage.hub == "click" {
-                    if featureUser.tagSource == "Page tag" {
-                        // TODO need to handle these...
-                    } else if featureUser.tagSource == "Click community tag" {
-                        // TODO need to handle these...
-                    } else if featureUser.tagSource == "Click hub tag" {
-                        // TODO need to handle these...
-                    }
-                } else if loadedPage.hub == "snap" {
-                    if featureUser.tagSource == "Page tag" {
-                        fromCommunityTag = false
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = false
-                        fromRawTagChanged(to: fromRawTag)
-                    } else if featureUser.tagSource == "RAW page tag" {
-                        fromCommunityTag = false
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = true
-                        fromRawTagChanged(to: fromRawTag)
-                    } else if featureUser.tagSource == "Snap community tag" {
-                        fromCommunityTag = true
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = false
-                        fromRawTagChanged(to: fromRawTag)
-                    } else if featureUser.tagSource == "RAW community tag" {
-                        fromCommunityTag = true
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = true
-                        fromRawTagChanged(to: fromRawTag)
-                    } else if featureUser.tagSource == "Snap membership tag" {
-                        // TODO need to handle this...
-                        fromCommunityTag = false
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = false
-                        fromRawTagChanged(to: fromRawTag)
-                    } else {
-                        fromCommunityTag = false
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromRawTag = false
-                        fromRawTagChanged(to: fromRawTag)
-                    }
-                }
-                
-                newMembership = NewMembershipCase(rawValue: featureUser.newLevel) ?? .none
-                newMembershipChanged(to: newMembership)
-                
-                focusedField = .userName
-            } else {
-                userName = ""
-                userNameChanged(to: userName)
-                userNameValidation = validateUserName(value: userName)
-                membership = MembershipCase.none
-                membershipChanged(to: membership)
-                membershipValidation = validateMembership(value: membership)
-                firstForPage = false
-                firstForPageChanged(to: firstForPage)
-                fromCommunityTag = false
-                fromCommunityTagChanged(to: fromCommunityTag)
-                fromRawTag = false
-                fromRawTagChanged(to: fromRawTag)
-                newMembership = NewMembershipCase.none
-                newMembershipChanged(to: newMembership)
-                focusedField = .userName
-            }
+            populateFromFeatureUser(featureUser)
         } catch {
             debugPrint(error)
+        }
+    }
+
+    private func populateFromFeatureUser(_ featureUser: CodableFeatureUser) {
+        if let loadedPage = loadedPages.first(where: { $0.id == featureUser.page }) {
+            currentPage = loadedPage
+            page = currentPage!.id
+            pageChanged(to: currentPage!.id)
+            if page.isEmpty {
+                pageValidation = (false, "Page is required")
+            } else {
+                pageValidation = (true, nil)
+            }
+
+            userName = featureUser.userAlias
+            userNameChanged(to: userName)
+            userNameValidation = validateUserName(value: userName)
+
+            membership = MembershipCase(rawValue: featureUser.userLevel) ?? MembershipCase.none
+            membershipChanged(to: membership)
+            membershipValidation = validateMembership(value: membership)
+
+            firstForPage = featureUser.firstFeature
+            firstForPageChanged(to: firstForPage)
+
+            if loadedPage.hub == "click" {
+                if featureUser.tagSource == "Page tag" {
+                    // TODO need to handle these...
+                } else if featureUser.tagSource == "Click community tag" {
+                    // TODO need to handle these...
+                } else if featureUser.tagSource == "Click hub tag" {
+                    // TODO need to handle these...
+                }
+            } else if loadedPage.hub == "snap" {
+                if featureUser.tagSource == "Page tag" {
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == "RAW page tag" {
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = true
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == "Snap community tag" {
+                    fromCommunityTag = true
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == "RAW community tag" {
+                    fromCommunityTag = true
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = true
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == "Snap membership tag" {
+                    // TODO need to handle this...
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                } else {
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                }
+            }
+
+            newMembership = NewMembershipCase(rawValue: featureUser.newLevel) ?? .none
+            newMembershipChanged(to: newMembership)
+
+            focusedField = .userName
+        } else {
+            userName = ""
+            userNameChanged(to: userName)
+            userNameValidation = validateUserName(value: userName)
+            membership = MembershipCase.none
+            membershipChanged(to: membership)
+            membershipValidation = validateMembership(value: membership)
+            firstForPage = false
+            firstForPageChanged(to: firstForPage)
+            fromCommunityTag = false
+            fromCommunityTagChanged(to: fromCommunityTag)
+            fromRawTag = false
+            fromRawTagChanged(to: fromRawTag)
+            newMembership = NewMembershipCase.none
+            newMembershipChanged(to: newMembership)
+            focusedField = .userName
         }
     }
 

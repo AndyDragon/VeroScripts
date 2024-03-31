@@ -5,6 +5,8 @@
 //  Created by Andrew Forget on 2024-02-10.
 //
 
+import SwiftUI
+
 enum FocusedField: Hashable {
     case userName,
          level,
@@ -259,4 +261,31 @@ struct CodableFeatureUser: Codable {
     var tagSource: String
     var firstFeature: Bool
     var newLevel: String
+    
+    init() {
+        page = ""
+        userName = ""
+        userAlias = ""
+        userLevel = ""
+        tagSource = ""
+        firstFeature = false
+        newLevel = ""
+    }
+
+    init(json: Data) {
+        self.init()
+        do {
+            let decoder = JSONDecoder()
+            let featureUser = try decoder.decode(CodableFeatureUser.self, from: json)
+            self.page = featureUser.page
+            self.userName = featureUser.userName
+            self.userAlias = featureUser.userAlias
+            self.userLevel = featureUser.userLevel
+            self.tagSource = featureUser.tagSource
+            self.firstFeature = featureUser.firstFeature
+            self.newLevel = featureUser.newLevel
+        } catch {
+            debugPrint(error)
+        }
+    }
 }
