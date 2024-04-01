@@ -32,6 +32,7 @@ extension View {
         }
     }
 }
+
 func matches(of regex: String, in text: String) -> [String] {
     do {
         let regex = try NSRegularExpression(pattern: regex)

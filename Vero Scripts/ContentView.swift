@@ -716,10 +716,12 @@ struct ContentView: View {
     private func setTheme(_ newTheme: Theme) {
         if (newTheme == .notSet) {
             isDarkModeOn = colorScheme == .dark
+            Color.isDarkModeOn = colorScheme == .dark
         } else {
             if let details = ThemeDetails[newTheme] {
                 Color.currentTheme = details.colorTheme
                 isDarkModeOn = details.darkTheme
+                Color.isDarkModeOn = details.darkTheme
                 theme = newTheme
                 UserDefaultsUtils.shared.setTheme(theme: newTheme)
             }
@@ -844,6 +846,14 @@ struct ContentView: View {
             newMembershipChanged(to: newMembership)
 
             focusedField = .userName
+            
+            Task {
+                await showToast(
+                    .complete(.green),
+                    "Populated from Feature Logging",
+                    subTitle: "Populated feature for user \(featureUser.userName) from the Feature Logging app",
+                    duration: ToastDuration.short)
+            }
         } else {
             userName = ""
             userNameChanged(to: userName)

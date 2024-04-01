@@ -33,6 +33,7 @@ struct VeroScriptsApp: App {
                 })
                 .disabled(checkingForUpdates)
             })
+            CommandGroup(replacing: CommandGroupPlacement.newItem) { }
         }
     }
 }
