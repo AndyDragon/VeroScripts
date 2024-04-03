@@ -158,10 +158,12 @@ class Program
         "first raw community comment",
         "first raw comment",
         "first community comment",
+        "first hub comment",
         "first comment",
         "raw community comment",
         "raw comment",
         "community comment",
+        "hub comment",
         "comment",
         "original post",
     };

@@ -22,37 +22,38 @@ struct ContentView: View {
     ) var sharedFeature = ""
 
     @Environment(\.openURL) private var openURL
-    @State private var membership: MembershipCase = MembershipCase.none
+    @State private var membership = MembershipCase.none
     @State private var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var userName: String = ""
+    @State private var userName = ""
     @State private var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var yourName: String = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State private var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
     @State private var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var yourFirstName: String = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+    @State private var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
     @State private var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var page: String = UserDefaults.standard.string(forKey: "Page") ?? ""
+    @State private var page = UserDefaults.standard.string(forKey: "Page") ?? ""
     @State private var pageValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var pageStaffLevel: StaffLevelCase = StaffLevelCase(
+    @State private var pageStaffLevel = StaffLevelCase(
         rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue
     ) ?? StaffLevelCase.mod
-    @State private var firstForPage: Bool = false
-    @State private var fromCommunityTag: Bool = false
-    @State private var fromRawTag: Bool = false
-    @State private var featureScript: String = ""
-    @State private var commentScript: String = ""
-    @State private var originalPostScript: String = ""
-    @State private var newMembership: NewMembershipCase = NewMembershipCase.none
+    @State private var firstForPage = false
+    @State private var fromCommunityTag = false
+    @State private var fromHubTag = false
+    @State private var fromRawTag = false
+    @State private var featureScript = ""
+    @State private var commentScript = ""
+    @State private var originalPostScript = ""
+    @State private var newMembership = NewMembershipCase.none
     @State private var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var newMembershipScript: String = ""
+    @State private var newMembershipScript = ""
     @State private var showingAlert = false
-    @State private var alertTitle: String = ""
-    @State private var alertMessage: String = ""
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
     @State private var terminalAlert = false
     @State private var placeholderSheetCase = PlaceholderSheetCase.featureScript
     @State private var showingPlaceholderSheet = false
     @State private var loadedPages = [LoadedPage]()
     @State private var currentPage: LoadedPage? = nil
-    @State private var waitingForTemplates: Bool = true
+    @State private var waitingForTemplates = true
     @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
     @State private var disallowList = [String]()
     @ObservedObject private var featureScriptPlaceholders = PlaceholderList()
@@ -103,7 +104,9 @@ struct ContentView: View {
             Color.BackgroundColor.edgesIgnoringSafeArea(.all)
 
             VStack {
+                // Fields
                 Group {
+                    // Page and staff level
                     HStack {
                         // Page picker
                         if !pageValidation.valid {
@@ -165,6 +168,7 @@ struct ContentView: View {
                         .focused($focusedField, equals: .staffLevel)
                     }
 
+                    // You
                     HStack {
                         // Your name editor
                         FieldEditor(
@@ -204,6 +208,7 @@ struct ContentView: View {
                         ).padding([.leading], 8)
                     }
 
+                    // User / Options
                     HStack {
                         // User name editor
                         FieldEditor(
@@ -262,7 +267,27 @@ struct ContentView: View {
                         .padding([.leading], 8)
                         .help("First feature on page")
 
-                        if currentPage?.hub == "snap" {
+                        if currentPage?.hub == "click" {
+                            Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                                Text("From community tag")
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            .focusable()
+                            .focused($focusedField, equals: .communityTag)
+                            .padding([.leading], 8)
+                            .help("From community tag")
+
+                            Toggle(isOn: $fromHubTag.onChange(fromHubTagChanged)) {
+                                Text("From hub tag")
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            .focusable()
+                            .focused($focusedField, equals: .hubTag)
+                            .padding([.leading], 8)
+                            .help("From hub tag")
+                        } else if currentPage?.hub == "snap" {
                             Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
                                 Text("From RAW tag")
                                     .lineLimit(1)
@@ -288,6 +313,7 @@ struct ContentView: View {
                     }
                 }
 
+                // Scripts
                 Group {
                     // Feature script output
                     ScriptEditor(
@@ -383,6 +409,7 @@ struct ContentView: View {
                         focusField: .originalPostScript)
                 }
 
+                // New membership
                 Group {
                     // New membership picker and script output
                     NewMembershipEditor(
@@ -503,6 +530,8 @@ struct ContentView: View {
                         firstForPageChanged(to: firstForPage)
                         fromCommunityTag = false
                         fromCommunityTagChanged(to: fromCommunityTag)
+                        fromHubTag = false
+                        fromHubTagChanged(to: fromHubTag)
                         fromRawTag = false
                         fromRawTagChanged(to: fromRawTag)
                         newMembership = NewMembershipCase.none
@@ -792,7 +821,7 @@ struct ContentView: View {
             userNameChanged(to: userName)
             userNameValidation = validateUserName(value: userName)
 
-            membership = MembershipCase(rawValue: featureUser.userLevel) ?? MembershipCase.none
+            membership = featureUser.userLevel
             membershipChanged(to: membership)
             membershipValidation = validateMembership(value: membership)
 
@@ -800,49 +829,76 @@ struct ContentView: View {
             firstForPageChanged(to: firstForPage)
 
             if loadedPage.hub == "click" {
-                if featureUser.tagSource == "Page tag" {
-                    // TODO need to handle these...
-                } else if featureUser.tagSource == "Click community tag" {
-                    // TODO need to handle these...
-                } else if featureUser.tagSource == "Click hub tag" {
-                    // TODO need to handle these...
+                if featureUser.tagSource == TagSourceCase.commonPageTag {
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == TagSourceCase.clickCommunityTag {
+                    fromCommunityTag = true
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
+                } else if featureUser.tagSource == TagSourceCase.clickHubTag {
+                    fromCommunityTag = false
+                    fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = true
+                    fromHubTagChanged(to: fromHubTag)
+                    fromRawTag = false
+                    fromRawTagChanged(to: fromRawTag)
                 }
             } else if loadedPage.hub == "snap" {
-                if featureUser.tagSource == "Page tag" {
+                if featureUser.tagSource == TagSourceCase.commonPageTag {
                     fromCommunityTag = false
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = false
                     fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == "RAW page tag" {
+                } else if featureUser.tagSource == TagSourceCase.snapRawPageTag {
                     fromCommunityTag = false
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = true
                     fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == "Snap community tag" {
+                } else if featureUser.tagSource == TagSourceCase.snapCommunityTag {
                     fromCommunityTag = true
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = false
                     fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == "RAW community tag" {
+                } else if featureUser.tagSource == TagSourceCase.snapRawCommunityTag {
                     fromCommunityTag = true
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = true
                     fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == "Snap membership tag" {
+                } else if featureUser.tagSource == TagSourceCase.snapMembershipTag {
                     // TODO need to handle this...
                     fromCommunityTag = false
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = false
                     fromRawTagChanged(to: fromRawTag)
                 } else {
                     fromCommunityTag = false
                     fromCommunityTagChanged(to: fromCommunityTag)
+                    fromHubTag = false
+                    fromHubTagChanged(to: fromHubTag)
                     fromRawTag = false
                     fromRawTagChanged(to: fromRawTag)
                 }
             }
 
-            newMembership = NewMembershipCase(rawValue: featureUser.newLevel) ?? .none
+            newMembership = featureUser.newLevel
             newMembershipChanged(to: newMembership)
 
             focusedField = .userName
@@ -865,6 +921,8 @@ struct ContentView: View {
             firstForPageChanged(to: firstForPage)
             fromCommunityTag = false
             fromCommunityTagChanged(to: fromCommunityTag)
+            fromHubTag = false
+            fromHubTagChanged(to: fromHubTag)
             fromRawTag = false
             fromRawTagChanged(to: fromRawTag)
             newMembership = NewMembershipCase.none
@@ -991,6 +1049,10 @@ struct ContentView: View {
         updateScripts()
     }
 
+    private func fromHubTagChanged(to value: Bool) {
+        updateScripts()
+    }
+    
     private func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
@@ -1179,19 +1241,22 @@ struct ContentView: View {
                 from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
-                communityTag: fromCommunityTag) ?? ""
+                communityTag: fromCommunityTag,
+                hubTag: fromHubTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
                 from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
-                communityTag: fromCommunityTag) ?? ""
+                communityTag: fromCommunityTag,
+                hubTag: fromHubTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
                 from: page,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
-                communityTag: fromCommunityTag) ?? ""
+                communityTag: fromCommunityTag,
+                hubTag: fromHubTag) ?? ""
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
@@ -1233,7 +1298,8 @@ struct ContentView: View {
         from pageId: String,
         firstFeature: Bool,
         rawTag: Bool,
-        communityTag: Bool
+        communityTag: Bool,
+        hubTag: Bool
     ) -> String! {
         var template: Template!
         if waitingForTemplates {
@@ -1263,7 +1329,14 @@ struct ContentView: View {
                 template.name == "first community " + templateName
             })
         }
-
+        
+        // next check first feature AND hub
+        if firstFeature && hubTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "first hub " + templateName
+            })
+        }
+        
         // next check first feature
         if firstFeature && template == nil {
             template = templatePage?.templates.first(where: { template in
@@ -1289,6 +1362,13 @@ struct ContentView: View {
         if communityTag && template == nil {
             template = templatePage?.templates.first(where: { template in
                 template.name == "community " + templateName
+            })
+        }
+
+        // next check hub
+        if hubTag && template == nil {
+            template = templatePage?.templates.first(where: { template in
+                template.name == "hub " + templateName
             })
         }
 

@@ -18,13 +18,14 @@ enum FocusedField: Hashable {
          firstFeature,
          rawTag,
          communityTag,
+         hubTag,
          featureScript,
          commentScript,
          originalPostScript,
          newMembershipScript
 }
 
-enum MembershipCase: String, CaseIterable, Identifiable {
+enum MembershipCase: String, CaseIterable, Identifiable, Codable {
     case none = "None",
 
          commonArtist = "Artist",
@@ -108,7 +109,7 @@ enum MembershipCase: String, CaseIterable, Identifiable {
     }
 }
 
-enum NewMembershipCase: String, CaseIterable, Identifiable {
+enum NewMembershipCase: String, CaseIterable, Identifiable, Codable {
     case none = "None",
 
          // common
@@ -168,6 +169,66 @@ enum NewMembershipCase: String, CaseIterable, Identifiable {
         }
         return [
             none
+        ].contains(value)
+    }
+}
+
+enum TagSourceCase: String, CaseIterable, Identifiable, Codable {
+    case commonPageTag = "Page tag",
+         
+         // snap
+         snapRawPageTag = "RAW page tag",
+         snapCommunityTag = "Snap community tag",
+         snapRawCommunityTag = "RAW community tag",
+         snapMembershipTag = "Snap membership tag",
+         
+         // click
+         clickCommunityTag = "Click community tag",
+         clickHubTag = "Click hub tag"
+    
+    var id: Self { self }
+    
+    static func casesFor(hub: String?) -> [TagSourceCase] {
+        if hub == "snap" {
+            return [
+                .commonPageTag,
+                .snapRawPageTag,
+                .snapCommunityTag,
+                .snapRawCommunityTag,
+                .snapMembershipTag
+            ]
+        }
+        if hub == "click" {
+            return [
+                .commonPageTag,
+                .clickCommunityTag,
+                .clickHubTag
+            ]
+        }
+        return [
+            .commonPageTag
+        ]
+    }
+    
+    static func caseValidFor(hub: String?, _ value: TagSourceCase) -> Bool {
+        if hub == "snap" {
+            return [
+                commonPageTag,
+                snapRawPageTag,
+                snapCommunityTag,
+                snapRawCommunityTag,
+                snapMembershipTag
+            ].contains(value)
+        }
+        if hub == "click" {
+            return [
+                commonPageTag,
+                clickCommunityTag,
+                clickHubTag
+            ].contains(value)
+        }
+        return [
+            commonPageTag
         ].contains(value)
     }
 }
@@ -257,19 +318,19 @@ struct CodableFeatureUser: Codable {
     var page: String
     var userName: String
     var userAlias: String
-    var userLevel: String
-    var tagSource: String
+    var userLevel: MembershipCase
+    var tagSource: TagSourceCase
     var firstFeature: Bool
-    var newLevel: String
+    var newLevel: NewMembershipCase
     
     init() {
         page = ""
         userName = ""
         userAlias = ""
-        userLevel = ""
-        tagSource = ""
+        userLevel = MembershipCase.none
+        tagSource = TagSourceCase.commonPageTag
         firstFeature = false
-        newLevel = ""
+        newLevel = NewMembershipCase.none
     }
 
     init(json: Data) {

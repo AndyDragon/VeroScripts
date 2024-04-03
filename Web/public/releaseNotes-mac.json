@@ -109,5 +109,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.37",
+        "notes": [
+            {
+                "date": "April 3, 2024",
+                "notes": [
+                    "Some code cleanup and added tag source for click hub."
+                ]
+            }
+        ]
     }
 ]
