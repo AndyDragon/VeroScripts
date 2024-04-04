@@ -44,5 +44,17 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.30",
+        "notes": [
+            {
+                "date": "April 4, 2024",
+                "notes": [
+                    "Added ability to populate by sharing data for the Feature Logging app.",
+                    "Added crash logging to help debug application crashes"
+                ]
+            }
+        ]
     }
 ]

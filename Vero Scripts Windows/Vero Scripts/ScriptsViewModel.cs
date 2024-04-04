@@ -120,13 +120,15 @@ namespace VeroScripts
             });
         }
 
-        private static string GetDataLocationPath()
+        #region User settings
+
+        public static string GetDataLocationPath(bool shared = false)
         {
             var user = WindowsIdentity.GetCurrent();
             var dataLocationPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "AndyDragonSoftware",
-                "VeroScripts",
+                shared ? "VeroTools" : "FeatureLogging",
                 user.Name);
             if (!Directory.Exists(dataLocationPath))
             {
@@ -135,11 +137,13 @@ namespace VeroScripts
             return dataLocationPath;
         }
 
-        public static string GetUserSettingsPath()
+        public static string GetUserSettingsPath(bool shared = false)
         {
-            var dataLocationPath = GetDataLocationPath();
+            var dataLocationPath = GetDataLocationPath(shared);
             return Path.Combine(dataLocationPath, "settings.json");
         }
+
+        #endregion
 
         #region Server access
 
@@ -182,6 +186,95 @@ namespace VeroScripts
                 }
                 _ = LoadTemplates();
                 _ = LoadDisallowList();
+
+                // Try populate from Feature Logging
+                try
+                {
+                    var sharedSettingsPath = GetDataLocationPath(true);
+                    var featureFile = Path.Combine(sharedSettingsPath, "feature.json");
+                    if (File.Exists(featureFile))
+                    {
+                        // Load the feature, then delete the feature file.
+                        var feature = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(File.ReadAllText(featureFile)) ?? [];
+                        File.Delete(featureFile);
+
+                        var page = LoadedPages.FirstOrDefault(page => page.Id == (string)feature["page"]);
+                        if (page != null)
+                        {
+                            Page = page.Id;
+                            UserName = (string)feature["userAlias"];
+                            Membership = HubMemberships.Contains((string)feature["userLevel"]) ? (string)feature["userLevel"] : HubMemberships[0];
+                            if (page.HubName == "click")
+                            {
+                                RawTag = false;
+                                switch ((string)feature["tagSource"])
+                                {
+                                    case "Page tag":
+                                    default:
+                                        CommunityTag = false;
+                                        HubTag = false;
+                                        break;
+                                    case "Click community tag":
+                                        CommunityTag = true;
+                                        HubTag = false;
+                                        break;
+                                    case "Click hub tag":
+                                        CommunityTag = false;
+                                        HubTag = true;
+                                        break;
+                                }
+                            }
+                            else if (page.HubName == "snap")
+                            {
+                                HubTag = false;
+                                switch ((string)feature["tagSource"])
+                                {
+                                    case "Page tag":
+                                    default:
+                                        RawTag = false;
+                                        CommunityTag = false;
+                                        break;
+                                    case "RAW page tag":
+                                        RawTag = true;
+                                        CommunityTag = false;
+                                        break;
+                                    case "Snap community tag":
+                                        RawTag = false;
+                                        CommunityTag = true;
+                                        break;
+                                    case "RAW community tag":
+                                        RawTag = true;
+                                        CommunityTag = true;
+                                        break;
+                                    case "Snap membership tag":
+                                        // TODO andydragon : need to handle this...
+                                        RawTag = false;
+                                        CommunityTag = false;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                RawTag = false;
+                                CommunityTag = false;
+                                HubTag = false;
+                            }
+                            NewMembership = HubNewMemberships.Contains((string)feature["newLevel"]) ? (string)feature["newLevel"] : HubNewMemberships[0];
+
+                            notificationManager.Show(
+                                "Populated from Feature Logging",
+                                $"Populated feature for user {UserName} from the Feature Logging app",
+                                type: NotificationType.Information,
+                                areaName: "WindowArea",
+                                expirationTime: TimeSpan.FromSeconds(3));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // TODO andydragon : handle errors
+                    Console.WriteLine("Error occurred: {0}", ex.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -654,6 +747,24 @@ namespace VeroScripts
             set
             {
                 if (Set(ref communityTag, value))
+                {
+                    UpdateScripts();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Hub tag
+
+        private bool hubTag = false;
+
+        public bool HubTag
+        {
+            get => hubTag;
+            set
+            {
+                if (Set(ref hubTag, value))
                 {
                     UpdateScripts();
                 }
