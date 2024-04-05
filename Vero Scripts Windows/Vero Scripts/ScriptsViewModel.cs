@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -1245,18 +1246,58 @@ namespace VeroScripts
 
         #region Clipboard management
 
+        private bool TrySetClipboardText(string text)
+        {
+            var retriesLeft = 9;
+            while (retriesLeft != 0)
+            {
+                try
+                {
+                    Clipboard.Clear();
+                    Clipboard.SetText(text);
+                    return true;
+                }
+                catch (COMException ex) 
+                { 
+                    const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
+                    if ((uint)ex.ErrorCode != CLIPBRD_E_CANT_OPEN)
+                    {
+                        throw;
+                    }
+                    --retriesLeft;
+                }
+            }
+            return false;
+        }
+
+        private void CopyTextToClipboard(string text, string successMessage)
+        {
+            if (TrySetClipboardText(text))
+            {
+                notificationManager.Show(
+                    "Copied script",
+                    successMessage,
+                    type: NotificationType.Success,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(3));
+            }
+            else
+            {
+                notificationManager.Show(
+                    "Failed to copy script",
+                    "Could not copy script to the clipboard, if you have another clipping tool active, disable it and try again",
+                    type: NotificationType.Error,
+                    areaName: "WindowArea",
+                    expirationTime: TimeSpan.FromSeconds(12));
+            }
+        }
+
         public void CopyScript(Script script, bool force = false, bool withPlaceholders = false)
         {
             if (withPlaceholders)
             {
                 var unprocessedScript = Scripts[script];
-                Clipboard.SetText(unprocessedScript);
-                notificationManager.Show(
-                    "Copied script",
-                    "Copied the " + scriptNames[script] + " script with placeholders to the clipboard",
-                    type: NotificationType.Success,
-                    areaName: "WindowArea",
-                    expirationTime: TimeSpan.FromSeconds(3));
+                CopyTextToClipboard(unprocessedScript, "Copied the " + scriptNames[script] + " script with placeholders to the clipboard");
             }
             else if (CheckForPlaceholders(script, force))
             {
@@ -1270,49 +1311,25 @@ namespace VeroScripts
             {
                 var processedScript = ProcessPlaceholders(script);
                 TransferPlaceholders(script);
-                Clipboard.SetText(processedScript);
-                notificationManager.Show(
-                    "Copied script",
-                    "Copied the " + scriptNames[script] + " script to the clipboard",
-                    type: NotificationType.Success,
-                    areaName: "WindowArea",
-                    expirationTime: TimeSpan.FromSeconds(3));
+                CopyTextToClipboard(processedScript, "Copied the " + scriptNames[script] + " script to the clipboard");
             }
         }
 
         public void CopyNewMembershipScript()
         {
-            Clipboard.SetText(NewMembershipScript);
-            notificationManager.Show(
-                "Copied script",
-                "Copied the new membership script to the clipboard",
-                type: NotificationType.Success,
-                areaName: "WindowArea",
-                expirationTime: TimeSpan.FromSeconds(3));
+            CopyTextToClipboard(NewMembershipScript, "Copied the new membership script to the clipboard");
         }
 
         public void CopyScriptFromPlaceholders(Script script, bool withPlaceholders = false)
         {
             if (withPlaceholders)
             {
-                Clipboard.SetText(Scripts[script]);
-                notificationManager.Show(
-                    "Copied script",
-                    "Copied the " + scriptNames[script] + " script with placeholders to the clipboard",
-                    type: NotificationType.Success,
-                    areaName: "WindowArea",
-                    expirationTime: TimeSpan.FromSeconds(3));
+                CopyTextToClipboard(Scripts[script], "Copied the " + scriptNames[script] + " script with placeholders to the clipboard");
             }
             else
             {
                 TransferPlaceholders(script);
-                Clipboard.SetText(ProcessPlaceholders(script));
-                notificationManager.Show(
-                    "Copied script",
-                    "Copied the " + scriptNames[script] + " script to the clipboard",
-                    type: NotificationType.Success,
-                    areaName: "WindowArea",
-                    expirationTime: TimeSpan.FromSeconds(3));
+                CopyTextToClipboard(ProcessPlaceholders(script), "Copied the " + scriptNames[script] + " script to the clipboard");
             }
         }
 
