@@ -1,11 +1,12 @@
-﻿using System.Windows;
+﻿using MahApps.Metro.Controls;
+using System.Windows;
 
 namespace VeroScripts
 {
     /// <summary>
     /// Interaction logic for PlaceholderEditor.xaml
     /// </summary>
-    public partial class PlaceholderEditor
+    public partial class PlaceholderEditor : MetroWindow
     {
         private readonly Script script;
 

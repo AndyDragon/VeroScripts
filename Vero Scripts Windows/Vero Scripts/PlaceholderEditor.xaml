@@ -33,7 +33,7 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="2*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" FontWeight="{Binding FontWeight, Mode=OneWay}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" VerticalAlignment="Center" />
                                 <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" Margin="8,0,0,0" FontSize="14" VerticalAlignment="Center" />
                             </Grid>
                         </DataTemplate>
@@ -47,7 +47,7 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="2*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" FontWeight="{Binding FontWeight, Mode=OneWay}" VerticalAlignment="Top" />
+                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Margin="8,0,0,0" FontSize="16" TextTrimming="WordEllipsis" VerticalAlignment="Top" />
                                 <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" Margin="8,0,0,0" FontSize="14" TextWrapping="Wrap" Height="48" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" />
                             </Grid>
                         </DataTemplate>

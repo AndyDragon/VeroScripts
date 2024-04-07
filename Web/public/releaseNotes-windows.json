@@ -67,5 +67,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.32",
+        "notes": [
+            {
+                "date": "April 6, 2024",
+                "notes": [
+                    "More work on bug with application crashing when trying to copy to clipboard."
+                ]
+            }
+        ]
     }
 ]

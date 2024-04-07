@@ -1248,8 +1248,9 @@ namespace VeroScripts
 
         private bool TrySetClipboardText(string text)
         {
+            const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
             var retriesLeft = 9;
-            while (retriesLeft != 0)
+            while (retriesLeft >= 0)
             {
                 try
                 {
@@ -1257,14 +1258,14 @@ namespace VeroScripts
                     Clipboard.SetText(text);
                     return true;
                 }
-                catch (COMException ex) 
-                { 
-                    const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
+                catch (COMException ex)
+                {
                     if ((uint)ex.ErrorCode != CLIPBRD_E_CANT_OPEN)
                     {
                         throw;
                     }
                     --retriesLeft;
+                    Thread.Sleep((9 - retriesLeft) * 10);
                 }
             }
             return false;
@@ -1304,6 +1305,7 @@ namespace VeroScripts
                 var editor = new PlaceholderEditor(this, script)
                 {
                     Owner = Application.Current.MainWindow,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 };
                 editor.ShowDialog();
             }
