@@ -13,7 +13,7 @@
         },
         {
           "name": "feature",
-          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n                      from\n       🐶 @click_%%PAGENAME%% 🐶\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it is a beautiful example of our furry best friends, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of dogs!\n\n@click_%%PAGENAME%% is a community-run page for featuring photos of our furry best friends and companions which are a hub part of our lives.\n\nFor internal use only!\n#featured_on_click\n#featured_on_click_%%PAGENAME%%\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
+          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n                      from\n         🐶 @click_%%PAGENAME%% 🐶\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it is a beautiful example of our furry best friends, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of dogs!\n\n@click_%%PAGENAME%% is a community-run page for featuring photos of our furry best friends and companions which are a hub part of our lives.\n\nFor internal use only!\n#featured_on_click\n#featured_on_click_%%PAGENAME%%\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "first comment",
@@ -677,27 +677,6 @@
         {
           "name": "original post",
           "template": "✨FEATURE SELECTION ☕️\n"
-        }
-      ]
-    },
-    {
-      "name": "snap:collage",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "🌟📸 [[PERSONALIZED INTRO]], [[USER'S FIRST NAME]]! [[PERSONALIZED MESSAGE]] @%%USERNAME%%  👏✨📸\nHuge congratulations on your beautiful feature with @snap_%%PAGENAME%% 👏📸🌟\nThank you very much for sharing your wonderful photography with #snap_%%PAGENAME%%! 🌟📸\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%%   ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%% ￼\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community .\n•\nCC Snap Community Owner Jane @snap_owner\n•\nPlease check our @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#frame\n#photoart\n#grid\n#collage_community\n#collage_creatives\n#fineartzone\n#Petal\n#Plant\n#Botany\n#Repetition\n#FullFrame\n#Dof\n#CloseUp\n#snap_flowers\n#snap_colours\n#Outdoors\n#Blossom\n#Leaf\n#FlowerHead\n#Freshness\n#Nature\n#Seasons\n#MacroPhotography\n\n.\n.\n\nTRACKING HASHTAGS\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
-        },
-        {
-          "name": "first comment",
-          "template": "📸🌟 Huge congratulations on your wonderful first feature with @snap_%%PAGENAME%%, [[USER'S FIRST NAME]]! @%%USERNAME%%  👏✨📸\nThank you very much for sharing your innovative and creative portrait art with our community! Wonderful mood and storytelling! 👏📸 ✨\nYour support is much appreciated! 🌟📸\n"
-        },
-        {
-          "name": "original post",
-          "template": "🌟 Featured on @snap_%%PAGENAME%% 👏🌟"
         }
       ]
     },
@@ -1667,6 +1646,27 @@
         {
           "name": "original post",
           "template": "FEATURED👊"
+        }
+      ]
+    },
+    {
+      "name": "snap:textures",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "🌟📸 [[PERSONALIZED INTRO]], [[USER'S FIRST NAME]]! [[PERSONALIZED MESSAGE]] @%%USERNAME%%  👏✨📸\nHuge congratulations on your beautiful feature with @snap_%%PAGENAME%% 👏📸🌟\nThank you very much for sharing your wonderful photography with #snap_%%PAGENAME%%! 🌟📸\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%%   ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%% ￼\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community .\n•\nCC Snap Community Owner Jane @snap_owner\n•\nPlease check our @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#frame\n#photoart\n#fineartzone\n#Petal\n#Plant\n#Botany\n#Repetition\n#FullFrame\n#Dof\n#CloseUp\n#snap_flowers\n#snap_colours\n#Outdoors\n#Blossom\n#Leaf\n#FlowerHead\n#Freshness\n#Nature\n#Seasons\n#MacroPhotography\n\n.\n.\n\nTRACKING HASHTAGS\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "📸🌟 Huge congratulations on your wonderful first feature with @snap_%%PAGENAME%%, [[USER'S FIRST NAME]]! @%%USERNAME%%  👏✨📸\nThank you very much for sharing your innovative and creative portrait art with our community! Wonderful mood and storytelling! 👏📸 ✨\nYour support is much appreciated! 🌟📸\n"
+        },
+        {
+          "name": "original post",
+          "template": "🌟 Featured on @snap_%%PAGENAME%% 👏🌟"
         }
       ]
     },
