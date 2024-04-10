@@ -131,5 +131,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.39",
+        "notes": [
+            {
+                "date": "Apr 10, 2024",
+                "notes": [
+                    "Minor tweak to subtle theme to make the accent color more visible."
+                ]
+            }
+        ]
     }
 ]

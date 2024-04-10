@@ -65,6 +65,18 @@ extension Color {
         }
         return Color("\(currentTheme)/BackgroundColorList")
     }
+    static var BackgroundColorListHover: Color  {
+        if currentTheme.isEmpty {
+            return Color(nsColor: .selectedContentBackgroundColor)
+        }
+        return Color("\(currentTheme)/BackgroundColorListHover")
+    }
+    static var BackgroundColorListSelected: Color  {
+        if currentTheme.isEmpty {
+            return Color(nsColor: .selectedContentBackgroundColor)
+        }
+        return Color("\(currentTheme)/BackgroundColorListSelected")
+    }
     static var BackgroundColorNavigationBar: Color  {
         if currentTheme.isEmpty {
             return .windowBackground
