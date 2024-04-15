@@ -719,6 +719,31 @@
       ]
     },
     {
+      "name": "snap:communityarts",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "🌟 You have been featured @%%USERNAME%% 👏\n🌟 Huge congratulations on your beautiful feature with @snap_%%PAGENAME%% ✨\n💕 Thank you very much for sharing your photo artworks with our community! 🙏\n🌟 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕\n"
+        },
+        {
+          "name": "community comment",
+          "template": "🌟 You have been featured @%%USERNAME%% 👏\n🌟 Huge congratulations on your beautiful feature with @snap_%%PAGENAME%% ✨\n💕 Thank you very much for sharing your wonderful photo with us and supporting our Community!! 🙏\n🌟 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features. 💕\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: %%YOURFIRSTNAME%% @%%YOURNAME%%\nAdmin on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🌟 You have been featured @%%USERNAME%% 👏\n🌟 Huge congratulations on your first feature here at @snap_%%PAGENAME%% ✨\n💕 Thank you for tagging this great picture with #snap_%%PAGENAME%%  🙏\n🌟 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% ✨✨✨"
+        }
+      ]
+    },
+    {
       "name": "snap:community_member",
       "templates": [
         {
