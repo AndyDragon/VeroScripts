@@ -1337,7 +1337,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "Congratulations on your beautiful feature @%%USERNAME%% 🌟 [[PERSONALIZED MESSAGE]] ✨ Thank you for tagging Snap Community\n👏👏👏👏💐💐💐💐\n"
+          "template": "🏆 Congratulations on your Snap %%MEMBERLEVEL%% feature, @%%USERNAME%%\nIt’s wonderful to see your photo in our gallery! Thanks for sharing it with us and Keep Tagging: #snap_%%PAGENAME%%\nWe look forward to seeing more of your work!!\n"
         },
         {
           "name": "feature",
@@ -1345,11 +1345,11 @@
         },
         {
           "name": "first comment",
-          "template": "Huge congratulations @%%USERNAME%% on your first feature on SNAP_%%PAGENAME%%!! ✨ Thank you for tagging Snap Community 👏✨👏🌟👏🥳👏\n"
+          "template": "🏆 Congratulations on your Snap %%MEMBERLEVEL%% first feature on @snap_%%PAGENAME%%, @%%USERNAME%%\nIt’s wonderful to see your photo in our gallery! Thanks for sharing it with us and Keep Tagging: #snap_%%PAGENAME%%\nWe look forward to seeing more of your work!!\n"
         },
         {
           "name": "original post",
-          "template": "💫 Featured 💫"
+          "template": "✨Featured Snap %%MEMBERLEVEL%% ✨"
         }
       ]
     },
