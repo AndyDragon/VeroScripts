@@ -904,19 +904,23 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🎣🌟 Huge congratulations on your beautiful feature with @snap_%%PAGENAME%% , dear [[USER'S FIRST NAME! @%%USERNAME%% 👏📸🎣✨\n[[PERSONALIZED MESSAGE]] 👏✨📸\nThank you very much for sharing your wonderful photography with our community and for supporting #snap_%%PAGENAME%% 🌟🎣\n"
+          "template": "🎣🌟 Congratulations You have been featured @%%USERNAME%% 👏📸🎣\n👏✨📸 Just an amazing shot. ✨✨\n🎣✨ Thanks for tagging this great picture with #snap_%%PAGENAME%% 🌟🎣\n🙏 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕🌟\n"
+        },
+        {
+          "name": "community comment",
+          "template": "🎣🌟 Congratulations You have been featured @%%USERNAME%% 🎣✨\n✨🎣 Just an amazing shot. ✨🎣\n💕🎣 Thank You for sharing your wonderful photo with us and supporting our Community!! 🙏\n🎣 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features. 🌟🎣\n"
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%%      ⭐️\n.\n________________________________\n✨CONGRATULATIONS ✨\n________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#fishing\n#fish\n#fishingtrip\n#FishingRod\n#Beach\n#photography\n#Outdoors\n#BodyOfWater\n#ScenicsNature\n#Sea\n#Sky\n#Reflection\n#Nature\n#Ocean\n#Coast\n#Afterglow\n#LeisureActivity\n#Silhouette\n#TranquilScene\n#Evening\n#QualityTime\n#People\n.\n.\n\nTRACKING HASHTAGS\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n________________________________\n\n✨CONGRATULATIONS ✨\n________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#snap\n#onverofirst\n#fishing\n#fish\n#flyfishing\n#photography #outdoors #sports #bodyofwater #scenicsnature #sea #nature #ocean #coast #leisureactivity #tranquilscene #people #lensculture\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n.\n"
         },
         {
           "name": "first comment",
-          "template": "🎣🌟 Huge congratulations on your fabulous first feature with @snap_%%PAGENAME%%, [[USER'S FIRST NAME]]! @%%USERNAME%%   👏🌟📸🎣\n[[PERSONALIZED MESSAGE]] 👏🌟📸\nThank you very much for sharing your amazing photography with our community! Your support is much appreciated! Please keep tagging #snap_%%PAGENAME%% for the chance of more beautiful features. 🌟🎣\n"
+          "template": "🎣🌟 Congratulations You have been featured @%%USERNAME%% 👏📸🎣\n👏✨ Huge congratulations on your first feature here at the @snap_%%PAGENAME%% 👏🎣\n🎣✨ Thanks for tagging this great picture with #snap_%%PAGENAME%% 🌟🎣\n🙏 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕🌟\n"
         },
         {
           "name": "original post",
-          "template": "🌟 Featured %%MEMBERLEVEL%% on @snap_%%PAGENAME%% ! Congratulations @%%USERNAME%% 👏🌟"
+          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% ✨✨✨"
         }
       ]
     },
@@ -1543,7 +1547,7 @@
         },
         {
           "name": "original post",
-          "template": "✨ Featured by @snap_%%PAGENAME%% ✨\nFeatures BNW every Wednesday & Thursday.\n    ✨ #snap_%%FULLPAGENAME%% ✨"
+          "template": "✨ Featured by @snap_%%PAGENAME%% ✨\n    Features BNW every Wednesday\n    ✨ #snap_%%FULLPAGENAME%% ✨"
         }
       ]
     },
