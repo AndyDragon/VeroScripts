@@ -100,7 +100,7 @@
         },
         {
           "name": "feature",
-          "template": "#%%PAGENAME%%\nCONGRATULATIONS\n🌟 🎉 [[USER'S FIRST NAME]] @%%USERNAME%% 🎉 🌟\nFeatured by @%%YOURNAME%%\nEnjoy a lovely Wednesday🫶\n🌟🫶🌟\n#%%PAGENAME%%_%%USERNAME%%\n•\n🌟🫶🌟\n#Sky #Tranquility #Winter #TranquilScene #ScenicsNature #bench\n"
+          "template": "#%%PAGENAME%%\nCONGRATULATIONS\n🌟 🎉 [[USER'S FIRST NAME]] @%%USERNAME%% 🎉 🌟\nFeatured by @%%YOURNAME%%\nEnjoy a lovely Wednesday🫶\n🌟🫶🌟\n#%%PAGENAME%%_%%USERNAME%%\n•\n🌟🫶🌟\n#Sky #Tranquility #Winter #TranquilScene #ScenicsNature #bench\n.\n"
         },
         {
           "name": "original post",
@@ -117,7 +117,7 @@
         },
         {
           "name": "feature",
-          "template": "✨✨ @%%PAGENAME%% ✨✨\n\nCONGRATULATIONS!  👏👏👏\n\n🦅 Your amazing BIF photograph has been chosen for a feature!   🦅\n\nWhy was it featured?\n[{PERSONALIZED MESSAGE}]\n\n✨BIRDS IN FLIGHT FEATURES ✨\n    ✨  Featured Photographer :  @%%USERNAME%%\n\nSelected by hub host:  @%%YOURNAME%%\n\n🦅🦅🦅🦅🦅🦅🦅🦅🦅\n\nThank you for using our hashtag #BIFFeatures\nPlease Follow @%%PAGENAME%%\n\n🩵🩵🩵🩵🩵🩵🩵🩵🩵\n\n#bird #birds #BIF  #%%PAGENAME%%  #wildlife #avian\n\nFor Hub Host Use Only\n#BIFFeatured_%%USERNAME%%\n"
+          "template": "✨✨ @%%PAGENAME%% ✨✨\n\nCONGRATULATIONS!  👏👏👏\n\n🦅 Your amazing BIF photograph has been chosen for a feature!   🦅\n\nWhy was it featured?\n[{PERSONALIZED MESSAGE}]\n\n✨BIRDS IN FLIGHT FEATURES ✨\n    ✨  Featured Photographer :  @%%USERNAME%%\n\nSelected by hub host:  @%%YOURNAME%%\n\n🦅🦅🦅🦅🦅🦅🦅🦅🦅\n\nThank you for using our hashtag #BIFFeatures\nPlease Follow @%%PAGENAME%%\n\n🩵🩵🩵🩵🩵🩵🩵🩵🩵\n\n#bird #birds #BIF  #%%PAGENAME%%  #wildlife #avian\n\nFor Hub Host Use Only\n#BIFFeatured_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -134,7 +134,7 @@
         },
         {
           "name": "feature",
-          "template": "🏜️ #%%PAGENAME%% 🏜️\n.\n🏜️🌵☀️ Featured Desert Adventurer☀️🌵🏜️\n\n🔆🌞☀️ @%%USERNAME%% ☀️🌞🔆\n.\n__________________________________\n\n🏜️🌵☀️CONGRATULATIONS ☀️🌵🏜️\n__________________________________\n.\nSelected by: @%%YOURNAME%%\nYour host at @%%PAGENAME%%\n.\nPlease follow @%%PAGENAME%% and tag your photos #%%PAGENAME%% ... If it happens in the desert, we want to feature it in @%%PAGENAME%%... landscapes, plants, animals, pretty much anything as long as it's in the desert! 🏜️🌵🔆\n.\nCreated by your hosts @lorirowland & @ms2thdr 🏜️☀️🌵😎\n.\n\n#%%PAGENAME%%\n#desert\n#desert_landscapes\n#desert_life\n#desert_flowers\n#desert_adventures\n#utah_landscapes\n#arizona_landscapes\n#sahara\n#saharadesert\n#deathvalley\n#atacama\n#atacamadesert\n#mojavedesert\n#desert_southwest\n#sonorandesert\n#badlands\n\nPAGE HASHTAGS\n.\nFor internal use only!\n#%%PAGENAME%%_%%USERNAME%%\n"
+          "template": "🏜️ #%%PAGENAME%% 🏜️\n.\n🏜️🌵☀️ Featured Desert Adventurer☀️🌵🏜️\n\n🔆🌞☀️ @%%USERNAME%% ☀️🌞🔆\n.\n__________________________________\n\n🏜️🌵☀️CONGRATULATIONS ☀️🌵🏜️\n__________________________________\n.\nSelected by: @%%YOURNAME%%\nYour host at @%%PAGENAME%%\n.\nPlease follow @%%PAGENAME%% and tag your photos #%%PAGENAME%% ... If it happens in the desert, we want to feature it in @%%PAGENAME%%... landscapes, plants, animals, pretty much anything as long as it's in the desert! 🏜️🌵🔆\n.\nCreated by your hosts @lorirowland & @ms2thdr 🏜️☀️🌵😎\n.\n\n#%%PAGENAME%%\n#desert\n#desert_landscapes\n#desert_life\n#desert_flowers\n#desert_adventures\n#utah_landscapes\n#arizona_landscapes\n#sahara\n#saharadesert\n#deathvalley\n#atacama\n#atacamadesert\n#mojavedesert\n#desert_southwest\n#sonorandesert\n#badlands\n\nPAGE HASHTAGS\n.\nFor internal use only!\n#%%PAGENAME%%_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -151,7 +151,7 @@
         },
         {
           "name": "feature",
-          "template": " #%%PAGEHASH%%\n\n🌟 FEATURED ARTIST: @%%USERNAME%%\n\n\n🌌Congratulations🌌\n\n☑️Selected by moderator @%%YOURNAME%%\n\nFor the chance to be featured in our gallery,  use the hashtag #%%PAGEHASH%% ☺\n\n🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.\n🙏🏻 Good luck!\n\n\n#fbpc_featured_%%USERNAME%%\n\n[{PHOTO HASH TAGS}]\n"
+          "template": " #%%PAGEHASH%%\n\n🌟 FEATURED ARTIST: @%%USERNAME%%\n\n\n🌌Congratulations🌌\n\n☑️Selected by moderator @%%YOURNAME%%\n\nFor the chance to be featured in our gallery,  use the hashtag #%%PAGEHASH%% ☺\n\n🌟 It doesn't matter what the theme of your photos is, the main thing is your talent.\n🙏🏻 Good luck!\n\n\n#fbpc_featured_%%USERNAME%%\n\n[{PHOTO HASH TAGS}]\n.\n"
         },
         {
           "name": "original post",
@@ -168,7 +168,7 @@
         },
         {
           "name": "feature",
-          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @%%PAGENAME%%  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #%%PAGENAME%% 🚪 😃 💖\n\nFor Admin Use Only\n#%%PAGENAME%%_%%USERNAME%%\n"
+          "template": "✨✨ CONGRATULATIONS 🎉🎊🎉🎊🎉\n✨✨ @%%USERNAME%%\n\n🏆 Your amazing door has been chosen by @the_average_man & @ms2thdr and featured\n🏆 on @%%PAGENAME%%  🚪😃💖🌟\n\n⭐👌We love it because it’s simply wond-door-ful 🤣😍\n\n💕 💫🎉🚪Thank you for tagging #%%PAGENAME%% 🚪 😃 💖\n\nFor Admin Use Only\n#%%PAGENAME%%_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -185,7 +185,7 @@
         },
         {
           "name": "feature",
-          "template": "Todays Featured Infrared Artist is @%%USERNAME%%\n\n✨✨ CONGRATULATIONS!!!\n\n✨✨ 🏆 🌟✨💫 Your amazing Infrared image has been featured by your host today @%%YOURNAME%% 💫✨🌟🏆 ⭐\n\n\nThank you for following @%%PAGENAME%% and tagging #%%PAGENAME%%! ⭐️\n\n@%%PAGENAME%%, the best in IR and UV photography on VERO, is brought to you by your hosts @ms2thdr and @lorirowland\n\n\n#infrared #IR #Infrared_landscape #infrared_portrait #infrared550nm #infrared665nm #infrared590nm #infrared720nm #infrared850nm #infraredblackwhite #infrared_image #infrared_moments #infrared_bnw #infrared_images #UV #UVIR #UV_Photography #UVIR_Flowers\n\nFor admin use\n\n#%%PAGENAME%%_%%USERNAME%%\n"
+          "template": "Todays Featured Infrared Artist is @%%USERNAME%%\n\n✨✨ CONGRATULATIONS!!!\n\n✨✨ 🏆 🌟✨💫 Your amazing Infrared image has been featured by your host today @%%YOURNAME%% 💫✨🌟🏆 ⭐\n\n\nThank you for following @%%PAGENAME%% and tagging #%%PAGENAME%%! ⭐️\n\n@%%PAGENAME%%, the best in IR and UV photography on VERO, is brought to you by your hosts @ms2thdr and @lorirowland\n\n\n#infrared #IR #Infrared_landscape #infrared_portrait #infrared550nm #infrared665nm #infrared590nm #infrared720nm #infrared850nm #infraredblackwhite #infrared_image #infrared_moments #infrared_bnw #infrared_images #UV #UVIR #UV_Photography #UVIR_Flowers\n\nFor admin use\n\n#%%PAGENAME%%_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -236,7 +236,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n\n⭐️ Featured *Snap %%MEMBERLEVEL%%*:  @%%USERNAME%%  ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%% \n%%STAFFLEVEL%% on @snap_%%PAGENAME%% \n.\nJoin us in our fresh, creative and supportive community on Instagram. Please follow @snap_community \n.\nCC Snap Community Owner \n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero \n#verofamily \n#verofriends \n\nPAGE HASHTAGS \n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%% \n#snap_featured_%%USERNAME%% \n----.\n"
+          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured *Snap %%MEMBERLEVEL%%*:  @%%USERNAME%%  ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Instagram. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n\nPAGE HASHTAGS\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n----\n.\n"
         },
         {
           "name": "original post",
@@ -1038,7 +1038,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n.\n✨ [[LOCATION]] ✨️\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%% \n%%STAFFLEVEL%% for @snap_%%PAGENAME%% \n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community \n.\nCC Snap Community Owner Jane\n@snap_owner \n.\nPlease check out @ snap_kingdom for more of our Snap_community pages\n\n\n•\n#germany #Photography #exploring #captures #adventure #Travel #mood #roamtheplanet #photographerlife \n\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.   \n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n✨ [[LOCATION]] ✨️\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% for @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @ snap_kingdom for more of our Snap_community pages\n\n\n•\n#germany #Photography #exploring #captures #adventure #Travel #mood #roamtheplanet #photographerlife\n\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -1076,7 +1076,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐\n.\n________________________________________________\nC O N G R A T U L A T I O N S ! ! !\n________________________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%%: @snap_%%PAGENAME%%\n.\n.\nJoin us in our fresh. creative. and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our SNAP_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#wewalkaround #hikingaddicts #livelifeoutdoors #enjoythescenery #naturebreak #trailblazer #climbmountains #thegreatoutdoors #findyourmountain #forest #outdooors #nature #woodland\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n,\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐\n.\n________________________________________________\nC O N G R A T U L A T I O N S ! ! !\n________________________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%%: @snap_%%PAGENAME%%\n.\n.\nJoin us in our fresh. creative. and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our SNAP_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#wewalkaround #hikingaddicts #livelifeoutdoors #enjoythescenery #naturebreak #trailblazer #climbmountains #thegreatoutdoors #findyourmountain #forest #outdooors #nature #woodland\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -1678,7 +1678,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n•\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by : @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community #tats #HANDTATTOOS\n#vero #inked4life #tattoos #tattoostudio #tattooartist #tattoomodels #customtattoos #colorfultattoos #Hand #Technology #jewlery #ring #fingers\n#verofamily #tattoos_of_vero #Holding\n#verofriends #snap_people #CloseUp\n#TATTOOED #bpa_arts #People #Black\n•\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘\n"
+          "template": "• #snap_%%PAGENAME%% •\n•\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by : @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community #tats #HANDTATTOOS\n#vero #inked4life #tattoos #tattoostudio #tattooartist #tattoomodels #customtattoos #colorfultattoos #Hand #Technology #jewlery #ring #fingers\n#verofamily #tattoos_of_vero #Holding\n#verofriends #snap_people #CloseUp\n#TATTOOED #bpa_arts #People #Black\n•\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘\n.\n"
         },
         {
           "name": "original post",
@@ -1775,7 +1775,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured SNAP %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero.\nPlease follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#planes #cars #bikes #trains #trucks #boat #aviationlovers #bikelife #cycling #motorcycle #transportation #bus #carsofvero\n\nPAGE HASHTAGS\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n..\n"
+          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured SNAP %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero.\nPlease follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#planes #cars #bikes #trains #trucks #boat #aviationlovers #bikelife #cycling #motorcycle #transportation #bus #carsofvero\n\nPAGE HASHTAGS\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n.\n"
         },
         {
           "name": "original post",
