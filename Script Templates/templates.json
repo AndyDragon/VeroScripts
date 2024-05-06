@@ -1,6 +1,43 @@
 {
   "pages": [
     {
+      "name": "click:astro",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+        },
+        {
+          "name": "community comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+        },
+        {
+          "name": "feature",
+          "template": "__________________________________\n\n     ✨ CONGRATULATIONS ✨\n                      from\n           🪐 @click_%%PAGENAME%% 🪐\n\nFeatured %%MEMBERLEVEL%%: @%%USERNAME%%\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @click_%%PAGENAME%%\n\nYour photo has been selected for this feature because we feel it embodies the nature of space, well done.\n\nWe encourage you to follow our page at @click_%%PAGENAME%% to see more featured photos of space!\n\n@click_%%PAGENAME%% is a community-run page for featuring photos of stars, galaxies, deep-space objects, the moon, the sun, the planets and astro landscape photography.\n\nFor internal use only!\n#featured_on_click\n#featured_on_click_%%PAGENAME%%\n#click_%%PAGENAME%%_%%USERNAME%%\n#click_featured_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "first comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+        },
+        {
+          "name": "first community comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+        },
+        {
+          "name": "first hub comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+        },
+        {
+          "name": "hub comment",
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨ Featured on 🪐 @click_%%PAGENAME%% 🪐 ✨\n💫 Congratulations @%%USERNAME%% 💫"
+        }
+      ]
+    },
+    {
       "name": "click:dogs",
       "templates": [
         {
@@ -33,7 +70,7 @@
         },
         {
           "name": "original post",
-          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫"
+          "template": "✨ Featured on 🐶 @click_%%PAGENAME%% 🐶 ✨\n💫 Congratulations @%%USERNAME%% 💫"
         }
       ]
     },
@@ -70,7 +107,7 @@
         },
         {
           "name": "original post",
-          "template": "✨ Featured on @click_%%PAGENAME%% ✨\n💫 Congratulations @%%USERNAME%% 💫"
+          "template": "✨ Featured on ⚙️ @click_%%PAGENAME%% ⚙️ ✨\n💫 Congratulations @%%USERNAME%% 💫"
         }
       ]
     },
