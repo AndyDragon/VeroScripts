@@ -22,6 +22,6 @@ Please check out @snap_kingdom for more of our Snap_community pages.
 #verofriends
 #snap_bridges
 
-#snap_%%PAGENAME%%_@%%PAGENAME%%
-#snap_featured_@%%PAGENAME%%
+#snap_%%PAGENAME%%_%%USERNAME%%
+#snap_featured_%%USERNAME%%
 .
