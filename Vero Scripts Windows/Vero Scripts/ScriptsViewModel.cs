@@ -73,6 +73,9 @@ namespace VeroScripts
 
         #endregion
 
+        // Change this to 'true' to load the testing scripts.
+        const bool ScriptTesting = false;
+
         private readonly HttpClient httpClient = new();
         private readonly NotificationManager notificationManager = new();
         private readonly Dictionary<Script, string> scriptNames = new()
@@ -157,7 +160,9 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var pagesUri = new Uri("https://vero.andydragon.com/static/data/pages.json");
+                var pagesUri = new Uri(ScriptTesting 
+                    ? "https://vero.andydragon.com/static/data/testing/pages.json"
+                    : "https://vero.andydragon.com/static/data/pages.json");
                 var content = await httpClient.GetStringAsync(pagesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -293,7 +298,9 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var templatesUri = new Uri("https://vero.andydragon.com/static/data/templates.json");
+                var templatesUri = new Uri(ScriptTesting 
+                    ? "https://vero.andydragon.com/static/data/testing/templates.json"
+                    : "https://vero.andydragon.com/static/data/templates.json");
                 var content = await httpClient.GetStringAsync(templatesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -318,7 +325,9 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var templatesUri = new Uri("https://vero.andydragon.com/static/data/disallowlist.json");
+                var templatesUri = new Uri(ScriptTesting
+                    ? "https://vero.andydragon.com/static/data/testing/disallowlist.json"
+                    : "https://vero.andydragon.com/static/data/disallowlist.json");
                 var content = await httpClient.GetStringAsync(templatesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -502,6 +511,7 @@ namespace VeroScripts
                     MembershipValidation = ValidateValueNotDefault(Membership, "None");
                     ClearAllPlaceholders();
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -656,6 +666,7 @@ namespace VeroScripts
                     PageValidation = CalculatePageValidation(Page);
                     ClearAllPlaceholders();
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -696,6 +707,7 @@ namespace VeroScripts
                     UserSettings.Store(nameof(StaffLevel), StaffLevel);
                     ClearAllPlaceholders();
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -714,6 +726,7 @@ namespace VeroScripts
                 if (Set(ref firstForPage, value))
                 {
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -732,6 +745,7 @@ namespace VeroScripts
                 if (Set(ref rawTag, value))
                 {
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -750,6 +764,7 @@ namespace VeroScripts
                 if (Set(ref communityTag, value))
                 {
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -768,6 +783,7 @@ namespace VeroScripts
                 if (Set(ref hubTag, value))
                 {
                     UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -1050,6 +1066,7 @@ namespace VeroScripts
             var pageId = pageName;
             var scriptPageName = pageName;
             var scriptPageHash = pageName;
+            var scriptPageTitle = pageName;
             var oldHubName = selectedPage?.HubName;
             var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
             if (sourcePage != null)
@@ -1058,9 +1075,14 @@ namespace VeroScripts
                 pageName = sourcePage.Name;
                 scriptPageName = pageName;
                 scriptPageHash = pageName;
+                scriptPageTitle = pageName;
                 if (sourcePage.PageName != null)
                 {
                     scriptPageName = sourcePage.PageName;
+                }
+                if (sourcePage.Title != null)
+                {
+                    scriptPageTitle = sourcePage.Title;
                 }
                 if (sourcePage.HashTag != null)
                 {
@@ -1101,6 +1123,7 @@ namespace VeroScripts
                 FeatureScript = featureScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
@@ -1112,6 +1135,7 @@ namespace VeroScripts
                 CommentScript = commentScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
@@ -1123,6 +1147,7 @@ namespace VeroScripts
                 OriginalPostScript = originalPostScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", pageName)
+                    .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", Membership)
                     .Replace("%%USERNAME%%", UserName)
@@ -1215,29 +1240,76 @@ namespace VeroScripts
             else
             {
                 var hubName = SelectedPage?.HubName;
+                var pageName = Page;
+                var pageId = pageName;
+                var scriptPageName = pageName;
+                var scriptPageHash = pageName;
+                var scriptPageTitle = pageName;
+                var sourcePage = LoadedPages.FirstOrDefault(page => page.Id == Page);
+                if (sourcePage != null)
+                {
+                    pageId = sourcePage.Id;
+                    pageName = sourcePage.Name;
+                    scriptPageName = pageName;
+                    scriptPageHash = pageName;
+                    scriptPageTitle = pageName;
+                    if (sourcePage.PageName != null)
+                    {
+                        scriptPageName = sourcePage.PageName;
+                    }
+                    if (sourcePage.Title != null)
+                    {
+                        scriptPageTitle = sourcePage.Title;
+                    }
+                    if (sourcePage.HashTag != null)
+                    {
+                        scriptPageHash = sourcePage.HashTag;
+                    }
+                }
                 if (!string.IsNullOrEmpty(hubName))
                 {
                     TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == hubName + ":" + NewMembership.Replace(" ", "_").ToLowerInvariant());
                     NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%PAGENAME%%", scriptPageName)
+                        .Replace("%%FULLPAGENAME%%", pageName)
+                        .Replace("%%PAGETITLE%%", scriptPageTitle)
+                        .Replace("%%PAGEHASH%%", scriptPageHash)
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
-                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
+                        .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
                 else if (NewMembership == "Member")
                 {
                     TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new member");
                     NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%PAGENAME%%", scriptPageName)
+                        .Replace("%%FULLPAGENAME%%", pageName)
+                        .Replace("%%PAGETITLE%%", scriptPageTitle)
+                        .Replace("%%PAGEHASH%%", scriptPageHash)
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
-                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
+                        .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
                 else if (NewMembership == "VIP Member")
                 {
                     TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == "new vip member");
                     NewMembershipScript = (template?.Template ?? "")
+                        .Replace("%%PAGENAME%%", scriptPageName)
+                        .Replace("%%FULLPAGENAME%%", pageName)
+                        .Replace("%%PAGETITLE%%", scriptPageTitle)
+                        .Replace("%%PAGEHASH%%", scriptPageHash)
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
-                        .Replace("%%YOURFIRSTNAME%%", YourFirstName);
+                        .Replace("%%YOURFIRSTNAME%%", YourFirstName)
+                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
+                        .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
             }
         }

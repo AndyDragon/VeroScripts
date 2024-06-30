@@ -78,5 +78,17 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.33",
+        "notes": [
+            {
+                "date": "Jun 30, 2024",
+                "notes": [
+                    "IMPORTANT: Added mapping of most placeholders for the new membership scripts.",
+                    "IMPORTANT: Added mapping of PAGETITLE placeholder from page catalog."
+                ]
+            }
+        ]
     }
 ]

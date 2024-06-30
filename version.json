@@ -5,8 +5,8 @@
         "vital": true
     },
     "windows": {
-        "current": "1.0.32",
+        "current": "1.0.33",
         "link": "https://vero.andydragon.com/app/veroscripts/windowsInstall",
-        "vital": false
+        "vital": true
     }
 }
