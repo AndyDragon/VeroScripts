@@ -1,4 +1,5 @@
 {
     "hub": "snap",
-    "page": "potd"
+    "page": "potd",
+    "title": "Photo of the Day"
 }

@@ -1,5 +1,6 @@
 {
     "hub": "snap",
     "page": "trainingpage",
-    "exclude": true
+    "title": "Training Page",
+    "excludeTag": true
 }

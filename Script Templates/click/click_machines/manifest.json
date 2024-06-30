@@ -1,4 +1,5 @@
 {
     "hub": "click",
-    "page": "machines"
+    "page": "machines",
+    "title": "Machines"
 }

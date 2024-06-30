@@ -163,6 +163,23 @@
       ]
     },
     {
+      "name": "other:birdworld",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "[[PERSONALIZED MESSAGE]] Great work @%%USERNAME%% ✨🕊️✨\n"
+        },
+        {
+          "name": "feature",
+          "template": "@%%USERNAME%%\n\n✨featured photographer ✨\n\n🕊✨⁣⁣⁣⁣⁣⁣⁣🕊✨🌍✨🕊✨🕊\n⁣ ⁣\n🕊 Species:  ⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣[[SPECIES]]\n⁣\n⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣#birdworld\n#bird_world ⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#birdsofvero⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#birds⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#wildlife⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#birdwatching⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#birdphotography⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#birdlover⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#naturephotography⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#snap_birds⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#podium_wildlife⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#featherlover⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣\n#bird\n⁣⁣⁣⁣⁣⁣⁣⁣⁣⁣#pictasbirds⁣\n\nselected by  @%%YOURNAME%%\n\n#bwf_%%USERNAME%%\n"
+        },
+        {
+          "name": "original post",
+          "template": "Featured! ✨🌞✨"
+        }
+      ]
+    },
+    {
       "name": "other:desert_worlds",
       "templates": [
         {
@@ -1075,7 +1092,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n✨ [[LOCATION]] ✨️\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% for @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @ snap_kingdom for more of our Snap_community pages\n\n\n•\n#germany #Photography #exploring #captures #adventure #Travel #mood #roamtheplanet #photographerlife\n\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n✨ [[LOCATION]] ✨️\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% for @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages\n.\n#germany #Photography #exploring #captures #adventure #Travel #mood #roamtheplanet #photographerlife\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "original post",
@@ -1315,6 +1332,23 @@
         {
           "name": "raw community comment",
           "template": "✨✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%% 🏆\n😍 Just an amazing shot.\n💕 🎉 Thanks for tagging this great picture with #raw_community! Please consider tagging with #snap_%%PAGENAME%% for more chances at a feature.\n"
+        }
+      ]
+    },
+    {
+      "name": "snap:longexposure_featuredartist",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "✨✨ SPECIAL CONGRATULATIONS!!! ✨✨\n🏆 You have been featured @%%USERNAME%% as the monthly featured artist 🏆\n⏱️ We chose this photo as an incredible example of your amazing long exposure work ⏱️\n[[PERSONALIZED MESSAGE]]\n💕 📣 Thanks for tagging this great picture with #snap_%%PAGENAME%% 📣 💕\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% •\n•\n🏆📣 Featured %%MEMBERLEVEL%%: @%%USERNAME%% 📣🏆\n•\n____________________________________\n       ✨ SPECIAL CONGRATULATIONS ✨\n•\n⏱️ Monthly Featured Long Exposure Artist ⏱️\n____________________________________\n•\nSpecially Selected by: The @snap_%%PAGENAME%% team members\n•\nThis artist has been selected by the @snap_%%PAGENAME%% team members in recognition of technical excellence and artistic vision in the genre of long exposure photography.\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n•\n#photography\n#longexposurephotography\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨ Featured on @snap_%%PAGENAME%% ✨\na page out of the @snap_kingdom at the @snap_community"
         }
       ]
     },
@@ -2030,11 +2064,11 @@
   "specialTemplates": [
     {
       "name": "new member",
-      "template": "Congratulations @%%USERNAME%% on your 5th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\nA @snap_community page of @snap_kingdom\n*With your latest feature, we would like to CONGRATULATE you on your NEW Snap Membership 💐💫\nThat's an awesome achievement 🎖️\nTo your Bio, add Snap Member\n✨For any membership inquiries, please send a connection request to @snap_community_member\nAND\n✨For all Snap / RawKingdom information, please check out:\nhttps://rawkingdomarts.com/\n"
     },
     {
       "name": "new vip member",
-      "template": "Congratulations @%%USERNAME%% on your 15th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\nA @snap_community page of @snap_kingdom\n*With your latest feature, we would like to CONGRATULATE you on your NEW Snap VIP Membership 💐💫\nThat's an awesome achievement 🎖️\nTo your Bio, add Snap VIP Member\n✨For any membership inquiries, please send a connection request to @snap_community_member\nAND\n✨For all Snap / RawKingdom information, please check out:\nhttps://rawkingdomarts.com/\n"
     },
     {
       "name": "click:bronze_member",
@@ -2058,11 +2092,11 @@
     },
     {
       "name": "snap:member",
-      "template": "Congratulations @%%USERNAME%% on your 5th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share with you that you are now a Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP Community Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\nA @snap_community page of @snap_kingdom\n*With your latest feature, we would like to CONGRATULATE you on your NEW Snap Membership 💐💫\nThat's an awesome achievement 🎖️\nTo your Bio, add Snap Member\n✨For any membership inquiries, please send a connection request to @snap_community_member\nAND\n✨For all Snap / RawKingdom information, please check out:\nhttps://rawkingdomarts.com/\n"
     },
     {
       "name": "snap:vip_member",
-      "template": "Congratulations @%%USERNAME%% on your 15th feature!\n\nI took the time to check the number of features you have with the SNAP Community and wanted to share that you are now a VIP Member of the SNAP Community!\n\nThat's an awesome achievement 👏🏼👏🏼💐💐💐💐💐💐.\n\nPlease consider adding ✨ SNAP VIP Member ✨ to your bio it will give you the chance to be featured in any snap page using only the membership tag.\n"
+      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\nA @snap_community page of @snap_kingdom\n*With your latest feature, we would like to CONGRATULATE you on your NEW Snap VIP Membership 💐💫\nThat's an awesome achievement 🎖️\nTo your Bio, add Snap VIP Member\n✨For any membership inquiries, please send a connection request to @snap_community_member\nAND\n✨For all Snap / RawKingdom information, please check out:\nhttps://rawkingdomarts.com/\n"
     }
   ]
 }

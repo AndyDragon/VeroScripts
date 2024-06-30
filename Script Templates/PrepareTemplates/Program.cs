@@ -56,7 +56,9 @@ class Program
                             var hubPage = new Page(manifest?.Page ?? pageName)
                             {
                                 PageName = manifest?.PageName,
+                                Title = manifest?.Title,
                                 HashTag = manifest?.HashTag,
+                                ExcludeTag = manifest?.ExcludeTag,
                             };
                             if (!pageCatalog.Hubs.TryGetValue(pageHub, out IList<Page>? value))
                             {
@@ -180,6 +182,7 @@ class Program
         var result = template
             .Replace("%%USERNAME%%", "aabbcc")
             .Replace("%%PAGENAME%%", "somepage")
+            .Replace("%%PAGETITLE%%", "Some Page")
             .Replace("%%PAGEHASH%%", "somepage")
             .Replace("%%FULLPAGENAME%%", "somepage")
             .Replace("%%YOURNAME%%", "ddeeff")
@@ -208,19 +211,9 @@ class PageCatalog
 
     [JsonProperty(propertyName: "pages")]
     public IList<Page> Pages { get; private set; }
-    // TODO andydragon - eventually need to remove the pages property altogether
-    // public bool ShouldSerializePages()
-    // {
-    //     return Pages.Count > 0;
-    // }
 
     [JsonProperty(propertyName: "hubs")]
     public IDictionary<string, IList<Page>> Hubs { get; private set; }
-    // TODO andydragon - eventually need to uncomment this
-    // public bool ShouldSerializeHubs()
-    // {
-    //     return Hubs.Count > 0;
-    // }
 }
 
 class Page
@@ -236,8 +229,14 @@ class Page
     [JsonProperty(propertyName: "pageName", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     public string? PageName { get; set; }
 
+    [JsonProperty(propertyName: "title", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? Title { get; set; }
+
     [JsonProperty(propertyName: "hashTag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     public string? HashTag { get; set; }
+
+    [JsonProperty(propertyName: "excludeTag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool? ExcludeTag { get; set; }
 }
 
 class Manifest
@@ -255,8 +254,14 @@ class Manifest
     [JsonProperty(propertyName: "pageName")]
     public string? PageName { get; set; }
 
+    [JsonProperty(propertyName: "title")]
+    public string? Title { get; set; }
+
     [JsonProperty(propertyName: "hashTag")]
     public string? HashTag { get; set; }
+
+    [JsonProperty(propertyName: "excludeTag")]
+    public bool? ExcludeTag { get; set; }
 }
 
 class TemplateCatalog

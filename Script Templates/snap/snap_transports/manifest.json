@@ -1,4 +1,5 @@
 {
     "hub": "snap",
-    "page": "transports"
+    "page": "transports",
+    "title": "Transports"
 }

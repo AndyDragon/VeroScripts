@@ -1,4 +1,5 @@
 {
     "hub": "snap",
-    "page": "minimal"
+    "page": "minimal",
+    "title": "Minimal"
 }
