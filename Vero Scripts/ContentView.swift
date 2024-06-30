@@ -965,6 +965,7 @@ struct ContentView: View {
         if value != lastMembership {
             clearPlaceholders()
             updateScripts()
+            updateNewMembershipScripts()
             lastMembership = value
         }
     }
@@ -1024,6 +1025,7 @@ struct ContentView: View {
             clearPlaceholders()
             UserDefaults.standard.set(page, forKey: "Page")
             updateScripts()
+            updateNewMembershipScripts()
             lastPage = value
         }
     }
@@ -1033,24 +1035,29 @@ struct ContentView: View {
             clearPlaceholders()
             UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
             updateScripts()
+            updateNewMembershipScripts()
             lastPageStaffLevel = value
         }
     }
 
     private func firstForPageChanged(to value: Bool) {
         updateScripts()
+        updateNewMembershipScripts()
     }
 
     private func fromCommunityTagChanged(to value: Bool) {
         updateScripts()
+        updateNewMembershipScripts()
     }
 
     private func fromRawTagChanged(to value: Bool) {
         updateScripts()
+        updateNewMembershipScripts()
     }
 
     private func fromHubTagChanged(to value: Bool) {
         updateScripts()
+        updateNewMembershipScripts()
     }
     
     private func newMembershipChanged(to value: NewMembershipCase) {
@@ -1188,6 +1195,7 @@ struct ContentView: View {
         var currentPageName = page
         var scriptPageName = currentPageName
         var scriptPageHash = currentPageName
+        var scriptPageTitle = currentPageName
         let currentHubName = currentPage?.hub
         if currentPageName != "" {
             let pageSource = loadedPages.first(where: { needle in needle.id == page })
@@ -1195,6 +1203,10 @@ struct ContentView: View {
                 currentPageName = pageSource?.name ?? page
                 scriptPageName = currentPageName
                 scriptPageHash = currentPageName
+                scriptPageTitle = currentPageName
+                if pageSource?.title != nil {
+                    scriptPageTitle = (pageSource?.title)!
+                }
                 if pageSource?.pageName != nil {
                     scriptPageName = (pageSource?.pageName)!
                 }
@@ -1260,6 +1272,7 @@ struct ContentView: View {
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
@@ -1271,6 +1284,7 @@ struct ContentView: View {
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
@@ -1282,6 +1296,7 @@ struct ContentView: View {
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
@@ -1399,6 +1414,31 @@ struct ContentView: View {
             }
             newMembershipScript = validationErrors
         } else {
+            var currentPageName = page
+            var scriptPageName = currentPageName
+            var scriptPageHash = currentPageName
+            var scriptPageTitle = currentPageName
+            if currentPageName != "" {
+                let pageSource = loadedPages.first(where: { needle in needle.id == page })
+                if pageSource != nil {
+                    currentPageName = pageSource?.name ?? page
+                    scriptPageName = currentPageName
+                    scriptPageHash = currentPageName
+                    scriptPageTitle = currentPageName
+                    if pageSource?.title != nil {
+                        scriptPageTitle = (pageSource?.title)!
+                    }
+                    if pageSource?.pageName != nil {
+                        scriptPageName = (pageSource?.pageName)!
+                    }
+                    if pageSource?.hashTag != nil {
+                        scriptPageHash = (pageSource?.hashTag)!
+                    }
+                }
+                currentPage = pageSource
+            } else {
+                currentPage = nil
+            }
             let templateName = "\(currentPage?.hub ?? ""):\(newMembership.rawValue.replacingOccurrences(of: " ", with: "_").lowercased())"
             let template = templatesCatalog.specialTemplates.first(where: { template in
                 template.name == templateName
@@ -1408,9 +1448,16 @@ struct ContentView: View {
                 return
             }
             newMembershipScript = template!.template
+                .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
+                .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
+                .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
+                .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
+                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
+                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
     }
 }

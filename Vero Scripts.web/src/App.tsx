@@ -24,6 +24,9 @@ import axios from "axios";
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
 import { themeDictionary, defaultThemeKey } from "./themes";
 
+// NOTE: Change the following to 'true' to use the testing scripts.
+const scriptTesting = false;
+
 initializeIcons();
 
 interface Template {
@@ -44,6 +47,8 @@ interface TemplateCatalog {
 interface Page {
   name: string;
   pageName?: string;
+  title?: string;
+  hashTag?: string;
 }
 
 interface PageCatalog {
@@ -153,7 +158,9 @@ function App() {
 
     // get the page catalog
     axios
-      .get("https://vero.andydragon.com/static/data/pages.json")
+      .get(scriptTesting
+        ? "https://vero.andydragon.com/static/data/testing/pages.json"
+        : "https://vero.andydragon.com/static/data/pages.json")
       .then((result) => {
         pageCatalog.current = result.data as PageCatalog;
         const options: IDropdownOption[] = [];
@@ -188,7 +195,9 @@ function App() {
 
         // get the templates catalog
         axios
-          .get("https://vero.andydragon.com/static/data/templates.json")
+          .get(scriptTesting
+            ? "https://vero.andydragon.com/static/data/testing/templates.json"
+            : "https://vero.andydragon.com/static/data/templates.json")
           .then((result) => {
             templateCatalog.current = result.data as TemplateCatalog;
           })
@@ -345,11 +354,14 @@ function App() {
       }
       const page = pageCatalog.current.hubs[hubPart].find((page) => page.name === pagePart);
       const scriptPageName = page?.pageName || pagePart;
-      console.log("PageName: " + scriptPageName + ", FullPageName: " + pagePart);
+      const scriptPageTitle = page?.title || scriptPageName
+      const scriptPageHash = page?.hashTag || scriptPageName
       return (
         template
           .replaceAll("%%PAGENAME%%", scriptPageName)
           .replaceAll("%%FULLPAGENAME%%", pagePart)
+          .replaceAll("%%PAGETITLE%%", scriptPageTitle)
+          .replaceAll("%%PAGEHASH%%", scriptPageHash)
           .replaceAll("%%MEMBERLEVEL%%", levelOptions.find((option) => option.key === selectedLevel)?.text || "")
           .replaceAll("%%USERNAME%%", userName)
           .replaceAll("%%YOURNAME%%", yourName)
@@ -447,13 +459,49 @@ function App() {
       setNewLevelScript(allErrors);
     } else {
       const template = templateCatalog.current.specialTemplates.find(template => template.name === selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase())
+      const pageName = selectedPage || "";
+      const parts = pageName.split(":");
+      let hubPart = "";
+      let pagePart = "";
+      if (parts.length === 1) {
+        hubPart = "snap";
+        pagePart = parts[0];
+      } else {
+        hubPart = parts[0];
+        pagePart = parts[1];
+      }
+      const page = pageCatalog.current.hubs[hubPart].find((page) => page.name === pagePart);
+      const scriptPageName = page?.pageName || pagePart;
+      const scriptPageTitle = page?.title || scriptPageName
+      const scriptPageHash = page?.hashTag || scriptPageName
       const script = (template?.template || "")
+        .replaceAll("%%PAGENAME%%", scriptPageName)
+        .replaceAll("%%FULLPAGENAME%%", pagePart)
+        .replaceAll("%%PAGETITLE%%", scriptPageTitle)
+        .replaceAll("%%PAGEHASH%%", scriptPageHash)
         .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
-        .replaceAll("%%YOURFIRSTNAME%%", firstName);
+        .replaceAll("%%YOURFIRSTNAME%%", firstName)
+        .replaceAll(
+          "%%STAFFLEVEL%%",
+          staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || ""
+        );
       setNewLevelScript(script);
     }
-  }, [selectedHub, userName, yourName, firstName, selectedNewLevel]);
+  }, [
+    selectedHub,
+    userName,
+    selectedLevel,
+    yourName,
+    firstName,
+    pageOptions,
+    selectedPage,
+    selectedStaffLevel,
+    isFirstFeature,
+    isRawTag,
+    isCommunityTag,
+    selectedNewLevel
+  ]);
 
   return (
     <ThemeProvider applyTo="body" theme={currentTheme}>
