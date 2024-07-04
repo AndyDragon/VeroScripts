@@ -1095,6 +1095,10 @@
           "template": "• #snap_%%PAGENAME%% •\n.\n✨ [[LOCATION]] ✨️\n.\n⭐️ Featured Snap %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% for @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages\n.\n#germany #Photography #exploring #captures #adventure #Travel #mood #roamtheplanet #photographerlife\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
+          "name": "first comment",
+          "template": "🎉🎊 CONGRATULATIONS!!! 🎊🎉\n👉🏆 Congratulations on your first feature with @snap_%%PAGENAME%% @%%USERNAME%% 👈\n😍 Just an amazing wonderful shot 💪💪.\n👍💛💚💙 Thanks for tagging this great picture with #snap_%%PAGENAME%%, Keep sharing with us  your great work!! 💛💚💙\n"
+        },
+        {
           "name": "original post",
           "template": "🏆 FEATURED on Snap Germany 🏆"
         }
