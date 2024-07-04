@@ -92,6 +92,9 @@ extension Bundle {
     func releaseVersionOlder(than: String) -> Bool {
         return releaseVersionNumberPretty.compare(than, options: .numeric) == .orderedAscending
     }
+    var displayName: String? {
+        return infoDictionary?["CFBundleDisplayName"] as? String
+    }
 }
 
 @resultBuilder
@@ -157,5 +160,11 @@ extension Data {
             }
             return String(utf16CodeUnits: chars, count: chars.count)
         }
+    }
+}
+
+extension URL {
+    var lastPathComponentWithoutExtension: String {
+        return String(NSString(string: self.lastPathComponent).deletingPathExtension)
     }
 }

@@ -109,70 +109,6 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum NewMembershipCase: String, CaseIterable, Identifiable, Codable {
-    case none = "None",
-
-         // common
-         commonMember = "Member",
-         
-         // snap
-         snapVipMember = "VIP Member",
-    
-         // click
-         clickBronzeMember = "Bronze Member",
-         clickSilverMember = "Silver Member",
-         clickGoldMember = "Gold Member",
-         clickPlatinumMember = "Platinum Member"
-    
-    var id: Self { self }
-    
-    static func casesFor(hub: String?) -> [NewMembershipCase] {
-        if hub == "snap" {
-            return [
-                .none,
-                .commonMember,
-                .snapVipMember
-            ]
-        }
-        if hub == "click" {
-            return [
-                .none,
-                .commonMember,
-                .clickBronzeMember,
-                .clickSilverMember,
-                .clickGoldMember,
-                .clickPlatinumMember
-            ]
-        }
-        return [
-            .none
-        ]
-    }
-    
-    static func caseValidFor(hub: String?, _ value: NewMembershipCase) -> Bool {
-        if hub == "snap" {
-            return [
-                none,
-                commonMember,
-                snapVipMember
-            ].contains(value)
-        } 
-        if hub == "click" {
-            return [
-                none,
-                commonMember,
-                clickBronzeMember,
-                clickSilverMember,
-                clickGoldMember,
-                clickPlatinumMember
-            ].contains(value)
-        }
-        return [
-            none
-        ].contains(value)
-    }
-}
-
 enum TagSourceCase: String, CaseIterable, Identifiable, Codable {
     case commonPageTag = "Page tag",
          
@@ -246,6 +182,107 @@ enum PlaceholderSheetCase {
          originalPostScript
 }
 
+enum NewMembershipCase: String, CaseIterable, Identifiable, Codable {
+    case none = "None",
+
+         // common
+         commonMember = "Member",
+         
+         // snap
+         snapVipMember = "VIP Member",
+    
+         // click
+         clickBronzeMember = "Bronze Member",
+         clickSilverMember = "Silver Member",
+         clickGoldMember = "Gold Member",
+         clickPlatinumMember = "Platinum Member"
+    
+    var id: Self { self }
+    
+    static func casesFor(hub: String?) -> [NewMembershipCase] {
+        if hub == "snap" {
+            return [
+                .none,
+                .commonMember,
+                .snapVipMember
+            ]
+        }
+        if hub == "click" {
+            return [
+                .none,
+                .commonMember,
+                .clickBronzeMember,
+                .clickSilverMember,
+                .clickGoldMember,
+                .clickPlatinumMember
+            ]
+        }
+        return [
+            .none
+        ]
+    }
+    
+    static func caseValidFor(hub: String?, _ value: NewMembershipCase) -> Bool {
+        if hub == "snap" {
+            return [
+                none,
+                commonMember,
+                snapVipMember
+            ].contains(value)
+        } 
+        if hub == "click" {
+            return [
+                none,
+                commonMember,
+                clickBronzeMember,
+                clickSilverMember,
+                clickGoldMember,
+                clickPlatinumMember
+            ].contains(value)
+        }
+        return [
+            none
+        ].contains(value)
+    }
+}
+
+struct CodableFeatureUser: Codable {
+    var page: String
+    var userName: String
+    var userAlias: String
+    var userLevel: MembershipCase
+    var tagSource: TagSourceCase
+    var firstFeature: Bool
+    var newLevel: NewMembershipCase
+    
+    init() {
+        page = ""
+        userName = ""
+        userAlias = ""
+        userLevel = MembershipCase.none
+        tagSource = TagSourceCase.commonPageTag
+        firstFeature = false
+        newLevel = NewMembershipCase.none
+    }
+
+    init(json: Data) {
+        self.init()
+        do {
+            let decoder = JSONDecoder()
+            let featureUser = try decoder.decode(CodableFeatureUser.self, from: json)
+            self.page = featureUser.page
+            self.userName = featureUser.userName
+            self.userAlias = featureUser.userAlias
+            self.userLevel = featureUser.userLevel
+            self.tagSource = featureUser.tagSource
+            self.firstFeature = featureUser.firstFeature
+            self.newLevel = featureUser.newLevel
+        } catch {
+            debugPrint(error)
+        }
+    }
+}
+
 struct ScriptsCatalog: Codable {
     var hubs: [String: [Page]]
 }
@@ -314,41 +351,4 @@ enum ToastDuration: Int {
          short = 3,
          medium = 10,
          long = 20
-}
-
-struct CodableFeatureUser: Codable {
-    var page: String
-    var userName: String
-    var userAlias: String
-    var userLevel: MembershipCase
-    var tagSource: TagSourceCase
-    var firstFeature: Bool
-    var newLevel: NewMembershipCase
-    
-    init() {
-        page = ""
-        userName = ""
-        userAlias = ""
-        userLevel = MembershipCase.none
-        tagSource = TagSourceCase.commonPageTag
-        firstFeature = false
-        newLevel = NewMembershipCase.none
-    }
-
-    init(json: Data) {
-        self.init()
-        do {
-            let decoder = JSONDecoder()
-            let featureUser = try decoder.decode(CodableFeatureUser.self, from: json)
-            self.page = featureUser.page
-            self.userName = featureUser.userName
-            self.userAlias = featureUser.userAlias
-            self.userLevel = featureUser.userLevel
-            self.tagSource = featureUser.tagSource
-            self.firstFeature = featureUser.firstFeature
-            self.newLevel = featureUser.newLevel
-        } catch {
-            debugPrint(error)
-        }
-    }
 }

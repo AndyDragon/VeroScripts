@@ -35,6 +35,7 @@ struct VersionCheckAppState {
     var isShowingVersionRequiredToast: Binding<Bool>
     var versionCheckToast: Binding<VersionCheckToast>
     private var versionLocation: String
+    var isPreviewMode: Bool = false
 
     init(
         isCheckingForUpdates: Binding<Bool>,
@@ -50,6 +51,9 @@ struct VersionCheckAppState {
         }
 
     func checkForUpdates() {
+        if isPreviewMode {
+            return;
+        }
         isCheckingForUpdates.wrappedValue = true
         Task {
             try? await checkForUpdatesAsync()
