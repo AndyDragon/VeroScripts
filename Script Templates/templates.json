@@ -785,7 +785,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: %%YOURFIRSTNAME%% @%%YOURNAME%%\nAdmin on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n#pictureframe #framed #border #collage\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
         },
         {
           "name": "first comment",
@@ -1378,6 +1378,31 @@
       ]
     },
     {
+      "name": "snap:middleeast",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n🙏 Thank you very much for sharing your wonderful photography with us and please keep tagging #snap_%%PAGENAME%% for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
+        },
+        {
+          "name": "community comment",
+          "template": "😍 Huge congratulations you have been featured @%%USERNAME%% ✨✨\n💕 Thank You for sharing your wonderful photo with us and supporting our Community!! 💫🙏\n🏆 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features 👍💕🌟\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n#uae #arab #world #travel #tourism #photography #picoftheday\n\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n🏆 Congratulations on your first feature here at @snap_%%PAGENAME%%\n🙏 Thank you very much for sharing your wonderful photography with us and please keep tagging #snap_%%PAGENAME%% for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
+        },
+        {
+          "name": "original post",
+          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% ✨✨✨"
+        }
+      ]
+    },
+    {
       "name": "snap:minimal",
       "templates": [
         {
@@ -1855,81 +1880,6 @@
         {
           "name": "original post",
           "template": "✨ This wonderful transportation photo was featured on @snap_transports ✨"
-        }
-      ]
-    },
-    {
-      "name": "snap:uae",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n😍 Just an amazing shot. ✨✨\n🙏 Thank you very much for sharing your wonderful photography with us and please keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
-        },
-        {
-          "name": "community comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 💫\n😍 Just an amazing shot. ✨✨\n💕 Thank You for sharing your wonderful photo with us and supporting our Community!! 💫🙏\n🏆 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts in your future posts for a chance of more features 👍💕🌟\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%FULLPAGENAME%% •\n.\n✨️  [[LOCATION]]  ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_%%PAGENAME%%\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#snap_%%PAGENAME%%\n#snap_uae_neighboring\n#snap_uae_deserts\n.\n#UAE #Dubai #dubaicreek #dubaimarina #dubai🇦🇪 #AbuDhabi #burjkhalifa #Sharjah #unitedarabemirates\n.\n#saudi_arabia #Bahrain #Kuwait #Oman #Qatar #middleeast #saudi #Riyadh\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
-        },
-        {
-          "name": "first comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 🏆\n😍 Just an amazing shot. ✨✨\n🏆 Congratulations on your first feature here at the @snap_%%PAGENAME%%\n💕 🎉 Thanks for tagging this great picture with #snap_%%FULLPAGENAME%% 💫🙏\n🏆 Keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features. 👍💕🌟\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%% ✨✨✨"
-        }
-      ]
-    },
-    {
-      "name": "snap:uae_deserts",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n😍 Just an amazing shot. ✨✨\n🙏 Thank you very much for sharing your wonderful photography with us and please keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
-        },
-        {
-          "name": "community comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 💫\n😍 Just an amazing shot. ✨✨\n💕 Thank You for sharing your wonderful photo with us and supporting our Community!! 💫🙏\n🏆 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts in your future posts for a chance of more features 👍💕🌟\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%FULLPAGENAME%% •\n.\n✨️  [[LOCATION]]  ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_%%PAGENAME%%\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#snap_%%PAGENAME%%\n#snap_uae_neighboring\n#snap_uae_deserts\n.\n#UAE #Dubai #dubaicreek #dubaimarina #dubai🇦🇪 #AbuDhabi #burjkhalifa #Sharjah #unitedarabemirates\n.\n#saudi_arabia #Bahrain #Kuwait #Oman #Qatar #middleeast #saudi #Riyadh\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
-        },
-        {
-          "name": "first comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 🏆\n😍 Just an amazing shot. ✨✨\n🏆 Congratulations on your first feature here at the @snap_%%PAGENAME%%\n💕 🎉 Thanks for tagging this great picture with #snap_%%FULLPAGENAME%% 💫🙏\n🏆 Keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features. 👍💕🌟\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%% ✨✨✨"
-        }
-      ]
-    },
-    {
-      "name": "snap:uae_neighboring",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n😍 Just an amazing shot. ✨✨\n🙏 Thank you very much for sharing your wonderful photography with us and please keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
-        },
-        {
-          "name": "community comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 💫\n😍 Just an amazing shot. ✨✨\n💕 Thank You for sharing your wonderful photo with us and supporting our Community!! 💫🙏\n🏆 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts in your future posts for a chance of more features 👍💕🌟\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%FULLPAGENAME%% •\n.\n✨️  [[LOCATION]]  ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_%%PAGENAME%%\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#snap_%%PAGENAME%%\n#snap_uae_neighboring\n#snap_uae_deserts\n.\n#UAE #Dubai #dubaicreek #dubaimarina #dubai🇦🇪 #AbuDhabi #burjkhalifa #Sharjah #unitedarabemirates\n.\n#saudi_arabia #Bahrain #Kuwait #Oman #Qatar #middleeast #saudi #Riyadh\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n@snap_%%PAGENAME%%\n•\n"
-        },
-        {
-          "name": "first comment",
-          "template": "🏆 Congratulations You have been featured @%%USERNAME%% 🏆\n😍 Just an amazing shot. ✨✨\n🏆 Congratulations on your first feature here at the @snap_%%PAGENAME%%\n💕 🎉 Thanks for tagging this great picture with #snap_%%FULLPAGENAME%% 💫🙏\n🏆 Keep tagging #snap_%%PAGENAME%%, #snap_uae_neighboring or #snap_uae_deserts for a chance of more features. 👍💕🌟\n"
-        },
-        {
-          "name": "original post",
-          "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% for #snap_%%FULLPAGENAME%% ✨✨✨"
         }
       ]
     },
