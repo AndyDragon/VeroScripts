@@ -5,11 +5,11 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "community comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "feature",
@@ -17,19 +17,19 @@
         },
         {
           "name": "first comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "first community comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "first hub comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🪐 This is your first feature on @click_%%PAGENAME%%, congratulations 🪐\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "hub comment",
-          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🪐 CONGRATULATIONS!!! 🪐 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🪐\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "original post",
@@ -42,11 +42,11 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "community comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "feature",
@@ -54,19 +54,19 @@
         },
         {
           "name": "first comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "first community comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "first hub comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n🐶 This is your first feature on @click_%%PAGENAME%%, congratulations 🐶\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "hub comment",
-          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ 🐶 CONGRATULATIONS!!! 🐶 ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! 🐶\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "original post",
@@ -79,11 +79,11 @@
       "templates": [
         {
           "name": "comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "community comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "feature",
@@ -91,19 +91,19 @@
         },
         {
           "name": "first comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_%%PAGENAME%%.\n"
         },
         {
           "name": "first community comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_community, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "first hub comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n⚙️ This is your first feature on @click_%%PAGENAME%%, congratulations ⚙️\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "hub comment",
-          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\n[[PERSONALIZED MESSAGE]]\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
+          "template": "✨ ⭐️ ⚙️ CONGRATULATIONS!!! ⚙️ ⭐️ ✨\n\n🏆 You have been featured @%%USERNAME%% 🏆\n\nFantastic photo! ⚙️\n\nThanks for tagging this great photo with #click_hub, consider tagging your photos with #click_%%PAGENAME%% for more chances to be featured.\n"
         },
         {
           "name": "original post",
