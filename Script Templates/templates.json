@@ -954,6 +954,23 @@
       ]
     },
     {
+      "name": "snap:filmphoto",
+      "templates": [
+        {
+          "name": "comment",
+          "template": "🎆 Congratulations on your feature @%%USERNAME%% 🎊🎉🎊 Thank you for sharing your gorgeous picture with us!! 💫🎆💫\n"
+        },
+        {
+          "name": "feature",
+          "template": "• #snap_%%PAGENAME%% •\n•\n[[CAMERA AND FILM]]\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n ✨ CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community #35mm #filmphotography\n#vero #filmphotography35mm #pinholecamera #120mm\n#verofamily #shootfilm #shootwithfilm #kodakfilm #analogcamera\n#analogvibes #filmisnotdead #analogphotography #kodacolor\n#verofriends\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "original post",
+          "template": "💫 Featured 💫"
+        }
+      ]
+    },
+    {
       "name": "snap:fishing",
       "templates": [
         {
