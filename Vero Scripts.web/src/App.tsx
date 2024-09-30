@@ -128,8 +128,10 @@ function App() {
 
   const snapNewLevelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
-    { key: "member", text: "Member" },
-    { key: "vip_member", text: "VIP member" },
+    { key: "member feature", text: "Member (feature comment)" },
+    { key: "member original post", text: "Member (original post comment)" },
+    { key: "vip member feature", text: "VIP Member (feature comment)" },
+    { key: "vip member original post", text: "VIP Member (original post comment)" },
   ];
 
   const clickNewLevelOptions: IDropdownOption[] = [
@@ -458,7 +460,6 @@ function App() {
       const allErrors = validationErrors.join("\n");
       setNewLevelScript(allErrors);
     } else {
-      const template = templateCatalog.current.specialTemplates.find(template => template.name === selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase())
       const pageName = selectedPage || "";
       const parts = pageName.split(":");
       let hubPart = "";
@@ -474,6 +475,13 @@ function App() {
       const scriptPageName = page?.pageName || pagePart;
       const scriptPageTitle = page?.title || scriptPageName
       const scriptPageHash = page?.hashTag || scriptPageName
+      const template = templateCatalog.current.specialTemplates.find(template => {
+        if (hubPart === "snap") {
+          return template.name === selectedHub + ":" + selectedNewLevel.toLowerCase();
+        } else {
+          return template.name === selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase();
+        }
+      });
       const script = (template?.template || "")
         .replaceAll("%%PAGENAME%%", scriptPageName)
         .replaceAll("%%FULLPAGENAME%%", pagePart)
@@ -862,8 +870,8 @@ function App() {
               <Dropdown
                 options={newLevelOptions}
                 selectedKey={selectedNewLevel || "none"}
-                onChange={(_, item) => setSelectedNewLevel((item?.key as string) || "mod")}
-                style={{ width: "200px" }}
+                onChange={(_, item) => setSelectedNewLevel((item?.key as string) || "none")}
+                style={{ width: selectedHub === "snap" ? "280px" : "160px" }}
               />
               <CommandButton
                 iconProps={{ iconName: "Copy" }}
