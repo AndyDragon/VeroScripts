@@ -169,7 +169,7 @@ enum TagSourceCase: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum StaffLevelCase: String, CaseIterable, Identifiable {
+enum StaffLevelCase: String, CaseIterable, Identifiable, Codable {
     case mod = "Mod",
          coadmin = "Co-Admin",
          admin = "Admin"
@@ -185,32 +185,35 @@ enum PlaceholderSheetCase {
 enum NewMembershipCase: String, CaseIterable, Identifiable, Codable {
     case none = "None",
 
-         // common
-         commonMember = "Member",
-         
          // snap
-         snapVipMember = "VIP Member",
-    
+         snapMemberFeature = "Member (feature comment)",
+         snapMemberOriginalPost = "Member (original post comment)",
+         snapVipMemberFeature = "VIP Member (feature comment)",
+         snapVipMemberOriginalPost = "VIP Member (original post comment)",
+
          // click
+         clickMember = "Member",
          clickBronzeMember = "Bronze Member",
          clickSilverMember = "Silver Member",
          clickGoldMember = "Gold Member",
          clickPlatinumMember = "Platinum Member"
-    
+
     var id: Self { self }
-    
+
     static func casesFor(hub: String?) -> [NewMembershipCase] {
         if hub == "snap" {
             return [
                 .none,
-                .commonMember,
-                .snapVipMember
+                .snapMemberFeature,
+                .snapMemberOriginalPost,
+                .snapVipMemberFeature,
+                .snapVipMemberOriginalPost
             ]
         }
         if hub == "click" {
             return [
                 .none,
-                .commonMember,
+                .clickMember,
                 .clickBronzeMember,
                 .clickSilverMember,
                 .clickGoldMember,
@@ -222,18 +225,40 @@ enum NewMembershipCase: String, CaseIterable, Identifiable, Codable {
         ]
     }
     
+    static func scriptFor(hub: String?, _ value: NewMembershipCase) -> String {
+        if hub == "snap" {
+            switch value {
+            case .snapMemberFeature:
+                return "snap:member feature"
+            case .snapMemberOriginalPost:
+                return "snap:member original post"
+            case .snapVipMemberFeature:
+                return "snap:vip member feature"
+            case .snapVipMemberOriginalPost:
+                return "snap:vip member original post"
+            default:
+                return ""
+            }
+        } else if hub == "click" {
+            return "\(hub ?? ""):\(value.rawValue.replacingOccurrences(of: " ", with: "_").lowercased())"
+        }
+        return ""
+    }
+
     static func caseValidFor(hub: String?, _ value: NewMembershipCase) -> Bool {
         if hub == "snap" {
             return [
                 none,
-                commonMember,
-                snapVipMember
+                snapMemberFeature,
+                snapMemberOriginalPost,
+                snapVipMemberFeature,
+                snapVipMemberOriginalPost
             ].contains(value)
-        } 
+        }
         if hub == "click" {
             return [
                 none,
-                commonMember,
+                clickMember,
                 clickBronzeMember,
                 clickSilverMember,
                 clickGoldMember,
