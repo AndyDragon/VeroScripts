@@ -7,6 +7,12 @@ AddHandler server-parsed .htm
         Header set Access-Control-Allow-Origin "*"
         Header set Access-Control-Allow-Methods "GET,HEAD,OPTIONS"
         Header set Access-Control-Allow-Headers "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires 0
+    </IfModule>
+    <IfModule mod_expires.c>
+        ExpiresActive Off
     </IfModule>
 </FilesMatch>
 Options -Indexes
