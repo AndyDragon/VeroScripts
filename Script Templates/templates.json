@@ -2066,23 +2066,23 @@
       "template": "Congratulations @%%USERNAME%% on your 30th feature!\n\nWe took the time to check the number of features you have with Click and wanted to share with you that you are now a Silver Member of the Click Community!\n\nThat's an awesome achievement!\n\nPlease consider adding ✨ Click Silver Member ✨ to your bio.\n"
     },
     {
-      "name": "snap:feature member",
+      "name": "snap:member feature",
       "template": "* With your latest feature, you are a NEW Snap Member 💐💫\nWelcome to the Snap Family!\n✨ Remember to add your Snap membership level to your bio.\n* For any membership inquiries, please send a connection request to: @snap_community_member"
     },
     {
-      "name": "snap:feature vip_member",
-      "template": "* With your latest feature, you are a NEW Snap VIP Member 💐💫\nExcellent work! We look forward to sharing more of your photos.\n✨ Please change your Snap membership level in your bio.\n* For any membership inquiries, please send a connection request to: @snap_community_member\n"
+      "name": "snap:member original post",
+      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\n* With your latest feature, we would like to CONGRATULATE you on your NEW Snap Membership 💐💫\nThat's an awesome achievement 🎖️\n✨ Please add your Snap membership level to your bio!\n* For any membership inquiries, please send a connection request to: @snap_community_member\n"
     },
     {
       "name": "snap:member",
       "template": "✨ Featured on Snap %%PAGETITLE%% ✨\nA @snap_community page of @snap_kingdom\n*With your latest feature, we would like to CONGRATULATE you on your NEW Snap Membership 💐💫\nThat's an awesome achievement 🎖️\nTo your Bio, add Snap Member\n✨For any membership inquiries, please send a connection request to @snap_community_member\nAND\n✨For all Snap / RawKingdom information, please check out:\nhttps://rawkingdomarts.com/\n"
     },
     {
-      "name": "snap:original post member",
-      "template": "✨ Featured on Snap %%PAGETITLE%% ✨\n* With your latest feature, we would like to CONGRATULATE you on your NEW Snap Membership 💐💫\nThat's an awesome achievement 🎖️\n✨ Please add your Snap membership level to your bio!\n* For any membership inquiries, please send a connection request to: @snap_community_member\n"
+      "name": "snap:vip member feature",
+      "template": "* With your latest feature, you are a NEW Snap VIP Member 💐💫\nExcellent work! We look forward to sharing more of your photos.\n✨ Please change your Snap membership level in your bio.\n* For any membership inquiries, please send a connection request to: @snap_community_member\n"
     },
     {
-      "name": "snap:original post vip_membership",
+      "name": "snap:vip member original post",
       "template": "✨ Featured on Snap %%PAGETITLE%% ✨\n* With your latest feature, we would like to CONGRATULATE you on your NEW Snap VIP Membership 💐💫\nThat's an awesome achievement 🎖️\n✨ Please add your Snap membership level to your bio!\n* For any membership inquiries, please send a connection request to: @snap_community_member\n"
     },
     {
