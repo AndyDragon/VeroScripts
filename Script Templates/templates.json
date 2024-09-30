@@ -623,6 +623,10 @@
           "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n\n__________________________________\n\n✨ CONGRATULATIONS ✨\n__________________________________\n\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\nCC Snap Community Owner Jane\n@snap_owner\nPlease check out @snap_kingdom for more of our Snap_community pages.\n\n#snap_community\n#vero\n#verofamily\n#verofriends\n\n#canadabound\n#canadanature\n#canadaparadise\n#canadathenorth\n#canadatour\n#canadaphotography\n#canadalife\n#canadaviews\n#canadaonline\n#imagesofcanada\n#explorecanada\n#discovercanada\n#canada\n#canada_eh\n#canadalove\n\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
+          "name": "first comment",
+          "template": "🌟 @%%USERNAME%% 🌟👍 [[PERSONALIZED MESSAGE]] Congratulations on your first feature with @snap_%%PAGENAME%% today!!! ✨🏆\n😍 Thank you very much for tagging us. Keep using our hashtag #snap_%%PAGENAME%% for a chance of more features.  👏❤️🌟\n"
+        },
+        {
           "name": "original post",
           "template": "✨ Featured %%MEMBERLEVEL%% ✨"
         }
