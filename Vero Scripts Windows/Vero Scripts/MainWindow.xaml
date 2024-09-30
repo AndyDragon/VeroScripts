@@ -368,7 +368,7 @@
                     Grid.Column="1" 
                     ItemsSource="{Binding HubNewMemberships}" 
                     SelectedItem="{Binding NewMembership, Mode=TwoWay}" 
-                    Width="140" />
+                    Width="230" />
                 <Button 
                     Grid.Column="2" 
                     Content="Copy" 

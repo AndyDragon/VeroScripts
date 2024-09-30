@@ -90,5 +90,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "2.0.34",
+        "notes": [
+            {
+                "date": "Sept 30, 2024",
+                "notes": [
+                    "Allow feature / original post comments for new membership levels for snap"
+                ]
+            }
+        ]
     }
 ]

@@ -160,7 +160,7 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var pagesUri = new Uri(ScriptTesting 
+                var pagesUri = new Uri(ScriptTesting
                     ? "https://vero.andydragon.com/static/data/testing/pages.json"
                     : "https://vero.andydragon.com/static/data/pages.json");
                 var content = await httpClient.GetStringAsync(pagesUri);
@@ -856,8 +856,10 @@ namespace VeroScripts
 
         private static string[] SnapNewMemberships => [
             "None",
-            "Member",
-            "VIP Member",
+            "Member (feature comment)",
+            "Member (original post comment)",
+            "VIP Member (feature comment)",
+            "VIP Member (original post comment)",
         ];
 
         private static string[] ClickNewMemberships => [
@@ -1217,6 +1219,30 @@ namespace VeroScripts
             return template?.Template ?? "";
         }
 
+        private string GetNewMembershipScriptName(string hubName, string newMembershipLevel)
+        {
+            if (hubName == "snap")
+            {
+                switch (newMembershipLevel)
+                {
+                    case "Member (feature comment)":
+                        return "snap:member feature";
+                    case "Member (original post comment)":
+                        return "snap:member original post";
+                    case "VIP Member (feature comment)":
+                        return "snap:vip member feature";
+                    case "VIP Member (original post comment)":
+                        return "snap:vip member original post";
+                    default:
+                        return "";
+                }
+            } else if (hubName == "click")
+            {
+                return hubName + ":" + NewMembership.Replace(" ", "_").ToLowerInvariant();
+            }
+            return "";
+        }
+
         private void UpdateNewMembershipScripts()
         {
             if (!CanCopyNewMembershipScript)
@@ -1268,7 +1294,8 @@ namespace VeroScripts
                 }
                 if (!string.IsNullOrEmpty(hubName))
                 {
-                    TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == hubName + ":" + NewMembership.Replace(" ", "_").ToLowerInvariant());
+                    var templateName = GetNewMembershipScriptName(hubName, NewMembership);
+                    TemplateEntry? template = TemplatesCatalog.SpecialTemplates.FirstOrDefault(template => template.Name == templateName);
                     NewMembershipScript = (template?.Template ?? "")
                         .Replace("%%PAGENAME%%", scriptPageName)
                         .Replace("%%FULLPAGENAME%%", pageName)
