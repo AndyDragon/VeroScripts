@@ -1786,7 +1786,7 @@
         },
         {
           "name": "original post",
-          "template": "✨🏆 Featured 🏆✨"
+          "template": "✨ Featured %%MEMBERLEVEL%% ✨"
         }
       ]
     },
