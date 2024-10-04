@@ -183,11 +183,10 @@ namespace VeroScripts
                     {
                         LoadedPages.Add(page);
                     }
-                    notificationManager.Show(
+                    ShowToast(
                         "Pages loaded",
                         "Loaded " + LoadedPages.Count.ToString() + " pages from the server",
                         type: NotificationType.Information,
-                        areaName: "WindowArea",
                         expirationTime: TimeSpan.FromSeconds(3));
                 }
                 _ = LoadTemplates();
@@ -267,11 +266,10 @@ namespace VeroScripts
                             }
                             NewMembership = HubNewMemberships.Contains((string)feature["newLevel"]) ? (string)feature["newLevel"] : HubNewMemberships[0];
 
-                            notificationManager.Show(
+                            ShowToast(
                                 "Populated from Feature Logging",
                                 $"Populated feature for user {UserName} from the Feature Logging app",
                                 type: NotificationType.Information,
-                                areaName: "WindowArea",
                                 expirationTime: TimeSpan.FromSeconds(3));
                         }
                     }
@@ -284,8 +282,12 @@ namespace VeroScripts
             }
             catch (Exception ex)
             {
-                // TODO andydragon : handle errors
                 Console.WriteLine("Error occurred: {0}", ex.Message);
+                ShowErrorToast(
+                    "Failed to load the page catalog",
+                    "The application requires the catalog to perform its operations: " + ex.Message + "\n\nClick here to retry",
+                    NotificationType.Error,
+                    () => { _ = LoadPages(); });
             }
         }
 
@@ -311,8 +313,12 @@ namespace VeroScripts
             }
             catch (Exception ex)
             {
-                // TODO andydragon : handle errors
                 Console.WriteLine("Error occurred: {0}", ex.Message);
+                ShowErrorToast(
+                    "Failed to load the page templates",
+                    "The application requires the templtes to perform its operations: " + ex.Message + "\n\nClick here to retry",
+                    NotificationType.Error,
+                    () => { _ = LoadTemplates(); });
             }
         }
 
@@ -339,7 +345,7 @@ namespace VeroScripts
             }
             catch (Exception ex)
             {
-                // TODO andydragon : handle errors
+                // Do nothing, not vital
                 Console.WriteLine("Error occurred: {0}", ex.Message);
             }
         }
@@ -1062,6 +1068,8 @@ namespace VeroScripts
             NewMembership != "None" &&
             UserNameValidation.Valid;
 
+        public MainWindow? MainWindow { get; internal set; }
+
         private void UpdateScripts()
         {
             var pageName = Page;
@@ -1223,19 +1231,14 @@ namespace VeroScripts
         {
             if (hubName == "snap")
             {
-                switch (newMembershipLevel)
+                return newMembershipLevel switch
                 {
-                    case "Member (feature comment)":
-                        return "snap:member feature";
-                    case "Member (original post comment)":
-                        return "snap:member original post";
-                    case "VIP Member (feature comment)":
-                        return "snap:vip member feature";
-                    case "VIP Member (original post comment)":
-                        return "snap:vip member original post";
-                    default:
-                        return "";
-                }
+                    "Member (feature comment)" => "snap:member feature",
+                    "Member (original post comment)" => "snap:member original post",
+                    "VIP Member (feature comment)" => "snap:vip member feature",
+                    "VIP Member (original post comment)" => "snap:vip member original post",
+                    _ => "",
+                };
             } else if (hubName == "click")
             {
                 return hubName + ":" + NewMembership.Replace(" ", "_").ToLowerInvariant();
@@ -1345,7 +1348,7 @@ namespace VeroScripts
 
         #region Clipboard management
 
-        private bool TrySetClipboardText(string text)
+        private static bool TrySetClipboardText(string text)
         {
             const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
             var retriesLeft = 9;
@@ -1374,20 +1377,18 @@ namespace VeroScripts
         {
             if (TrySetClipboardText(text))
             {
-                notificationManager.Show(
+                ShowToast(
                     "Copied script",
                     successMessage,
                     type: NotificationType.Success,
-                    areaName: "WindowArea",
                     expirationTime: TimeSpan.FromSeconds(3));
             }
             else
             {
-                notificationManager.Show(
+                ShowToast(
                     "Failed to copy script",
                     "Could not copy script to the clipboard, if you have another clipping tool active, disable it and try again",
                     type: NotificationType.Error,
-                    areaName: "WindowArea",
                     expirationTime: TimeSpan.FromSeconds(12));
             }
         }
@@ -1435,6 +1436,53 @@ namespace VeroScripts
         }
 
         #endregion
+
+        internal void ShowToast(string title, string? message, NotificationType type, TimeSpan? expirationTime = null)
+        {
+            notificationManager.Show(
+                title,
+                message,
+                type: type,
+                areaName: "WindowArea",
+                expirationTime: expirationTime);
+        }
+
+        internal async void ShowErrorToast(string title, string? message, NotificationType type, Action action)
+        {
+            int sleepTime = 0;
+            int MaxSleepTime = 1000 * 60 * 60;
+            int SleepStep = 500;
+
+            while (sleepTime < MaxSleepTime)
+            {
+                if (MainWindow != null && MainWindow.IsVisible)
+                {
+                    var wasClicked = false;
+                    notificationManager.Show(
+                        title,
+                        message,
+                        type,
+                        areaName: "WindowArea",
+                        onClick: () =>
+                        {
+                            wasClicked = true;
+                            action();
+                        },
+                        ShowXbtn: true,
+                        onClose: () =>
+                        {
+                            if (!wasClicked)
+                            {
+                                MainWindow?.Close();
+                            }
+                        },
+                        expirationTime: TimeSpan.MaxValue);
+                    break;
+                }
+                sleepTime += SleepStep;
+                await Task.Delay(SleepStep);
+            }
+        }
 
         [GeneratedRegex("\\[\\[([^\\]]*)\\]\\]")]
         private static partial Regex PlaceholderRegex();

@@ -19,5 +19,13 @@ namespace VeroScripts
                 viewModel.WindowActive = IsActive;
             }
         }
+
+        private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            if (this.DataContext is ScriptsViewModel viewModel)
+            {
+                viewModel.MainWindow = this;
+            }
+        }
     }
 }

@@ -14,7 +14,10 @@
     Icon="pack://application:,,,/Vero Scripts;component/App.ico"
     Height="800" Width="1200" MinHeight="720" MinWidth="960"
     GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
-    ResizeMode="CanResizeWithGrip" Activated="OnActivatedChanged" Deactivated="OnActivatedChanged">
+    ResizeMode="CanResizeWithGrip" 
+    Activated="OnActivatedChanged" 
+    Deactivated="OnActivatedChanged"
+    DataContextChanged="OnDataContextChanged">
 
     <Window.DataContext>
         <local:ScriptsViewModel />
