@@ -14,13 +14,13 @@ class Program
         var pageCatalog = new PageCatalog();
         var templateCatalog = new TemplateCatalog();
         var warnings = new List<string>();
-        var templateFolders = new Dictionary<string, IDictionary<string, string>>();
+        var templateFolders = new Dictionary<string, TemplateFolder>();
         EnumerateFolder(cwd, ref templateFolders, ref warnings);
         foreach (var folder in templateFolders.Keys)
         {
             var pageName = folder.Split(Path.DirectorySeparatorChar).Last();
-            var templates = templateFolders[folder];
-            if (templates.Count != 0)
+            var templateFolder = templateFolders[folder];
+            if (templateFolder.ManifestFile != null || templateFolder.TemplatesFiles.Count != 0)
             {
                 // TODO : eventually remove the new membership scripts at the root
                 //        once the new version is around for a month or so.
@@ -32,22 +32,50 @@ class Program
                         hubName = pageName;
                     }
                     // Add special templates to template catalog.
-                    foreach (var key in templates.Keys)
+                    foreach (var key in templateFolder.TemplatesFiles.Keys)
                     {
                         var templateKey = string.IsNullOrEmpty(hubName) ? key : (hubName + ":" + key);
-                        templateCatalog.SpecialTemplates.Add(new Template(templateKey, templates[key]));
+                        templateCatalog.SpecialTemplates.Add(new Template(templateKey, templateFolder.TemplatesFiles[key]));
                     }
                 }
                 else
                 {
                     // Add page to all the catalogs.
                     var templatePageName = pageName;
-                    if (File.Exists(Path.Combine(folder, "manifest.json")))
+                    if (templateFolder.ManifestFile != null)
                     {
-                        var manifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
-                        var manifest = JsonConvert.DeserializeObject<Manifest>(manifestFile);
+                        var manifest = JsonConvert.DeserializeObject<Manifest>(templateFolder.ManifestFile);
                         var pageHub = manifest?.Hub;
-                        if (!string.IsNullOrEmpty(pageHub))
+                        var tagOnly = manifest?.TagOnly;
+                        if (tagOnly == true)
+                        {
+                            if (!string.IsNullOrEmpty(pageHub))
+                            {
+                                if (string.IsNullOrEmpty(manifest?.Page))
+                                {
+                                    warnings.Add(string.Format("PREP0102: The page '{0}' has a manifest but the manifest is missing the Page", pageName));
+                                }
+                                var hubPageTag = new PageTag(manifest?.Page ?? pageName)
+                                {
+                                    PageName = manifest?.PageName,
+                                    Title = manifest?.Title,
+                                    HashTag = manifest?.HashTag,
+                                    ExcludeTag = manifest?.ExcludeTag,
+                                };
+                                if (!pageCatalog.Tags.TryGetValue(pageHub, out IList<PageTag>? value))
+                                {
+                                    value = new List<PageTag>();
+                                    pageCatalog.Tags[pageHub] = value;
+                                }
+
+                                value.Add(hubPageTag);
+                                if (!string.Equals(pageName, string.Format("{0}_{1}", manifest?.Hub, manifest?.Page)))
+                                {
+                                    warnings.Add(string.Format("PREP0101: The hub '{0}' page '{1}' has location '{2}' that was not expected", manifest?.Hub, manifest?.Page, pageName));
+                                }
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(pageHub))
                         {
                             if (string.IsNullOrEmpty(manifest?.Page))
                             {
@@ -59,6 +87,7 @@ class Program
                                 Title = manifest?.Title,
                                 HashTag = manifest?.HashTag,
                                 ExcludeTag = manifest?.ExcludeTag,
+
                             };
                             if (!pageCatalog.Hubs.TryGetValue(pageHub, out IList<Page>? value))
                             {
@@ -96,7 +125,10 @@ class Program
                     {
                         warnings.Add(string.Format("PREP0103: The page '{0}' is missing the manifest", pageName));
                     }
-                    templateCatalog.Pages.Add(new TemplatePage(templatePageName, templates));
+                    if (templateFolder.TemplatesFiles.Count != 0)
+                    {
+                        templateCatalog.Pages.Add(new TemplatePage(templatePageName, templateFolder.TemplatesFiles));
+                    }
                 }
             }
         }
@@ -124,9 +156,21 @@ class Program
         Console.ForegroundColor = originalForeground;
     }
 
+    private class TemplateFolder
+    {
+        public TemplateFolder()
+        {
+            TemplatesFiles = new Dictionary<string, string>();
+        }
+
+        public string? ManifestFile { get; set; }
+
+        public IDictionary<string, string> TemplatesFiles { get; }
+    }
+
     private static void EnumerateFolder(
         string currentFolder,
-        ref Dictionary<string, IDictionary<string, string>> templateFolders,
+        ref Dictionary<string, TemplateFolder> templateFolders,
         ref List<string> warnings)
     {
         var folderName = currentFolder.Split(Path.DirectorySeparatorChar).Last();
@@ -134,8 +178,13 @@ class Program
                                         .OrderBy(dir => dir, PageDirectoryComparer.Default))
         {
             var pageName = folder.Split(Path.DirectorySeparatorChar).Last();
-            templateFolders.Add(folder, new Dictionary<string, string>());
+            templateFolders.Add(folder, new TemplateFolder());
             Console.WriteLine("Searching {0} folder...", folder);
+            if (File.Exists(Path.Combine(folder, "manifest.json")))
+            {
+                Console.WriteLine("\tAdding manifest.json...");
+                templateFolders[folder].ManifestFile = File.ReadAllText(Path.Combine(folder, "manifest.json"));
+            }
             foreach (var file in Directory.EnumerateFiles(folder, "*.template")
                                           .Order())
             {
@@ -147,7 +196,7 @@ class Program
                 }
                 Console.WriteLine("\tAdding {0}...", file);
                 var template = File.ReadAllText(file);
-                templateFolders[folder].Add(fileName, template);
+                templateFolders[folder].TemplatesFiles.Add(fileName, template);
                 ValidateTemplate(pageName, fileName, template, ref warnings);
             }
             EnumerateFolder(folder, ref templateFolders, ref warnings);
@@ -207,18 +256,48 @@ class PageCatalog
     {
         Pages = new List<Page>();
         Hubs = new Dictionary<string, IList<Page>>();
+        Tags = new Dictionary<string, IList<PageTag>>();
     }
 
-    [JsonProperty(propertyName: "pages")]
+    [JsonProperty(propertyName: "pages", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public IList<Page> Pages { get; private set; }
+    public bool ShouldSerializePages() { return Pages.Any(); }
 
-    [JsonProperty(propertyName: "hubs")]
+    [JsonProperty(propertyName: "hubs", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public IDictionary<string, IList<Page>> Hubs { get; private set; }
+    public bool ShouldSerializeHubs() { return Hubs.Keys.Any(); }
+
+    [JsonProperty(propertyName: "tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public IDictionary<string, IList<PageTag>> Tags { get; private set; }
+    public bool ShouldSerializeHubsTags() { return Tags.Keys.Any(); }
 }
 
 class Page
 {
     public Page(string name)
+    {
+        Name = name;
+    }
+
+    [JsonProperty(propertyName: "name")]
+    public string Name { get; }
+
+    [JsonProperty(propertyName: "pageName", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? PageName { get; set; }
+
+    [JsonProperty(propertyName: "title", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? Title { get; set; }
+
+    [JsonProperty(propertyName: "hashTag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public string? HashTag { get; set; }
+
+    [JsonProperty(propertyName: "excludeTag", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool? ExcludeTag { get; set; }
+}
+
+class PageTag
+{
+    public PageTag(string name)
     {
         Name = name;
     }
@@ -262,6 +341,9 @@ class Manifest
 
     [JsonProperty(propertyName: "excludeTag")]
     public bool? ExcludeTag { get; set; }
+
+    [JsonProperty(propertyName: "tagOnly")]
+    public bool? TagOnly { get; set; }
 }
 
 class TemplateCatalog
