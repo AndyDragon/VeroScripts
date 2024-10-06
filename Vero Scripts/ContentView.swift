@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var theme = Theme.notSet
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = true
-    
+
     // SHARED FEATURE
     @AppStorage(
         "feature",
@@ -32,9 +32,7 @@ struct ContentView: View {
     @State private var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
     @State private var page = UserDefaults.standard.string(forKey: "Page") ?? ""
     @State private var pageValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var pageStaffLevel = StaffLevelCase(
-        rawValue: UserDefaults.standard.string(forKey: "StaffLevel") ?? StaffLevelCase.mod.rawValue
-    ) ?? StaffLevelCase.mod
+    @State private var pageStaffLevel = StaffLevelCase.mod
     @State private var firstForPage = false
     @State private var fromCommunityTag = false
     @State private var fromHubTag = false
@@ -99,91 +97,6 @@ struct ContentView: View {
         self.appState = appState
     }
 
-    private func loadPages() async {
-        do {
-#if TESTING
-            let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
-#else
-            let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
-#endif
-            let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
-            var pages = [LoadedPage]()
-            for hubPair in (pagesCatalog.hubs) {
-                for hubPage in hubPair.value {
-                    pages.append(LoadedPage.from(hub: hubPair.key, page: hubPage))
-                }
-            }
-            loadedPages.removeAll()
-            loadedPages.append(contentsOf: pages.sorted(by: {
-                if $0.hub == "other" && $1.hub == "other" {
-                    return $0.name < $1.name
-                }
-                if $0.hub == "other" {
-                    return false
-                }
-                if $1.hub == "other" {
-                    return true
-                }
-                return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
-            }))
-            
-            loadSharedFeature()
-            
-            // Delay the start of the templates download so the window can be ready faster
-            try await Task.sleep(nanoseconds: 200_000_000)
-            
-#if TESTING
-            let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
-#else
-            let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
-#endif
-            templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
-            waitingForTemplates = false
-            updateScripts()
-            updateNewMembershipScripts()
-            
-            do {
-                // Delay the start of the disallowed list download so the window can be ready faster
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-                
-#if TESTING
-                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
-#else
-                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
-#endif
-                disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
-                updateScripts()
-                updateNewMembershipScripts()
-            } catch {
-                // do nothing, the disallow list is not critical
-                debugPrint(error.localizedDescription)
-            }
-            
-            do {
-                // Delay the start of the disallowed list download so the window can be ready faster
-                try await Task.sleep(nanoseconds: 100_000_000)
-                
-                appState.checkForUpdates()
-            } catch {
-                // do nothing, the version check is not critical
-                debugPrint(error.localizedDescription)
-            }
-        } catch {
-            alertTitle = "Could not load the page catalog from the server"
-            alertMessage = "The application requires the catalog to perform its operations: " +
-            error.localizedDescription +
-            "\n\nClick here to try again."
-            showingAlert = true
-            toastTapAction = {
-                DispatchQueue.main.async {
-                    Task {
-                        await loadPages()
-                    }
-                }
-            }
-        }
-    }
-    
     var body: some View {
         ZStack {
             Color.BackgroundColor.edgesIgnoringSafeArea(.all)
@@ -732,11 +645,6 @@ struct ContentView: View {
 #if TESTING
             .navigationTitle("Vero Scripts - Script Testing")
 #endif
-            .onAppear {
-//                alertTitle = "onAppear"
-//                alertMessage = "here"
-//                showingAlert.toggle()
-            }
             .onValueChanged(value: sharedFeature) { newValue in
                 loadSharedFeature()
             }
@@ -752,7 +660,7 @@ struct ContentView: View {
             }
             .preferredColorScheme(isDarkModeOn ? .dark : .light)
     }
-    
+
     private func setTheme(_ newTheme: Theme) {
         if (newTheme == .notSet) {
             isDarkModeOn = colorScheme == .dark
@@ -790,22 +698,145 @@ struct ContentView: View {
         }
     }
 
+    private func updateStaffLevelForPage() {
+        // debugPrint("******* Update *******")
+        // debugPrint(UserDefaults.standard.dictionaryRepresentation().filter { $0.key.starts(with: "StaffLevel") })
+        if !page.isEmpty {
+            if let rawPageStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel_" + page) {
+                if let pageStaffLevelFromRaw = StaffLevelCase(rawValue: rawPageStaffLevel) {
+                    pageStaffLevel = pageStaffLevelFromRaw
+                    return
+                }
+                pageStaffLevel = StaffLevelCase.mod
+                return
+            }
+        }
+
+        if let rawPagelessStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel") {
+            if let pageStaffLevelFromRaw = StaffLevelCase(rawValue: rawPagelessStaffLevel) {
+                pageStaffLevel = pageStaffLevelFromRaw
+                storeStaffLevelForPage()
+                return
+            }
+        }
+
+        pageStaffLevel = StaffLevelCase.mod
+        storeStaffLevelForPage()
+    }
+
+    private func storeStaffLevelForPage() {
+        if !page.isEmpty {
+            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel_" + page)
+        } else {
+            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
+        }
+        // debugPrint("******* Store *******")
+        // debugPrint(UserDefaults.standard.dictionaryRepresentation().filter { $0.key.starts(with: "StaffLevel") })
+    }
+
+    private func loadPages() async {
+        do {
+#if TESTING
+            let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
+#else
+            let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
+#endif
+            let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
+            var pages = [LoadedPage]()
+            for hubPair in (pagesCatalog.hubs) {
+                for hubPage in hubPair.value {
+                    pages.append(LoadedPage.from(hub: hubPair.key, page: hubPage))
+                }
+            }
+            loadedPages.removeAll()
+            loadedPages.append(contentsOf: pages.sorted(by: {
+                if $0.hub == "other" && $1.hub == "other" {
+                    return $0.name < $1.name
+                }
+                if $0.hub == "other" {
+                    return false
+                }
+                if $1.hub == "other" {
+                    return true
+                }
+                return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
+            }))
+
+            loadSharedFeature()
+
+            // Delay the start of the templates download so the window can be ready faster
+            try await Task.sleep(nanoseconds: 200_000_000)
+
+#if TESTING
+            let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
+#else
+            let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
+#endif
+            templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
+            waitingForTemplates = false
+            updateScripts()
+            updateNewMembershipScripts()
+
+            do {
+                // Delay the start of the disallowed list download so the window can be ready faster
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+
+#if TESTING
+                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
+#else
+                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
+#endif
+                disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
+                updateScripts()
+                updateNewMembershipScripts()
+            } catch {
+                // do nothing, the disallow list is not critical
+                debugPrint(error.localizedDescription)
+            }
+
+            do {
+                // Delay the start of the disallowed list download so the window can be ready faster
+                try await Task.sleep(nanoseconds: 100_000_000)
+
+                appState.checkForUpdates()
+            } catch {
+                // do nothing, the version check is not critical
+                debugPrint(error.localizedDescription)
+            }
+        } catch {
+            alertTitle = "Could not load the page catalog from the server"
+            alertMessage = "The application requires the catalog to perform its operations: " +
+            error.localizedDescription +
+            "\n\nClick here to try again."
+            showingAlert = true
+            toastTapAction = {
+                DispatchQueue.main.async {
+                    Task {
+                        await loadPages()
+                    }
+                }
+            }
+        }
+    }
+
     private func loadSharedFeature() {
         if !sharedFeature.isEmpty {
             // Store this before we clear the value
             let sharedFeatureJson = sharedFeature
-            
+
             // Clear the feature
             UserDefaults(suiteName: "group.com.andydragon.VeroTools")?.removeObject(forKey: "feature")
-            
+
             // Load the feature
             let featureUser = CodableFeatureUser(json: sharedFeatureJson.data(using: .utf8)!)
             if !featureUser.page.isEmpty {
                 populateFromFeatureUser(featureUser)
             }
+        } else {
+            updateStaffLevelForPage()
         }
     }
-    
+
     private func populateFromClipboard() {
         do {
             let json = pasteFromClipboard()
@@ -827,6 +858,9 @@ struct ContentView: View {
             } else {
                 pageValidation = (true, nil)
             }
+
+            updateStaffLevelForPage()
+            pageStaffLevelChanged(to: pageStaffLevel)
 
             userName = featureUser.userAlias
             userNameChanged(to: userName)
@@ -913,7 +947,7 @@ struct ContentView: View {
             newMembershipChanged(to: newMembership)
 
             focusedField = .userName
-            
+
             Task {
                 await showToast(
                     .complete(.green),
@@ -939,6 +973,7 @@ struct ContentView: View {
             newMembership = NewMembershipCase.none
             newMembershipChanged(to: newMembership)
             focusedField = .userName
+            updateStaffLevelForPage()
         }
     }
 
@@ -1035,6 +1070,7 @@ struct ContentView: View {
         if value != lastPage {
             clearPlaceholders()
             UserDefaults.standard.set(page, forKey: "Page")
+            updateStaffLevelForPage()
             updateScripts()
             updateNewMembershipScripts()
             lastPage = value
@@ -1044,10 +1080,12 @@ struct ContentView: View {
     private func pageStaffLevelChanged(to value: StaffLevelCase) {
         if value != lastPageStaffLevel {
             clearPlaceholders()
-            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
+            storeStaffLevelForPage()
             updateScripts()
             updateNewMembershipScripts()
             lastPageStaffLevel = value
+        } else {
+            storeStaffLevelForPage()
         }
     }
 
@@ -1070,7 +1108,7 @@ struct ContentView: View {
         updateScripts()
         updateNewMembershipScripts()
     }
-    
+
     private func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
     }
@@ -1355,14 +1393,14 @@ struct ContentView: View {
                 template.name == "first community " + templateName
             })
         }
-        
+
         // next check first feature AND hub
         if firstFeature && hubTag && template == nil {
             template = templatePage?.templates.first(where: { template in
                 template.name == "first hub " + templateName
             })
         }
-        
+
         // next check first feature
         if firstFeature && template == nil {
             template = templatePage?.templates.first(where: { template in

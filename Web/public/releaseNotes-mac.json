@@ -176,5 +176,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.43",
+        "notes": [
+            {
+                "date": "Oct 6, 2024",
+                "notes": [
+                    "Store staff level per page to avoid mistakes once corrected the first time"
+                ]
+            }
+        ]
     }
 ]
