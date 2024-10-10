@@ -616,7 +616,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "CONGRATULATIONS @%%USERNAME%% on your feature with @snap_%%PAGENAME%% today!!! ✨🏆\n😍 Thank you for sharing this amazing shot with us. Keep tagging #snap_%%PAGENAME%% for a chance of more features.\n"
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured with @snap_%%PAGENAME%%. ✨🏆\n[[PERSONALIZED MESSAGE]]\nThank you for sharing this amazing shot with us, keep tagging #snap_%%PAGENAME%% for a chance of more features.\n"
         },
         {
           "name": "feature",
@@ -624,7 +624,7 @@
         },
         {
           "name": "first comment",
-          "template": "🌟 @%%USERNAME%% 🌟👍 [[PERSONALIZED MESSAGE]] Congratulations on your first feature with @snap_%%PAGENAME%% today!!! ✨🏆\n😍 Thank you very much for tagging us. Keep using our hashtag #snap_%%PAGENAME%% for a chance of more features.  👏❤️🌟\n"
+          "template": "✨✨ CONGRATULATIONS!!! ✨✨\n@%%USERNAME%%: You have been featured with @snap_%%PAGENAME%%, your first feature with us. ✨🏆\n[[PERSONALIZED MESSAGE]]\nThank you for sharing this amazing shot with us, keep tagging #snap_%%PAGENAME%% for a chance of more features.\n"
         },
         {
           "name": "original post",
