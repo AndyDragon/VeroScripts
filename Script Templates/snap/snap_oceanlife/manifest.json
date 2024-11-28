@@ -1,5 +1,6 @@
 {
     "hub": "snap",
     "page": "oceanlife",
-    "title": "Ocean Life"
+    "title": "Ocean Life",
+    "tagOnly": true
 }

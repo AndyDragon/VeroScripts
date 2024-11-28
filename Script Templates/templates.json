@@ -523,23 +523,6 @@
       ]
     },
     {
-      "name": "snap:blue",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "✨ CONGRATULATIONS!!! ✨✨\n🏆 You have been featured. @%%USERNAME%%  🏆\n😍 Just an amazing shot.\n💕 🎉 Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏 😃 💙\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n\n#blue #bluelover #instablue #blueasthetic #bluelove #iloveblue #blueheart #blueworld #bluelife #everythingblue #blues #azul #livecolorfully #colourblue #blueobssesion #blau #colorlove #colorful #lightblue\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "🌟Featured on @snap_%%PAGENAME%% 🌟"
-        }
-      ]
-    },
-    {
       "name": "snap:bnw",
       "templates": [
         {
@@ -1559,23 +1542,6 @@
       ]
     },
     {
-      "name": "snap:oceanlife",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "🌟Hello [[USER'S FIRST NAME]] @%%USERNAME%% it’s [[YOUR FIRST NAME]] @%%YOURNAME%% here🙋🏽‍♀️ [[PERSONALIZED MESSAGE]] 🥰 ☀️❤️ Thank you for tagging us this beauty, I’m delighted to see you on @snap_%%PAGENAME%% Biggest congratulations and a great [[YEAR]] to you!🎆🎊🌟"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: [[USER'S FIRST NAME]] @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: [[YOUR FIRST NAME]] @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n\nPAGE HASHTAGS\n•\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
-        },
-        {
-          "name": "original post",
-          "template": "🌟This [[DESCRIPTION]] has been featured on @snap_%%PAGENAME%% Congratulations James and enjoy a great [[YEAR]]🌟"
-        }
-      ]
-    },
-    {
       "name": "snap:people",
       "templates": [
         {
@@ -1956,23 +1922,6 @@
         {
           "name": "original post",
           "template": "✨✨FEATURED ON @snap_%%PAGENAME%% ✨✨ Congratulations ✨\n"
-        }
-      ]
-    },
-    {
-      "name": "snap:weddings",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "🤍🤍💫 Congratulations💫🤍🤍 @%%USERNAME%% on your beautiful feature 🤍 Thank you for tagging #snap_%%PAGENAME%% 🤍💫🤍\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured:  [[USER'S NAME]] -  @%%USERNAME%% ⭐\n.\n______________________\n✨ CONGRATULATIONS  ✨\n______________________\n.\nSelected by:  [[YOUR FIRST NAME]]  -  @%%YOURNAME%%\n%%STAFFLEVEL%% on:  @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative, and supportive community on VERO. Please follow @snap_community .\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap Community pages.\n.\n#snap_community\n#vero\n#verofamily\n#verofriends\n#wedding\n#weddibgphotographer\n#weddingshoot\n#bride\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "🤍✨ Featured ✨🤍 Congratulations !!!"
         }
       ]
     },
