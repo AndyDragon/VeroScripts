@@ -924,23 +924,6 @@
       ]
     },
     {
-      "name": "snap:europe",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "🌟 Great shot  📸 🌟 Keep tagging us so we can see your beautiful photos in our feed 👏👏🖤\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n.\n✨️ [[LOCATION]] ✨️\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%% \n%%STAFFLEVEL%% on @snap_%%PAGENAME%% \n.\nJoin us in our fresh, creative and supportive community on Instagram. Please follow @snap_community \n.\nCC Snap Community Owner \n@snap_owner \n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero \n#verofamily \n#verofriends \n#Photography \n#LensCulture \n#Travel\n#vero_travel\n#europe\n#travel\n#tourism\n\n#Belgium #Mons \n\n#whale #street_painting #alley\n\n.\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%% \n#snap_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "⭐️ FEATURED on @snap_%%PAGENAME%% ⭐\n"
-        }
-      ]
-    },
-    {
       "name": "snap:filmphoto",
       "templates": [
         {
@@ -1038,27 +1021,6 @@
         {
           "name": "original post",
           "template": "✨✨✨FEATURED✨✨✨"
-        }
-      ]
-    },
-    {
-      "name": "snap:france",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]] Congratulations on your feature with #snap_%%PAGENAME%% today, [[USER'S FIRST NAME]], and thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n✨ [[LOCATION]] ✨\n.\n✨ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ✨\n.\n_____________________________________\n.\n✨CONGRATULATIONS ✨.\n_____________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero, Instagram and Tumblr\nPlease follow @snap_community .\n.\nPlease check out @snap_kingdom for more of our SNAP_community pages.\n•\n#snap_featured\n#snap_community\n#verofamily\n#verofriends\n#onverofirst\n#vero\n#verophotos\n#verotravelcommunity\n#france\n#hellofrance\n#travelfrance\n#visitfrance\n#explordfrance\n#france_focus_on\n#france_photolovers\n#ilovefrance\n#france4dreams\n.\n.\nFor internal Snap Community use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "first comment",
-          "template": "✨👍💕 @%%USERNAME%% ✨ [[PERSONALIZED MESSAGE]] Congratulations on your first feature with #snap_%%PAGENAME%% today, and a warm welcome to our gallery. Thank you for tagging us. Keep tagging #snap_%%PAGENAME%% for a chance of more features. 👍💕🌟\n"
-        },
-        {
-          "name": "original post",
-          "template": "🎉 Snap Community %%MEMBERLEVEL%% feature 🎉"
         }
       ]
     },
