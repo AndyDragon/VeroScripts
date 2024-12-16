@@ -16,7 +16,7 @@
     <Copyright>Copyright (c) 2024 AndyDragon Software, all rights reserved</Copyright>
     <Company>AndyDragon Software</Company>
     <Authors>Andrew Forget</Authors>
-    <Version>1.0.35</Version>
+    <Version>1.0.36</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,9 +26,24 @@
   <ItemGroup>
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
-    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Notification.Wpf" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

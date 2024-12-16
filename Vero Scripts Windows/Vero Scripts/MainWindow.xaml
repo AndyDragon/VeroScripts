@@ -17,6 +17,8 @@
     ResizeMode="CanResizeWithGrip" 
     Activated="OnActivatedChanged" 
     Deactivated="OnActivatedChanged"
+    SourceInitialized="OnSourceInitialized"
+    Closing="OnClosing"
     DataContextChanged="OnDataContextChanged">
 
     <Window.DataContext>
