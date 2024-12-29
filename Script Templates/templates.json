@@ -1470,7 +1470,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • #[[COUNTRY]]\n.\n✨featured %%MEMBERLEVEL%% :@%%USERNAME%% . ✨\n______________________________\n✨CONGRATULATIONS ✨\n______________________________\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community.\n.\nCC Snap Community Owner\n@snap_owner Jane\n.\nPlease check out @snap_kingdom for more of our snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n[(add suitable tags for photo)]\n•\n•\nFor internal use only:\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% • #[[COUNTRY]]\n.\n✨featured %%MEMBERLEVEL%% :@%%USERNAME%% . ✨\n______________________________\n✨CONGRATULATIONS ✨\n______________________________\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community.\n.\nCC Snap Community Owner\n@snap_owner Jane\n.\nPlease check out @snap_kingdom for more of our snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n\n•\n•\nFor internal use only:\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
         },
         {
           "name": "first comment",
