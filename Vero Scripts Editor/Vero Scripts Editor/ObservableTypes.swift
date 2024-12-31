@@ -48,7 +48,8 @@ class ObservableTemplateCatalog: Identifiable, Hashable {
 
 @Observable
 class ObservableTemplatePage: Identifiable, Hashable {
-    var id: String { self.name }
+    var id = UUID()
+    var pageId: String { self.name }
     let name: String
     var templates: [ObservableTemplate]
 
@@ -68,12 +69,7 @@ class ObservableTemplatePage: Identifiable, Hashable {
 
 @Observable
 class ObservablePage: Identifiable, Hashable {
-    var id: String {
-        if self.hub.isEmpty {
-            return self.name
-        }
-        return "\(self.hub):\(self.name)"
-    }
+    var id = UUID()
     var hub: String
     var name: String
     var pageName: String?
@@ -101,6 +97,12 @@ class ObservablePage: Identifiable, Hashable {
         } else {
             return [hashTag ?? name]
         }
+    }
+    var pageId: String {
+        if self.hub.isEmpty {
+            return self.name
+        }
+        return "\(self.hub):\(self.name)"
     }
 
     init(hub: String, page: Page) {
@@ -132,7 +134,7 @@ class ObservablePage: Identifiable, Hashable {
 
 @Observable
 class ObservableTemplate: Identifiable, Hashable {
-    var id: String { self.name }
+    var id = UUID()
     var name: String
     var template: String
 

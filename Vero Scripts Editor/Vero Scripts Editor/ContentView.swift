@@ -9,7 +9,7 @@ import AlertToast
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    //@Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = true
 
     @Environment(\.openURL) private var openURL
@@ -22,14 +22,13 @@ struct ContentView: View {
     @State private var documentDirtyAfterDismissAction: () -> Void = {}
     @State private var selectedMissingPageTemplate = ""
     @State private var selectedTemplate: ObservableTemplate?
-    @State private var isSelectedTemplate = false
 
     private var appState: VersionCheckAppState
     private let labelWidth: CGFloat = 80
 
     private var selectedPageTemplates: [ObservableTemplate]? {
         if let selectedPage = viewModel.selectedPage,
-            let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.id == selectedPage.id }) {
+            let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == selectedPage.pageId }) {
             return templatePage.templates
         }
         return nil
@@ -126,7 +125,7 @@ struct ContentView: View {
                                 }
                                 Button(action: {
                                     if !selectedMissingPageTemplate.isEmpty {
-                                        if let selectedPage = viewModel.selectedPage, let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.id == selectedPage.id }) {
+                                        if let selectedPage = viewModel.selectedPage, let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == selectedPage.pageId }) {
                                             let template = ObservableTemplate(name: selectedMissingPageTemplate, template: "- script -")
                                             templatePage.templates.append(template)
                                             selectedTemplate = template
@@ -198,7 +197,7 @@ struct ContentView: View {
                 }))
             viewModel.catalog.waitingForPages = false
             let lastPage = UserDefaults.standard.string(forKey: "Page") ?? ""
-            viewModel.selectedPage = viewModel.catalog.pages.first(where: { $0.id == lastPage })
+            viewModel.selectedPage = viewModel.catalog.pages.first(where: { $0.pageId == lastPage })
             if viewModel.selectedPage == nil {
                 viewModel.selectedPage = viewModel.catalog.pages.first ?? nil
             }
@@ -264,7 +263,8 @@ struct ContentView: View {
             if direction != .same {
                 viewModel.selectedPage = newValue
             }
-            UserDefaults.standard.set(viewModel.selectedPage?.id ?? "", forKey: "Page")
+            selectedTemplate = nil
+            UserDefaults.standard.set(viewModel.selectedPage?.pageId ?? "", forKey: "Page")
         }
     }
 
@@ -282,7 +282,8 @@ struct ContentView: View {
         if change {
             if let newPage = viewModel.catalog.pages.first(where: { $0.name == newValue }) {
                 viewModel.selectedPage = newPage
-                UserDefaults.standard.set(viewModel.selectedPage?.id ?? "", forKey: "Page")
+                selectedTemplate = nil
+                UserDefaults.standard.set(viewModel.selectedPage?.pageId ?? "", forKey: "Page")
             }
             return .handled
         }
