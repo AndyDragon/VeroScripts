@@ -9,10 +9,12 @@ import SwiftUI
 
 struct WelcomeView: View {
     var body: some View {
-        Text("Welcome to Vero Scripts Editor")
-            .font(.largeTitle)
-        Text("Select a page on the left and then select a template to edit")
-            .foregroundStyle(.secondary)
+        VStack {
+            Text("Welcome to Vero Scripts Editor")
+                .font(.largeTitle)
+            Text("Select a page on the left and then select a template to edit")
+                .foregroundStyle(.secondary)
+        }
     }
 }
 

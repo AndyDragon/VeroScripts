@@ -110,4 +110,18 @@ class EditorState<T>: NSObject, NSTextViewDelegate where T: Identifiable {
         onTextChanged(textView?.textStorage?.string ?? "", contextId)
         updateHighlighting()
     }
+
+    func resetText(_ newText: String) {
+        if let textView, let text = textView.textStorage?.string {
+            let wholeRange = NSRange(text.startIndex..<text.endIndex, in: text)
+            if textView.shouldChangeText(in: wholeRange, replacementString: newText) {
+                textView.textStorage?.beginEditing()
+                textView.textStorage?.replaceCharacters(in: wholeRange, with: newText)
+                textView.textStorage?.endEditing()
+                textView.undoManager?.removeAllActions()
+            }
+        }
+        onTextChanged(textView?.textStorage?.string ?? "", contextId)
+        updateHighlighting()
+    }
 }

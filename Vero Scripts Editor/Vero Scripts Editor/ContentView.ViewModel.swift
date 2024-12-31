@@ -13,7 +13,10 @@ extension ContentView {
         var catalog = ObservableCatalog()
         var selectedPage: ObservablePage?
         var selectedTemplate: ObservableTemplate?
-        private(set) var isDirty = false
+        var ignoreDirty: Bool = false
+        var isDirty: Bool {
+            catalog.isDirty && !ignoreDirty
+        }
         var isShowingDocumentDirtyAlert = false
 
         var tagSource: TagSourceCase = .commonPageTag
@@ -25,17 +28,5 @@ extension ContentView {
         var pageStaffLevel: StaffLevelCase = .mod
 
         init() {}
-
-        func markDocumentDirty() {
-            if !isDirty {
-                isDirty = true
-            }
-        }
-
-        func clearDocumentDirty() {
-            if isDirty {
-                isDirty = false
-            }
-        }
     }
 }

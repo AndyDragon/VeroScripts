@@ -16,6 +16,9 @@ class ObservableCatalog: Identifiable, Hashable {
     var templatesCatalog = ObservableTemplateCatalog(pages: [], specialTemplates: [])
     var waitingForDisallowList = true
     var disallowList = [String: [String]]()
+    var isDirty: Bool {
+        pages.count(where: { $0.isDirty }) > 0 || templatesCatalog.isDirty
+    }
 
     static func == (lhs: ObservableCatalog, rhs: ObservableCatalog) -> Bool {
         return lhs.id == rhs.id
@@ -31,6 +34,9 @@ class ObservableTemplateCatalog: Identifiable, Hashable {
     var id = UUID()
     var pages: [ObservableTemplatePage]
     var specialTemplates: [ObservableTemplate]
+    var isDirty: Bool {
+        pages.count(where: { $0.isDirty }) > 0 || specialTemplates.count(where: { $0.isDirty }) > 0
+    }
 
     init(pages: [ObservableTemplatePage], specialTemplates: [ObservableTemplate]) {
         self.pages = pages
@@ -52,6 +58,9 @@ class ObservableTemplatePage: Identifiable, Hashable {
     var pageId: String { self.name }
     let name: String
     var templates: [ObservableTemplate]
+    var isDirty: Bool {
+        templates.count(where: { $0.isDirty }) > 0
+    }
 
     init(name: String, templates: [ObservableTemplate]) {
         self.name = name
@@ -104,6 +113,9 @@ class ObservablePage: Identifiable, Hashable {
         }
         return "\(self.hub):\(self.name)"
     }
+    var isDirty: Bool {
+        false
+    }
 
     init(hub: String, page: Page) {
         self.hub = hub
@@ -137,20 +149,29 @@ class ObservableTemplate: Identifiable, Hashable {
     var id = UUID()
     var name: String
     var template: String
+    var originalTemplate: String
+    var forceDirty: Bool
+    var isDirty: Bool { template != originalTemplate || forceDirty }
 
     init(template: Template) {
         self.name = template.name
         self.template = template.template
+        self.originalTemplate = template.template
+        self.forceDirty = false
     }
 
-    init(name: String, template: String) {
+    init(name: String, template: String, forceDirty: Bool = false) {
         self.name = name
         self.template = template
+        self.originalTemplate = template
+        self.forceDirty = forceDirty
     }
 
     private init() {
         name = ""
         template = ""
+        originalTemplate = ""
+        forceDirty = false
     }
 
     static func == (lhs: ObservableTemplate, rhs: ObservableTemplate) -> Bool {

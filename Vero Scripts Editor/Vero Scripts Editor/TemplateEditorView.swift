@@ -10,6 +10,7 @@ import SystemColors
 import SwiftUIIntrospect
 
 struct TemplateEditorView: View {
+    @Bindable var toastManager: ContentView.ToastManager
     @Bindable var viewModel: ContentView.ViewModel
     @Bindable var selectedTemplate: ObservableTemplate
     @State var focusedField: FocusState<FocusField?>.Binding
@@ -23,15 +24,35 @@ struct TemplateEditorView: View {
             HStack {
                 Text("Template:")
                 Spacer()
+                Button(action: {
+                    copyToClipboard(selectedTemplate.template)
+                    // reset the dirty state...
+                    selectedTemplate.forceDirty = false
+                    selectedTemplate.originalTemplate = selectedTemplate.template
+                    toastManager.showCompletedToast("Copied", "Copied the script template to the clipboard")
+                }) {
+                    Text("Copy template")
+                        //.font(.system(size: 10))
+                }
+                Button(action: {
+                    state.resetText(selectedTemplate.originalTemplate)
+                }) {
+                    Text("Revert template")
+                        //.font(.system(size: 10))
+                }
+                .disabled(!selectedTemplate.isDirty)
             }
+            
             HStack {
                 Text("Insert placeholder:")
+                    .lineLimit(1)
                 ForEach(staticPlaceholders, id: \.self) { placeholder in
                     Button(action: {
                         state.pasteTextToEditor("%%\(placeholder)%%")
                     }) {
-                        Text(placeholder)
+                        Text("%%\(placeholder)%%")
                             .font(.system(size: 10))
+                            .lineLimit(1)
                     }
                 }
                 
@@ -40,6 +61,7 @@ struct TemplateEditorView: View {
                 
                 TextField(text: $manualPlaceholderKey) {
                     Text("Manual: ")
+                        .lineLimit(1)
                 }
                 .frame(maxWidth: 80)
                 
@@ -48,6 +70,7 @@ struct TemplateEditorView: View {
                 }) {
                     Text("Short")
                         .font(.system(size: 10))
+                        .lineLimit(1)
                 }
                 .disabled(manualPlaceholderKey.isEmpty)
                 
@@ -56,6 +79,7 @@ struct TemplateEditorView: View {
                 }) {
                     Text("Long")
                         .font(.system(size: 10))
+                        .lineLimit(1)
                 }
                 .disabled(manualPlaceholderKey.isEmpty)
                 
@@ -94,6 +118,7 @@ struct TemplateEditorView: View {
 
             HStack {
                 Text("User alias: ")
+                    .lineLimit(1)
                 TextField("", text: $viewModel.userAlias.onChange { value in
                     updateScript()
                 })
@@ -112,11 +137,13 @@ struct TemplateEditorView: View {
                     }
                 }
                 .focusable()
-                
+                .lineLimit(1)
+
                 Text("|")
                     .padding(.horizontal)
                 
                 Text("Your alias: ")
+                    .lineLimit(1)
                 TextField("", text: $viewModel.yourName.onChange { value in
                     updateScript()
                 })
@@ -126,6 +153,7 @@ struct TemplateEditorView: View {
                     .padding(.horizontal)
                 
                 Text("Your first name: ")
+                    .lineLimit(1)
                 TextField("Your first name", text: $viewModel.yourFirstName.onChange { value in
                     updateScript()
                 })
@@ -144,7 +172,8 @@ struct TemplateEditorView: View {
                     }
                 }
                 .focusable()
-                
+                .lineLimit(1)
+
                 Spacer()
             }
 

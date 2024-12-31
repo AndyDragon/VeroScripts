@@ -17,18 +17,20 @@ struct ContentView: View {
     @State private var viewModel = ViewModel()
     @State private var toastManager = ToastManager()
     @FocusState private var focusedField: FocusField?
-    @State private var documentDirtyAlertConfirmation = "Would you like to save this log file?"
-    @State private var documentDirtyAfterSaveAction: () -> Void = {}
+    @State private var documentDirtyAlertConfirmation = "Are you sure you wish to quit?"
     @State private var documentDirtyAfterDismissAction: () -> Void = {}
-    @State private var selectedMissingPageTemplate = ""
+    @State private var selectedMissingPageTemplate: String?
     @State private var selectedTemplate: ObservableTemplate?
 
     private var appState: VersionCheckAppState
     private let labelWidth: CGFloat = 80
 
+    private func templatePageFromPage(_ page: ObservablePage) -> ObservableTemplatePage? {
+        return viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == page.pageId })
+    }
+
     private var selectedPageTemplates: [ObservableTemplate]? {
-        if let selectedPage = viewModel.selectedPage,
-            let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == selectedPage.pageId }) {
+        if let selectedPage = viewModel.selectedPage, let templatePage = templatePageFromPage(selectedPage) {
             return templatePage.templates
         }
         return nil
@@ -81,17 +83,27 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.BackgroundColor.edgesIgnoringSafeArea(.all)
-
-            NavigationSplitView(sidebar: {
+        NavigationSplitView(sidebar: {
+            ZStack {
                 VStack(alignment: .leading) {
                     Text("Page:")
                     Picker("", selection: $viewModel.selectedPage.onChange { value in
                         navigateToPage(.same)
                     }) {
                         ForEach(viewModel.catalog.pages) { page in
-                            Text(page.displayName).tag(page)
+                            HStack {
+                                Text(page.displayName)
+                                Spacer()
+                                if page.isDirty || templatePageFromPage(page)?.isDirty ?? false {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white, .red)
+                                        .help("One or more templates has been modified")
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .environment(\.layoutDirection, .leftToRight)
+                            .tag(page)
                         }
                     }
                     .tint(Color.AccentColor)
@@ -110,9 +122,21 @@ struct ContentView: View {
                         Text("Scripts:")
                         List(selectedPageTemplates.sorted(by: { $0.name < $1.name }), selection: $selectedTemplate) { template in
                             NavigationLink(value: template) {
-                                Text(template.name)
+                                HStack {
+                                    Text(template.name)
+                                    Spacer()
+                                    if template.isDirty {
+                                        Image(systemName: "exclamationmark.circle.fill")
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(.white, .red)
+                                            .help("This template has been modified")
+                                    }
+                                }
                             }
                         }
+                        .listStyle(.sidebar)
+                        .navigationSplitViewColumnWidth(min: 240, ideal: 320)
+                        .frame(minWidth: 240)
                         Spacer()
                         if !missingPageTemplates.isEmpty {
                             Text("Missing scripts:")
@@ -124,43 +148,60 @@ struct ContentView: View {
                                     }
                                 }
                                 Button(action: {
-                                    if !selectedMissingPageTemplate.isEmpty {
-                                        if let selectedPage = viewModel.selectedPage, let templatePage = viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == selectedPage.pageId }) {
-                                            let template = ObservableTemplate(name: selectedMissingPageTemplate, template: "- script -")
+                                    if let selectedMissingPageTemplate, !selectedMissingPageTemplate.isEmpty {
+                                        if let selectedPage = viewModel.selectedPage, let templatePage = templatePageFromPage(selectedPage) {
+                                            let template = ObservableTemplate(name: selectedMissingPageTemplate, template: "- script -", forceDirty: true)
                                             templatePage.templates.append(template)
                                             selectedTemplate = template
                                         }
                                     }
-                                    selectedMissingPageTemplate = ""
+                                    selectedMissingPageTemplate = nil
                                 }) {
                                     Text("Add")
                                 }
-                                .disabled(selectedMissingPageTemplate.isEmpty)
+                                .disabled(selectedMissingPageTemplate == nil)
                             }
                         }
                     }
                     Spacer()
                 }
                 .padding(.horizontal)
-            }, detail: {
+                ToastDismissShield(toastManager)
+            }
+            .blur(radius: toastManager.isShowingAnyToast ? 4 : 0)
+            .allowsHitTesting(!toastManager.isShowingAnyToast)
+        }, detail: {
+            ZStack {
                 if let selectedTemplate {
-                    TemplateEditorView(viewModel: viewModel, selectedTemplate: selectedTemplate, focusedField: $focusedField)
+                    TemplateEditorView(toastManager: toastManager, viewModel: viewModel, selectedTemplate: selectedTemplate, focusedField: $focusedField)
                 } else {
                     WelcomeView()
                 }
-            })
+                ToastDismissShield(toastManager)
+            }
+            .blur(radius: toastManager.isShowingAnyToast ? 4 : 0)
             .allowsHitTesting(!toastManager.isShowingAnyToast)
-            ToastDismissShield(toastManager)
-        }
+        })
         .navigationTitle("Vero Scripts Editor")
-        .blur(radius: toastManager.isShowingAnyToast ? 4 : 0)
-        .frame(minWidth: 1024, minHeight: 720)
+        .navigationSubtitle(viewModel.isDirty ? "templates modified" : "")
+        .frame(minWidth: 1280, minHeight: 800)
         .background(Color.BackgroundColor)
+        .sheet(isPresented: $viewModel.isShowingDocumentDirtyAlert) {
+            DocumentDirtySheet(
+                isShowing: $viewModel.isShowingDocumentDirtyAlert,
+                confirmationText: $documentDirtyAlertConfirmation,
+                dismissAction: {
+                    documentDirtyAfterDismissAction()
+                    documentDirtyAfterDismissAction = {}
+                },
+                cancelAction: {
+                    documentDirtyAfterDismissAction = {}
+                })
+        }
         .modifier(ToastModifier(toastManager))
         .onAppear(perform: {
             DocumentManager.default.registerReceiver(receiver: self)
         })
-        .navigationSubtitle(viewModel.isDirty ? "edited" : "")
         .task {
             toastManager.showProgressToast = showProgressToast
             toastManager.showToast = showToast
@@ -249,7 +290,7 @@ struct ContentView: View {
     }
 
     private func delayAndTerminate() {
-        viewModel.clearDocumentDirty()
+        viewModel.ignoreDirty = true
         DispatchQueue.main.asyncAfter(
             deadline: .now() + 0.2,
             execute: {
@@ -297,10 +338,6 @@ extension ContentView: DocumentManagerDelegate {
             documentDirtyAfterDismissAction = {
                 delayAndTerminate()
             }
-            documentDirtyAfterSaveAction = {
-                delayAndTerminate()
-            }
-            documentDirtyAlertConfirmation = "Would you like to save this log file before leaving the app?"
             viewModel.isShowingDocumentDirtyAlert.toggle()
         }
         return !viewModel.isDirty
