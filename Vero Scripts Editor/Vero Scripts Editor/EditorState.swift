@@ -48,7 +48,7 @@ let longManualPlaceholderText: [NSAttributedString.Key : Any] = [
 ]
 let hastagText: [NSAttributedString.Key : Any] = [
     .font: monospaceFont,
-    .foregroundColor: NSColor(red: 0.6, green: 1, blue: 1, alpha: 1)
+    .foregroundColor: NSColor(red: 0.8, green: 0.9, blue: 1, alpha: 1)
 ]
 
 class EditorState<T>: NSObject, NSTextViewDelegate where T: Identifiable {
@@ -111,14 +111,20 @@ class EditorState<T>: NSObject, NSTextViewDelegate where T: Identifiable {
         updateHighlighting()
     }
 
-    func resetText(_ newText: String) {
+    func resetText(_ newText: String, clearUndo: Bool = true) {
         if let textView, let text = textView.textStorage?.string {
             let wholeRange = NSRange(text.startIndex..<text.endIndex, in: text)
             if textView.shouldChangeText(in: wholeRange, replacementString: newText) {
+                textView.breakUndoCoalescing()
+                textView.undoManager?.beginUndoGrouping()
                 textView.textStorage?.beginEditing()
                 textView.textStorage?.replaceCharacters(in: wholeRange, with: newText)
                 textView.textStorage?.endEditing()
-                textView.undoManager?.removeAllActions()
+                textView.undoManager?.endUndoGrouping()
+                textView.breakUndoCoalescing()
+                if clearUndo {
+                    textView.undoManager?.removeAllActions()
+                }
             }
         }
         onTextChanged(textView?.textStorage?.string ?? "", contextId)

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUIIntrospect
 import SystemColors
 
 struct ScriptEditor: View {
@@ -13,6 +14,7 @@ struct ScriptEditor: View {
     @Binding var script: String
     var minHeight: CGFloat
     var maxHeight: CGFloat
+    var copy: () -> Void
     var focusedField: FocusState<FocusField?>.Binding
     var editorFocusField: FocusField
     var buttonFocusField: FocusField
@@ -21,6 +23,13 @@ struct ScriptEditor: View {
         // Header
         HStack {
             Text(title)
+
+            Button(action: {
+                copy()
+            }, label: {
+                Text("Copy")
+                    .padding(.horizontal, 20)
+            })
 
             Spacer()
         }
@@ -39,5 +48,10 @@ struct ScriptEditor: View {
             .cornerRadius(6)
             .autocorrectionDisabled(false)
             .disableAutocorrection(false)
+            .introspect(.scrollView, on: .macOS(.v14, .v15)) { scrollView in
+                scrollView.scrollerStyle = .overlay
+                scrollView.autohidesScrollers = true
+                scrollView.scrollerStyle = .legacy
+            }
     }
 }

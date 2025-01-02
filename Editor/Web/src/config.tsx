@@ -5,8 +5,8 @@ export const applicationDetails = (
         This tool is used to edit the script templates for the Vero Scripts tool.
     </>
 );
-export const macScreenshotWidth = 1200;
-export const macScreenshotHeight = 820;
+export const macScreenshotWidth = 1320;
+export const macScreenshotHeight = 800;
 export const windowsScreenshotWidth = 1200;
 export const windowsScreenshotHeight = 800;
 

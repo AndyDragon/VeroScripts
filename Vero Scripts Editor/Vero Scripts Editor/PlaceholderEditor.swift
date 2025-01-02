@@ -7,19 +7,21 @@
 
 import SwiftUI
 
-final class PlaceholderValue: ObservableObject {
-    @Published var value = ""
+@Observable
+final class PlaceholderValue {
+    var value = ""
 }
 
-final class PlaceholderList: ObservableObject {
-    @Published var placeholderDict = [String: PlaceholderValue]()
-    @Published var longPlaceholderDict = [String: PlaceholderValue]()
+@Observable
+final class PlaceholderList {
+    var placeholderDict = [String: PlaceholderValue]()
+    var longPlaceholderDict = [String: PlaceholderValue]()
 }
 
 struct PlaceholderView: View {
     let element: [String: PlaceholderValue].Element
-    var editorName = ""
-    var editorLongForm = false
+    @State var editorName = ""
+    @State var editorLongForm = false
     @State var editorValue: String
 
     var body: some View {
@@ -29,34 +31,19 @@ struct PlaceholderView: View {
                 .padding([.top], editorLongForm ? 4 : 0)
 
             if editorLongForm {
-                if #available(macOS 14.0, *) {
-                    TextEditor(text: $editorValue.onChange(editorValueChanged))
-                        .font(.body)
-                        .frame(height: 48)
-                        .frame(minWidth: 320)
-                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
-                        .scrollContentBackground(.hidden)
-                        .padding(4)
-                        .background(Color.BackgroundColorEditor)
-                        .border(Color.gray.opacity(0.25))
-                        .cornerRadius(4)
-                        .textEditorStyle(.plain)
-                        .autocorrectionDisabled(false)
-                        .disableAutocorrection(false)
-                } else {
-                    TextEditor(text: $editorValue.onChange(editorValueChanged))
-                        .font(.body)
-                        .frame(height: 48)
-                        .frame(minWidth: 320)
-                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
-                        .scrollContentBackground(.hidden)
-                        .padding(4)
-                        .background(Color.BackgroundColorEditor)
-                        .border(Color.gray.opacity(0.25))
-                        .cornerRadius(4)
-                        .autocorrectionDisabled(false)
-                        .disableAutocorrection(false)
-                }
+                TextEditor(text: $editorValue.onChange(editorValueChanged))
+                    .font(.body)
+                    .frame(height: 48)
+                    .frame(minWidth: 320)
+                    .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                    .scrollContentBackground(.hidden)
+                    .padding(4)
+                    .background(Color.BackgroundColorEditor)
+                    .border(Color.gray.opacity(0.25))
+                    .cornerRadius(4)
+                    .textEditorStyle(.plain)
+                    .autocorrectionDisabled(false)
+                    .disableAutocorrection(false)
             } else {
                 TextField("", text: $editorValue.onChange(editorValueChanged))
                     .lineLimit(1)
@@ -72,7 +59,6 @@ struct PlaceholderView: View {
                     .disableAutocorrection(false)
             }
             Spacer()
-                .background(Color.yellow)
         }
         .frame(maxWidth: .infinity)
         .listRowSeparator(.hidden)
@@ -93,12 +79,9 @@ struct PlaceholderView: View {
 }
 
 struct PlaceholderSheet: View {
-    @ObservedObject var placeholders: PlaceholderList
-    @Binding var scriptWithPlaceholders: String
-    @Binding var scriptWithPlaceholdersInPlace: String
-    @Binding var isPresenting: Bool
-    var transferPlaceholders: () -> Void
-    var toastCopyToClipboard: (_ copySuffix: String) -> Void
+    var placeholders: PlaceholderList
+    var script: String
+    var closeSheetWithToast: (_ copySuffix: String) -> Void
 
     var body: some View {
         ZStack {
@@ -134,7 +117,7 @@ struct PlaceholderSheet: View {
                 HStack {
                     Button(
                         action: {
-                            scriptWithPlaceholders = scriptWithPlaceholdersInPlace
+                            var scriptWithPlaceholders = script
                             placeholders.placeholderDict.forEach({ placeholder in
                                 scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
                                     of: placeholder.key,
@@ -145,10 +128,8 @@ struct PlaceholderSheet: View {
                                     of: placeholder.key,
                                     with: placeholder.value.value)
                             })
-                            transferPlaceholders()
-                            copyToClipboard(scriptWithPlaceholders)
-                            isPresenting.toggle()
-                            toastCopyToClipboard("")
+                            Pasteboard.copyToClipboard(scriptWithPlaceholders)
+                            closeSheetWithToast("")
                         },
                         label: {
                             Text("Copy")
@@ -156,9 +137,8 @@ struct PlaceholderSheet: View {
                         })
                     Button(
                         action: {
-                            copyToClipboard(scriptWithPlaceholdersInPlace)
-                            isPresenting.toggle()
-                            toastCopyToClipboard("with placeholders")
+                            Pasteboard.copyToClipboard(script)
+                            closeSheetWithToast("with placeholders")
                         },
                         label: {
                             Text("Copy with Placeholders")

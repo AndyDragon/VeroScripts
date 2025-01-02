@@ -57,12 +57,14 @@ export default function About(props: GeneralProps) {
             <br /><br />
             <Body2>{applicationDetails}</Body2>
             <br /><br />
-            {/* <div style={{ textAlign: "center"}}>
+            <div style={{ textAlign: "center"}}>
                 <Image alt="macOS Screenshot" src={process.env.PUBLIC_URL + "/MacOS.png"} width={macScreenshotWidth} height={macScreenshotHeight} />
+                {/*
                 <br />
                 <Image alt="Windows Screenshot" src={process.env.PUBLIC_URL + "/Windows.png"} width={windowsScreenshotWidth} height={windowsScreenshotHeight} />
+                */}
             </div>
-            <br /><br /> */}
+            <br /><br />
             <Subtitle2>{applicationName} is currently available for:</Subtitle2>
             <br /><br />
             {platforms.map(platform => {

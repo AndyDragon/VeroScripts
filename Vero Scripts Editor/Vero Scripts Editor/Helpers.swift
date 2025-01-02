@@ -110,15 +110,34 @@ extension NSMutableData {
     }
 }
 
-func copyToClipboard(_ text: String) {
-    let pasteBoard = NSPasteboard.general
-    pasteBoard.clearContents()
-    pasteBoard.writeObjects([text as NSString])
-}
+final class Pasteboard {
+    static func copyToClipboard(_ text: String) {
+#if os(macOS)
+        let pasteBoard = NSPasteboard.general
+        pasteBoard.clearContents()
+        pasteBoard.writeObjects([text as NSString])
+#elseif os(iOS)
+        // TODO
+#endif
+    }
 
-func stringFromClipboard() -> String {
-    let pasteBoard = NSPasteboard.general
-    return pasteBoard.string(forType: .string) ?? ""
+    static func stringFromClipboard() -> String {
+#if os(macOS)
+        let pasteBoard = NSPasteboard.general
+        return pasteBoard.string(forType: .string) ?? ""
+#elseif os(iOS)
+        // TODO
+#endif
+    }
+
+    static var clipboardHasString: Bool {
+#if os(macOS)
+        let pasteBoard = NSPasteboard.general
+        return pasteBoard.string(forType: .string) != nil
+#elseif os(iOS)
+        // TODO
+#endif
+    }
 }
 
 extension Bundle {

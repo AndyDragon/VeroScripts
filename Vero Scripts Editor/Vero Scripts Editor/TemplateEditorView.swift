@@ -18,33 +18,44 @@ struct TemplateEditorView: View {
     @State private var manualPlaceholderKey = ""
     @State private var template = ""
     @State private var script = ""
-    
+    @State private var scriptPlaceholders = PlaceholderList()
+    @State private var showingPlaceholderSheet = false
+
     var body: some View {
         VStack {
             HStack {
                 Text("Template:")
                 Spacer()
                 Button(action: {
-                    copyToClipboard(selectedTemplate.template)
-                    // reset the dirty state...
                     selectedTemplate.forceDirty = false
                     selectedTemplate.originalTemplate = selectedTemplate.template
+                }) {
+                    Text("Mark completed")
+                }
+                Text("|")
+                    .padding(.horizontal)
+                Button(action: {
+                    Pasteboard.copyToClipboard(selectedTemplate.template)
                     toastManager.showCompletedToast("Copied", "Copied the script template to the clipboard")
                 }) {
                     Text("Copy template")
-                        //.font(.system(size: 10))
                 }
+                Button(action: {
+                    state.resetText(Pasteboard.stringFromClipboard(), clearUndo: false)
+                }) {
+                    Text("Paste template")
+                }
+                .disabled(!Pasteboard.clipboardHasString)
                 Button(action: {
                     state.resetText(selectedTemplate.originalTemplate)
                 }) {
                     Text("Revert template")
-                        //.font(.system(size: 10))
                 }
                 .disabled(!selectedTemplate.isDirty)
             }
-            
+
             HStack {
-                Text("Insert placeholder:")
+                Text("Insert:")
                     .lineLimit(1)
                 ForEach(staticPlaceholders, id: \.self) { placeholder in
                     Button(action: {
@@ -55,16 +66,18 @@ struct TemplateEditorView: View {
                             .lineLimit(1)
                     }
                 }
-                
-                Text("|")
-                    .padding(.horizontal)
-                
+                Spacer()
+            }
+
+            HStack {
+                Text("Insert:")
+                    .lineLimit(1)
+                    .opacity(0.000001)
                 TextField(text: $manualPlaceholderKey) {
-                    Text("Manual: ")
+                    Text("Manual")
                         .lineLimit(1)
                 }
-                .frame(maxWidth: 80)
-                
+                .frame(maxWidth: 120)
                 Button(action: {
                     state.pasteTextToEditor("[[\(manualPlaceholderKey)]]")
                 }) {
@@ -73,7 +86,6 @@ struct TemplateEditorView: View {
                         .lineLimit(1)
                 }
                 .disabled(manualPlaceholderKey.isEmpty)
-                
                 Button(action: {
                     state.pasteTextToEditor("[{\(manualPlaceholderKey)}]")
                 }) {
@@ -82,10 +94,9 @@ struct TemplateEditorView: View {
                         .lineLimit(1)
                 }
                 .disabled(manualPlaceholderKey.isEmpty)
-                
                 Spacer()
             }
-            
+
             TextEditor(text: $template)
                 .font(.system(size: 14, design: .monospaced))
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
@@ -112,7 +123,12 @@ struct TemplateEditorView: View {
                         }
                     }
                 }
-            
+                .introspect(.scrollView, on: .macOS(.v14, .v15)) { scrollView in
+                    scrollView.scrollerStyle = .overlay
+                    scrollView.autohidesScrollers = true
+                    scrollView.scrollerStyle = .legacy
+                }
+
             Divider()
                 .padding(.vertical)
 
@@ -123,10 +139,10 @@ struct TemplateEditorView: View {
                     updateScript()
                 })
                 .focusable()
-                
+
                 Text("|")
                     .padding(.horizontal)
-                
+
                 Picker("User level: ", selection: $viewModel.userLevel.onChange { value in
                     updateScript()
                 }) {
@@ -139,29 +155,30 @@ struct TemplateEditorView: View {
                 .focusable()
                 .lineLimit(1)
 
-                Text("|")
-                    .padding(.horizontal)
-                
+                Spacer()
+            }
+
+            HStack {
                 Text("Your alias: ")
                     .lineLimit(1)
                 TextField("", text: $viewModel.yourName.onChange { value in
                     updateScript()
                 })
                 .focusable()
-                
+
                 Text("|")
                     .padding(.horizontal)
-                
+
                 Text("Your first name: ")
                     .lineLimit(1)
                 TextField("Your first name", text: $viewModel.yourFirstName.onChange { value in
                     updateScript()
                 })
                 .focusable()
-                
+
                 Text("|")
                     .padding(.horizontal)
-                
+
                 Picker("Your level: ", selection: $viewModel.pageStaffLevel.onChange { value in
                     updateScript()
                 }) {
@@ -182,10 +199,25 @@ struct TemplateEditorView: View {
                 script: $script,
                 minHeight: 200,
                 maxHeight: 640,
+                copy: {
+                    if copyScript() {
+                        toastManager.showCompletedToast( "Copied", "Copied the feature script to the clipboard")
+                    }
+                },
                 focusedField: focusedField,
                 editorFocusField: .scriptEditor,
                 buttonFocusField: .scriptCopyButton
             )
+        }
+        .sheet(isPresented: $showingPlaceholderSheet) {
+            PlaceholderSheet(
+                placeholders: scriptPlaceholders,
+                script: script,
+                closeSheetWithToast: { copiedSuffix in
+                    let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
+                    toastManager.showCompletedToast("Copied", "Copied the script\(suffix) to the clipboard")
+                    showingPlaceholderSheet.toggle()
+                })
         }
         .padding()
         .onAppear {
@@ -196,6 +228,8 @@ struct TemplateEditorView: View {
                     state.updateHighlighting()
                 })
             updateScript()
+            scriptPlaceholders.placeholderDict.removeAll()
+            scriptPlaceholders.longPlaceholderDict.removeAll()
         }
         .onChange(of: selectedTemplate) {
             template = selectedTemplate.template
@@ -205,9 +239,11 @@ struct TemplateEditorView: View {
                     state.updateHighlighting()
                 })
             updateScript()
+            scriptPlaceholders.placeholderDict.removeAll()
+            scriptPlaceholders.longPlaceholderDict.removeAll()
         }
     }
-    
+
     private func updateScript() {
         let currentPageDisplayName = viewModel.selectedPage?.name ?? ""
         let scriptPageName = viewModel.selectedPage?.pageName ?? currentPageDisplayName
@@ -223,5 +259,45 @@ struct TemplateEditorView: View {
             .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
             .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)
             .replacingOccurrences(of: "%%STAFFLEVEL%%", with: viewModel.pageStaffLevel.rawValue)
+    }
+
+    private func scriptHasPlaceholders(_ script: String) -> Bool {
+        return !matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script).isEmpty || !matches(of: "\\[\\{([^\\}]*)\\}\\]", in: script).isEmpty
+    }
+
+    private func copyScript() -> Bool {
+        if !checkForPlaceholders() {
+            Pasteboard.copyToClipboard(script)
+            return true
+        }
+        return false
+    }
+
+    private func checkForPlaceholders() -> Bool {
+        var foundPlaceholders: [String] = [];
+        foundPlaceholders.append(contentsOf: matches(of: "\\[\\[([^\\]]*)\\]\\]", in: script))
+        if foundPlaceholders.count != 0 {
+            for placeholder in foundPlaceholders {
+                let placeholderEntry = scriptPlaceholders.placeholderDict[placeholder]
+                if placeholderEntry == nil {
+                    scriptPlaceholders.placeholderDict[placeholder] = PlaceholderValue()
+                }
+            }
+        }
+        var foundLongPlaceholders: [String] = [];
+        foundLongPlaceholders.append(contentsOf: matches(of: "\\[\\{([^\\}]*)\\}\\]", in: script))
+        if foundLongPlaceholders.count != 0 {
+            for placeholder in foundLongPlaceholders {
+                let placeholderEntry = scriptPlaceholders.longPlaceholderDict[placeholder]
+                if placeholderEntry == nil {
+                    scriptPlaceholders.longPlaceholderDict[placeholder] = PlaceholderValue()
+                }
+            }
+        }
+        if foundPlaceholders.count != 0 || foundLongPlaceholders.count != 0 && !showingPlaceholderSheet {
+            showingPlaceholderSheet.toggle()
+            return true
+        }
+        return false
     }
 }
