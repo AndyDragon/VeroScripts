@@ -1,5 +1,6 @@
 {
     "hub": "snap",
     "page": "drone",
-    "title": "Drone"
+    "title": "Drone",
+    "tagOnly": true
 }
