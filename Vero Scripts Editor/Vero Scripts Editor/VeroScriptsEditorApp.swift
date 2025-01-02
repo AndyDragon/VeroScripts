@@ -39,8 +39,6 @@ struct VeroScriptsEditorApp: App {
     }
 
     class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
-//        @EnvironmentObject var commandModel: AppCommandModel
-
         func applicationDidFinishLaunching(_ notification: Notification) {
             let mainWindow = NSApp.windows[0]
             mainWindow.delegate = self

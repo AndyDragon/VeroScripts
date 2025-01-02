@@ -9,7 +9,6 @@ import AlertToast
 import SwiftUI
 
 struct ContentView: View {
-    //@Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = true
 
     @Environment(\.openURL) private var openURL
@@ -186,6 +185,43 @@ struct ContentView: View {
         .navigationSubtitle(viewModel.isDirty ? "templates modified" : "")
         .frame(minWidth: 1280, minHeight: 800)
         .background(Color.BackgroundColor)
+        .onChange(of: appState.isShowingVersionAvailableToast.wrappedValue) {
+            if appState.isShowingVersionAvailableToast.wrappedValue {
+                showToastWithCompletion(
+                    .systemImage("exclamationmark.triangle.fill", .yellow),
+                    "New version available",
+                    getVersionSubTitle(),
+                    .LongFailure,
+                    {
+                        if let url = URL(string: appState.versionCheckToast.wrappedValue.linkToCurrentVersion) {
+                            openURL(url)
+                        }
+                    },
+                    {
+                        appState.resetCheckingForUpdates()
+                    }
+                )
+            }
+        }
+        .onChange(of: appState.isShowingVersionRequiredToast.wrappedValue) {
+            if appState.isShowingVersionRequiredToast.wrappedValue {
+                showToastWithCompletion(
+                    .systemImage("xmark.octagon.fill", .red),
+                    "New version required",
+                    getVersionSubTitle(),
+                    .Blocking,
+                    {
+                        if let url = URL(string: appState.versionCheckToast.wrappedValue.linkToCurrentVersion) {
+                            openURL(url)
+                            NSApplication.shared.terminate(nil)
+                        }
+                    },
+                    {
+                        appState.resetCheckingForUpdates()
+                    }
+                )
+            }
+        }
         .sheet(isPresented: $viewModel.isShowingDocumentDirtyAlert) {
             DocumentDirtySheet(
                 isShowing: $viewModel.isShowingDocumentDirtyAlert,
@@ -210,6 +246,17 @@ struct ContentView: View {
             await loadPageCatalog()
         }
         .preferredColorScheme(isDarkModeOn ? .dark : .light)
+    }
+
+    private func getVersionSubTitle() -> String {
+        if appState.isShowingVersionAvailableToast.wrappedValue {
+            return "You are using v\(appState.versionCheckToast.wrappedValue.appVersion) " + "and v\(appState.versionCheckToast.wrappedValue.currentVersion) is available"
+            + "\(appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty ? "" : ", click here to open your browser") " + "(this will go away in 10 seconds)"
+        } else if appState.isShowingVersionRequiredToast.wrappedValue {
+            return "You are using v\(appState.versionCheckToast.wrappedValue.appVersion) " + "and v\(appState.versionCheckToast.wrappedValue.currentVersion) is required"
+            + "\(appState.versionCheckToast.wrappedValue.linkToCurrentVersion.isEmpty ? "" : ", click here to open your browser") " + "or ⌘ + Q to Quit"
+        }
+        return ""
     }
 
     private func loadPageCatalog() async {
