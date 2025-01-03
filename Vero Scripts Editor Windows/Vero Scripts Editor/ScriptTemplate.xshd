@@ -1,0 +1,31 @@
+﻿<SyntaxDefinition
+	name="ScriptTemplate"
+	xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	
+	<Color name="Error" foreground="#FF6060" fontWeight="bold" />
+	<Color name="StaticPlaceholder" foreground="#FF60FF" fontWeight="bold" />
+	<Color name="ShortManualPlaceholder" foreground="#60FFFF" fontWeight="bold" />
+  <Color name="LongManualPlaceholder" foreground="#60FF60" fontWeight="bold" />
+  <Color name="HashTag" foreground="#D0E0FF" />
+
+  <RuleSet name="Placeholders">
+    <Rule color="StaticPlaceholder">
+      %%(PAGENAME|FULLPAGENAME|PAGETITLE|PAGEHASH|USERNAME|MEMBERLEVEL|YOURNAME|YOURFIRSTNAME|STAFFLEVEL)%%
+    </Rule>
+    <Rule color="Error">
+      %%[^%]+%%
+    </Rule>
+    <Rule color="ShortManualPlaceholder">
+      \[\[[^\]]+\]\]
+    </Rule>
+    <Rule color="LongManualPlaceholder">
+      \[{[^}]+}\]
+    </Rule>
+  </RuleSet>
+
+  <RuleSet>
+    <!--<Span color="HashTag" begin="(\@|\#)" end="[^\s]*" ruleSet="Placeholders" />-->
+    <Import ruleSet="Placeholders"/>
+  </RuleSet>
+
+</SyntaxDefinition>

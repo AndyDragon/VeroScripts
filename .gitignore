@@ -10,6 +10,11 @@ Vero Scripts Windows/Vero Scripts/bin/
 Vero Scripts Windows/Vero Scripts/obj/
 Vero Scripts Windows/Vero Scripts/*.csproj.user
 Vero Scripts Windows/Vero Scripts/Properties/PublishProfiles/*.user
+Vero Scripts Editor Windows/.vs/
+Vero Scripts Editor Windows/Vero Scripts Editor/bin/
+Vero Scripts Editor Windows/Vero Scripts Editor/obj/
+Vero Scripts Editor Windows/Vero Scripts Editor/*.csproj.user
+Vero Scripts Editor Windows/Vero Scripts Editor/Properties/PublishProfiles/*.user
 
 *.xcbkptlist
 **/xcuserdata/

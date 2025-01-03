@@ -18,7 +18,7 @@ export const showMacInfo = true;
 export const macDmgLocation = "veroscriptseditor/macos/Vero%20Scripts%20Editor%20";
 export const macReleaseNotesLocation = "releaseNotes-mac.json";
 
-export const showWindowsInfo = false;
+export const showWindowsInfo = true;
 export const windowsInstallerLocation = "veroscriptseditor/windows";
 export const windowsReleaseNotesLocation = "releaseNotes-windows.json";
 
