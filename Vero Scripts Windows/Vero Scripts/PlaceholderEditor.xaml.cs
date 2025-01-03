@@ -10,7 +10,7 @@ namespace VeroScripts
     {
         private readonly Script script;
 
-        public PlaceholderEditor(ScriptsViewModel viewModel, Script script)
+        public PlaceholderEditor(MainViewModel viewModel, Script script)
         {
             InitializeComponent();
             this.DataContext = new PlaceholdersViewModel(viewModel, script);

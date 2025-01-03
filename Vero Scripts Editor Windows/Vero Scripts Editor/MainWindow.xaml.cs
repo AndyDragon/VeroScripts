@@ -69,7 +69,7 @@ namespace VeroScriptsEditor
             if (this.DataContext is MainViewModel viewModel && viewModel.IsDirty)
             {
                 e.Cancel = true;
-                viewModel.HandleDirtyAction(exit => e.Cancel = !exit);
+                MainViewModel.HandleDirtyAction(exit => e.Cancel = !exit);
             }
         }
 

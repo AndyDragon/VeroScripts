@@ -22,7 +22,7 @@ namespace VeroScripts
         OriginalPost,
     }
 
-    public partial class ScriptsViewModel : NotifyPropertyChanged
+    public partial class MainViewModel : NotifyPropertyChanged
     {
         #region Field validation
 
@@ -85,7 +85,7 @@ namespace VeroScripts
             { Script.OriginalPost, "original post" },
         };
 
-        public ScriptsViewModel()
+        public MainViewModel()
         {
             _ = LoadPages();
             TemplatesCatalog = new TemplatesCatalog();
@@ -476,23 +476,23 @@ namespace VeroScripts
         private static string[] SnapMemberships => [
             "None",
             "Artist",
-            "Member",
-            "VIP Member",
-            "VIP Gold Member",
-            "Platinum Member",
-            "Elite Member",
-            "Hall of Fame Member",
-            "Diamond Member",
+            "Snap Member",
+            "Snap VIP Member",
+            "Snap VIP Gold Member",
+            "Snap Platinum Member",
+            "Snap Elite Member",
+            "Snap Hall of Fame Member",
+            "Snap Diamond Member",
         ];
 
         private static string[] ClickMemberships => [
             "None",
             "Artist",
-            "Member",
-            "Bronze Member",
-            "Silver Member",
-            "Gold Member",
-            "Platinum Member",
+            "Click Member",
+            "Click Bronze Member",
+            "Click Silver Member",
+            "Click Gold Member",
+            "Click Platinum Member",
         ];
 
         private static string[] OtherMemberships => [
@@ -633,6 +633,11 @@ namespace VeroScripts
                         OnPropertyChanged(nameof(SnapHubVisibility));
                         NewMembership = "None";
                         OnPropertyChanged(nameof(HubNewMemberships));
+                        OnPropertyChanged(nameof(StaffLevels));
+                        if (!StaffLevels.Contains(StaffLevel))
+                        {
+                            StaffLevel = StaffLevels[0];
+                        }
                     }
                 }
             }
@@ -695,11 +700,29 @@ namespace VeroScripts
 
         #region Staff level
 
-        public static string[] StaffLevels => [
+        public static string[] SnapStaffLevels => [
+            "Mod",
+            "Co-Admin",
+            "Admin",
+            "Guest moderator"
+        ];
+
+        public static string[] ClickStaffLevels => [
             "Mod",
             "Co-Admin",
             "Admin",
         ];
+
+        public static string[] OtherStaffLevels => [
+            "Mod",
+            "Co-Admin",
+            "Admin",
+        ];
+
+        public string[] StaffLevels =>
+            SelectedPage?.HubName == "click" ? ClickStaffLevels :
+            SelectedPage?.HubName == "snap" ? SnapStaffLevels :
+            OtherStaffLevels;
 
         private string staffLevel = UserSettings.Get(nameof(StaffLevel), "Mod");
 

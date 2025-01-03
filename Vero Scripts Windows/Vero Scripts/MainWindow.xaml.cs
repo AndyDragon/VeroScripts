@@ -16,7 +16,7 @@ namespace VeroScripts
 
         private void OnActivatedChanged(object sender, EventArgs e)
         {
-            if (this.DataContext is ScriptsViewModel viewModel)
+            if (this.DataContext is MainViewModel viewModel)
             {
                 viewModel.WindowActive = IsActive;
             }
@@ -24,7 +24,7 @@ namespace VeroScripts
 
         private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            if (this.DataContext is ScriptsViewModel viewModel)
+            if (this.DataContext is MainViewModel viewModel)
             {
                 viewModel.MainWindow = this;
             }

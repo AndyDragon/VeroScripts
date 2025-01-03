@@ -219,7 +219,7 @@ namespace VeroScriptsEditor
 
         public string Title => $"Vero Scripts Editor{(IsDirty ? " - some templates edited" : string.Empty)}";
 
-        public void HandleDirtyAction(Action<bool> onAction)
+        public static void HandleDirtyAction(Action<bool> onAction)
         {
             switch (MessageBox.Show(
                 Application.Current.MainWindow,
@@ -275,6 +275,10 @@ namespace VeroScriptsEditor
                     SelectedNewTemplate = NewTemplates.FirstOrDefault();
                     var page = SelectedPage?.Id ?? string.Empty;
                     UserSettings.Store("Page", page);
+                    if (!StaffLevels.Contains(StaffLevel))
+                    {
+                        StaffLevel = StaffLevels[0];
+                    }
                     UpdateScript();
                 }
             }
@@ -498,12 +502,29 @@ namespace VeroScriptsEditor
 
         #region Staff level
 
-        public static string[] StaffLevels => [
+        public static string[] SnapStaffLevels => [
             "Mod",
             "Co-Admin",
             "Admin",
             "Guest moderator"
         ];
+
+        public static string[] ClickStaffLevels => [
+            "Mod",
+            "Co-Admin",
+            "Admin",
+        ];
+
+        public static string[] OtherStaffLevels => [
+            "Mod",
+            "Co-Admin",
+            "Admin",
+        ];
+
+        public string[] StaffLevels =>
+            SelectedPage?.HubName == "click" ? ClickStaffLevels :
+            SelectedPage?.HubName == "snap" ? SnapStaffLevels :
+            OtherStaffLevels;
 
         private string staffLevel = "Mod";
 

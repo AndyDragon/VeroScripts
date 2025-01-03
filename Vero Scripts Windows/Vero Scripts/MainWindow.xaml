@@ -22,7 +22,7 @@
     DataContextChanged="OnDataContextChanged">
 
     <Window.DataContext>
-        <local:ScriptsViewModel />
+        <local:MainViewModel />
     </Window.DataContext>
 
     <Window.Resources>

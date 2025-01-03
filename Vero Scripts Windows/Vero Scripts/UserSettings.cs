@@ -12,7 +12,7 @@ namespace VeroScripts
         {
             if (cachedStore == null)
             {
-                var userSettingsPath = ScriptsViewModel.GetUserSettingsPath();
+                var userSettingsPath = MainViewModel.GetUserSettingsPath();
                 if (File.Exists(userSettingsPath))
                 {
                     var json = File.ReadAllText(userSettingsPath);
@@ -24,7 +24,7 @@ namespace VeroScripts
 
         private static void SaveStore()
         {
-            var userSettingsPath = ScriptsViewModel.GetUserSettingsPath();
+            var userSettingsPath = MainViewModel.GetUserSettingsPath();
             var json = JsonConvert.SerializeObject(cachedStore);
             File.WriteAllText(userSettingsPath, json);
         }
