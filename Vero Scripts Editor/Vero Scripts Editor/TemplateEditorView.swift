@@ -182,7 +182,7 @@ struct TemplateEditorView: View {
                 Picker("Your level: ", selection: $viewModel.pageStaffLevel.onChange { value in
                     updateScript()
                 }) {
-                    ForEach(StaffLevelCase.allCases) { staffLevelCase in
+                    ForEach(StaffLevelCase.casesFor(hub: viewModel.selectedPage!.hub)) { staffLevelCase in
                         Text(staffLevelCase.rawValue)
                             .tag(staffLevelCase)
                             .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
@@ -249,12 +249,13 @@ struct TemplateEditorView: View {
         let scriptPageName = viewModel.selectedPage?.pageName ?? currentPageDisplayName
         let scriptPageHash = viewModel.selectedPage?.hashTag ?? currentPageDisplayName
         let scriptPageTitle = viewModel.selectedPage?.title ?? currentPageDisplayName
+        let userLevelTitle = viewModel.userLevel.scriptMembershipStringForHub(hub: viewModel.selectedPage?.hub)
         script = selectedTemplate.template
             .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
             .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageDisplayName)
             .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
             .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-            .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: viewModel.userLevel.rawValue)
+            .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: userLevelTitle)
             .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userAlias)
             .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
             .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)

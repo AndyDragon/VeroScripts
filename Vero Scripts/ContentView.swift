@@ -15,12 +15,6 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isDarkModeOn = true
 
-    // SHARED FEATURE
-    @AppStorage(
-        "feature",
-        store: UserDefaults(suiteName: "group.com.andydragon.VeroTools")
-    ) var sharedFeature = ""
-
     @Environment(\.openURL) private var openURL
     @State private var membership = MembershipCase.none
     @State private var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
@@ -153,7 +147,7 @@ struct ContentView: View {
                             .lineLimit(1)
                             .truncationMode(.tail)
                         Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
-                            ForEach(StaffLevelCase.allCases) { staffLevelCase in
+                            ForEach(StaffLevelCase.casesFor(hub: currentPage?.hub)) { staffLevelCase in
                                 Text(staffLevelCase.rawValue)
                                     .tag(staffLevelCase)
                                     .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
@@ -645,9 +639,6 @@ struct ContentView: View {
 #if TESTING
             .navigationTitle("Vero Scripts - Script Testing")
 #endif
-            .onValueChanged(value: sharedFeature) { newValue in
-                loadSharedFeature()
-            }
             .task {
                 // Hack for page staff level to handle changes (otherwise they are not persisted)
                 lastPageStaffLevel = pageStaffLevel
@@ -762,7 +753,7 @@ struct ContentView: View {
                 return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
             }))
 
-            loadSharedFeature()
+            updateStaffLevelForPage()
 
             // Delay the start of the templates download so the window can be ready faster
             try await Task.sleep(nanoseconds: 200_000_000)
@@ -816,24 +807,6 @@ struct ContentView: View {
                     }
                 }
             }
-        }
-    }
-
-    private func loadSharedFeature() {
-        if !sharedFeature.isEmpty {
-            // Store this before we clear the value
-            let sharedFeatureJson = sharedFeature
-
-            // Clear the feature
-            UserDefaults(suiteName: "group.com.andydragon.VeroTools")?.removeObject(forKey: "feature")
-
-            // Load the feature
-            let featureUser = CodableFeatureUser(json: sharedFeatureJson.data(using: .utf8)!)
-            if !featureUser.page.isEmpty {
-                populateFromFeatureUser(featureUser)
-            }
-        } else {
-            updateStaffLevelForPage()
         }
     }
 
@@ -1246,6 +1219,7 @@ struct ContentView: View {
         var scriptPageHash = currentPageName
         var scriptPageTitle = currentPageName
         let currentHubName = currentPage?.hub
+        var membershipString = membership.rawValue
         if currentPageName != "" {
             let pageSource = loadedPages.first(where: { needle in needle.id == page })
             if pageSource != nil {
@@ -1264,12 +1238,14 @@ struct ContentView: View {
                 }
             }
             currentPage = pageSource
+            membershipString = membership.scriptMembershipStringForHub(hub: currentPage?.hub)
         } else {
             currentPage = nil
         }
         // There was a hub change, re-validate the membership and new membership
         if currentPage?.hub != currentHubName {
             membership = MembershipCase.none
+            membershipString = membership.scriptMembershipStringForHub(hub: currentPage?.hub)
             lastMembership = membership
             membershipValidation = validateMembership(value: membership)
             newMembership = NewMembershipCase.none
@@ -1323,7 +1299,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
@@ -1335,7 +1311,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
@@ -1347,7 +1323,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membership.rawValue)
+                .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)

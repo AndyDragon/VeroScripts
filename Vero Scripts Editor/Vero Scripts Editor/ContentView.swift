@@ -352,6 +352,8 @@ struct ContentView: View {
                 viewModel.selectedPage = newValue
             }
             selectedTemplate = nil
+            viewModel.userLevel = .commonArtist
+            viewModel.pageStaffLevel = .mod
             UserDefaults.standard.set(viewModel.selectedPage?.pageId ?? "", forKey: "Page")
         }
     }

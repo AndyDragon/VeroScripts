@@ -187,5 +187,16 @@
                 ]
             }
         ]
+    },
+    {
+        "version": "1.0.44",
+        "notes": [
+            {
+                "date": "January 3, 2025",
+                "notes": [
+                    "Added guest moderator for snap pages"
+                ]
+            }
+        ]
     }
 ]

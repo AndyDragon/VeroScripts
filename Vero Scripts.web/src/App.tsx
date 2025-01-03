@@ -68,6 +68,7 @@ function App() {
   const [firstName, setFirstName] = useState<string>("");
   const [pageOptions, setPageOptions] = useState<IDropdownOption[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>("none");
+  const [staffLevelOptions, setStaffLevelOptions] = useState<IDropdownOption[]>([]);
   const [selectedStaffLevel, setSelectedStaffLevel] = useState<string>("mod");
   const [isFirstFeature, setIsFirstFeature] = useState<boolean>(false);
   const [isRawTagCheckVisible, setIsRawTagCheckVisible] = useState<boolean>(false);
@@ -96,23 +97,23 @@ function App() {
   const snapLevelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
     { key: "artist", text: "Artist" },
-    { key: "member", text: "Member" },
-    { key: "vip", text: "VIP Member" },
-    { key: "gold", text: "VIP Gold Member" },
-    { key: "platinum", text: "Platinum Member" },
-    { key: "elite", text: "Elite Member" },
-    { key: "hof", text: "Hall of Fame Member" },
-    { key: "diamond", text: "Diamond Member" },
+    { key: "member", text: "Snap Member" },
+    { key: "vip", text: "Snap VIP Member" },
+    { key: "gold", text: "Snap VIP Gold Member" },
+    { key: "platinum", text: "Snap Platinum Member" },
+    { key: "elite", text: "Snap Elite Member" },
+    { key: "hof", text: "Snap Hall of Fame Member" },
+    { key: "diamond", text: "Snap Diamond Member" },
   ];
 
   const clickLevelOptions: IDropdownOption[] = [
     { key: "none", text: "None" },
     { key: "artist", text: "Artist" },
-    { key: "member", text: "Member" },
-    { key: "bronze", text: "Bronze Member" },
-    { key: "silver", text: "Silver Member" },
-    { key: "gold", text: "Gold Member" },
-    { key: "platinum", text: "Platinum Member" },
+    { key: "member", text: "Click Member" },
+    { key: "bronze", text: "Click Bronze Member" },
+    { key: "silver", text: "Click Silver Member" },
+    { key: "gold", text: "Click Gold Member" },
+    { key: "platinum", text: "Click Platinum Member" },
   ];
 
   const defaultLevelOptions: IDropdownOption[] = [
@@ -120,7 +121,14 @@ function App() {
     { key: "artist", text: "Artist" },
   ];
 
-  const staffLevelOptions: IDropdownOption[] = [
+  const snapStaffLevelOptions: IDropdownOption[] = [
+    { key: "mod", text: "Mod" },
+    { key: "coadmin", text: "Co-admin" },
+    { key: "admin", text: "Admin" },
+    { key: "guestmod", text: "Guest moderator" },
+  ];
+
+  const defaultStaffLevelOptions: IDropdownOption[] = [
     { key: "mod", text: "Mod" },
     { key: "coadmin", text: "Co-admin" },
     { key: "admin", text: "Admin" },
@@ -209,10 +217,18 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setLevelOptions(levelOptionsForPage());
-    setSelectedLevel("none");
+    let levelOptions = levelOptionsForPage();
+    setLevelOptions(levelOptions);
+    if (!levelOptions.find(option => option.key === selectedLevel)) {
+      setSelectedLevel("none");
+    }
     setNewLevelOptions(newLevelOptionsForPage());
     setSelectedNewLevel("none");
+    let staffLevelOptions = staffLevelOptionsForPage();
+    setStaffLevelOptions(staffLevelOptions);
+    if (!staffLevelOptions.find(option => option.key === selectedStaffLevel)) {
+      setSelectedStaffLevel("mod");
+    }
     setIsRawTagCheckVisible(selectedHub === "snap");
     setIsCommunityTagCheckVisible(selectedHub === "snap");
   }, [selectedHub]);
@@ -358,6 +374,7 @@ function App() {
       const scriptPageName = page?.pageName || pagePart;
       const scriptPageTitle = page?.title || scriptPageName
       const scriptPageHash = page?.hashTag || scriptPageName
+      const staffLevelString = staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || defaultStaffLevelOptions[0].text;
       return (
         template
           .replaceAll("%%PAGENAME%%", scriptPageName)
@@ -370,10 +387,7 @@ function App() {
           .replaceAll("%%YOURFIRSTNAME%%", firstName)
           // Special case for 'YOUR FIRST NAME' since it's now autofilled.
           .replaceAll("[[YOUR FIRST NAME]]", firstName)
-          .replaceAll(
-            "%%STAFFLEVEL%%",
-            staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || ""
-          )
+          .replaceAll("%%STAFFLEVEL%%", staffLevelString)
       );
     }
   }, [
@@ -442,6 +456,15 @@ function App() {
     return defaultNewLevelOptions;
   }
 
+  function staffLevelOptionsForPage() {
+    if (selectedHub === "snap") {
+      return snapStaffLevelOptions;
+    } else if (selectedHub === "click") {
+      return defaultStaffLevelOptions;
+    }
+    return defaultStaffLevelOptions;
+  }
+
   useEffect(() => {
     localStorage.setItem("theme", selectedTheme);
     localStorage.setItem("yourname", yourName);
@@ -482,6 +505,7 @@ function App() {
           return template.name === selectedHub + ":" + selectedNewLevel.replaceAll(" ", "_").toLowerCase();
         }
       });
+      const staffLevelString = staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || defaultStaffLevelOptions[0].text;
       const script = (template?.template || "")
         .replaceAll("%%PAGENAME%%", scriptPageName)
         .replaceAll("%%FULLPAGENAME%%", pagePart)
@@ -490,10 +514,7 @@ function App() {
         .replaceAll("%%USERNAME%%", userName)
         .replaceAll("%%YOURNAME%%", yourName)
         .replaceAll("%%YOURFIRSTNAME%%", firstName)
-        .replaceAll(
-          "%%STAFFLEVEL%%",
-          staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || ""
-        );
+        .replaceAll("%%STAFFLEVEL%%", staffLevelString);
       setNewLevelScript(script);
     }
   }, [
