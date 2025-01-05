@@ -273,7 +273,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% • \n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%  \n%%STAFFLEVEL%% on @snap_%%PAGENAME%% \n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community \n.\nCC Snap Community Owner \n@snap_owner \n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero \n#verofamily \n#verofriends \n\n#veroart #abstractart #abstract_and_contemporary_art #abstractbuff #abstract_artist #abstract_expressionism #abstract_lovers #color_art #abstract_capture #icmabstractphotography #icm_gallery #icm_world #icm_photomag #icm_planet #icm_snap \n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%  \n#snap_featured_%%USERNAME%%   \n•\n"
+          "template": "• #snap_%%PAGENAME%% and #snap_surreal •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n\n#veroart #abstractart #abstract_and_contemporary_art #abstractbuff #abstract_artist #abstract_expressionism #abstract_lovers #color_art #abstract_capture #icmabstractphotography #icm_gallery #icm_world #icm_photomag #icm_planet #icm_snap\n.\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
         },
         {
           "name": "original post",
@@ -307,7 +307,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n✨Featured %%MEMBERLEVEL%%: [[USER'S FIRST NAME]] @%%USERNAME%% ✨\n.\n___________________________________\n✨CONGRATULATIONS ✨.\n___________________________________\n.\nSelected by: [[YOUR FIRST NAME]] @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero, Instagram and Tumblr\nPlease follow @snap_community .\n\n.\nCC Snap Community Owner Jane @snap_owner .\n.\nPlease check out @snap_kingdom for more of our @snap_community pages\n•\n#snap_featured #snap_community #vero #verofamily #verofriends .\n#ai_generated\n#ai_art_community\n#Ai\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#vero_ai_creators\n#vero\n#picsta\n.\nTRACKING TAGS FOR INTERNAL USE.\nSnap_community admin and mod use only. Thank you:\n#snap_featured\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n.\n"
+          "template": "• #snap_%%PAGENAME%% •\n•\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•_________________________\n\n✨ CONGRATULATIONS ✨\n__________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane @snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n•\n#ai\n#ai_generated\n#ai_art_community\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#digitalart\n#vero_ai_creators\n•\n•\nFor internal use only!\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n•\n"
         },
         {
           "name": "first comment",
@@ -540,23 +540,6 @@
         {
           "name": "original post",
           "template": "🌟 FEATURED 🌟"
-        }
-      ]
-    },
-    {
-      "name": "snap:books",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "✨✨  CONGRATULATIONS @%%USERNAME%% !!!  Thank you for tagging @snap_%%PAGENAME%% and for supporting the Vero Community ✨✨\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on Vero. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#coffeelover #readingcorner #bookcommunity #readallthebooks #booksaddict #booksbooksandmorebooks #readersofinstagram #booklove #bookishlife #cozyreads #bookaesthetic\n#bookflatlay #bookiesunited #booksonbooks #booksandflowers #booksaremagic #Bookshelf #Literature #Publication\n\n.\n\n.\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "💫🎊🎉 FEATURED on SNAP_%%PAGENAME%% 💫🎊🎉"
         }
       ]
     },
@@ -1660,23 +1643,6 @@
       ]
     },
     {
-      "name": "snap:surreal",
-      "templates": [
-        {
-          "name": "comment",
-          "template": "💥🏆Heartfelt congratulations, [[USER'S FIRST NAME]], on your feature with us🏆💥! Thank you for sharing your wonderful surrealistic artwork. 🙏🏼 Please keep tagging #snap_%%PAGENAME%%  for a chance of more features! 🙋🏻🌎🌍🌏💥🚀🪐✨\n"
-        },
-        {
-          "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n✨Featured %%MEMBERLEVEL%%: [[USER'S FIRST NAME]] @%%USERNAME%% ✨\n.\n________________________________\n✨CONGRATULATIONS ✨\n________________________________\n.\nSelected by: [[YOUR FIRST NAME]] @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO.\nPlease follow @snap_community\n.\nCC Snap Community owner Jane @snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n.\n#snap_community\n#snap_community_member\n#surreal\n#surrealism\n#surrealismo\n#surrealismcommunity\n#surreal_art\n#surrealart\n#surrealarts\n#surrealartwork\n#surreal_photography\n#surrealartists\n#surreal42\n#SurrealCollage\n#vero\n#verofamily\n#verofriends\n.\nFor internal SNAP use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
-        },
-        {
-          "name": "original post",
-          "template": "⭐️🏆FEATURED🏆⭐"
-        }
-      ]
-    },
-    {
       "name": "snap:symmetry",
       "templates": [
         {
@@ -1913,7 +1879,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n.\n💫 Featured %%MEMBERLEVEL%%: @%%USERNAME%% 💫\n•\n__________________________________\n.\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom  for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#poetsofvero\n#poetryhive\n#bleedink\n#spilledthoughts\n#wordsmith\n#drunkpoetsociety\n#poetrysociety\n#poetryisart\n#writersnetwork\n#signs\n#motivationalquotes\n#inspirationalquotes\n#Poetry\n\n•\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% and #snap_books •\n.\n💫 Featured %%MEMBERLEVEL%%: @%%USERNAME%% 💫\n•\n__________________________________\n.\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom  for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#poetsofvero\n#poetryhive\n#bleedink\n#spilledthoughts\n#wordsmith\n#drunkpoetsociety\n#poetrysociety\n#poetryisart\n#writersnetwork\n#signs\n#motivationalquotes\n#inspirationalquotes\n#Poetry\n\n•\n•\n For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
         },
         {
           "name": "first comment",
