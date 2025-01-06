@@ -7,7 +7,7 @@ __________________________________
 Featured %%MEMBERLEVEL%%: @%%USERNAME%%
 __________________________________
 
-Selected by: @%%YOURNAME%%
+Selected by: %%YOURFIRSTNAME%% @%%YOURNAME%%
 %%STAFFLEVEL%% on @click_%%PAGENAME%%
 
 Your photo has been selected for this feature because we feel it embodies the nature of machines, well done.
