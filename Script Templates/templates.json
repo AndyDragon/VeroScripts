@@ -303,7 +303,7 @@
       "templates": [
         {
           "name": "comment",
-          "template": "💥🏆Heartfelt congratulations, [[USER'S FIRST NAME]] @%%USERNAME%% on your feature with us🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
+          "template": "💥🏆Heartfelt congratulations, @%%USERNAME%% on your feature with us🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
         },
         {
           "name": "feature",
@@ -311,7 +311,7 @@
         },
         {
           "name": "first comment",
-          "template": "💥🏆Heartfelt congratulations, [[USER'S FIRST NAME]] @%%USERNAME%% on your FIRST feature with us 🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
+          "template": "💥🏆Heartfelt congratulations, @%%USERNAME%% on your FIRST feature with us 🏆💥! Thank you for sharing your wonderful AI artwork with us. 🙏🏼 Please keep tagging #snap_%%PAGENAME%% for a chance of more features!\n"
         },
         {
           "name": "original post",
