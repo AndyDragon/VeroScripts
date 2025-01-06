@@ -307,7 +307,7 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n•\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•_________________________\n\n✨ CONGRATULATIONS ✨\n__________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane @snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n•\n#ai\n#ai_generated\n#ai_art_community\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#digitalart\n#vero_ai_creators\n•\n•\nFor internal use only!\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% •\n•  \n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n__________________________\n\n✨ CONGRATULATIONS ✨\n__________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane @snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n•\n#ai\n#ai_generated\n#ai_art_community\n#ai_art_gallery\n#ai_artist\n#ai_artwork\n#digitalart\n#vero_ai_creators\n•\n•\nFor internal use only!\n#snap_featured_%%USERNAME%%\n#snap_%%PAGENAME%%_%%USERNAME%%\n•\n"
         },
         {
           "name": "first comment",
