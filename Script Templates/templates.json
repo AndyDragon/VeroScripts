@@ -1482,7 +1482,7 @@
         },
         {
           "name": "original post",
-          "template": "💫 Snap Community %%MEMBERLEVEL%% feature 💫"
+          "template": "💫 %%MEMBERLEVEL%% feature 💫"
         }
       ]
     },
@@ -1887,7 +1887,7 @@
         },
         {
           "name": "original post",
-          "template": "💫 Snap Community %%MEMBERLEVEL%% feature 💫"
+          "template": "💫 FEATURED %%MEMBERLEVEL%% 💫\n🍾🎉C O N G R A T U L A T I O N S !! 🎉🍾"
         }
       ]
     }
