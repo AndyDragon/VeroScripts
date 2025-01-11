@@ -22,30 +22,9 @@ extension ContentView {
     class ViewModel {
         init() {}
 
-        // MARK: Catalog
-        var catalog = ObservableCatalog()
-        var selectedPage: ObservablePage?
-        var selectedTemplate: ObservableTemplate?
-
-        // MARK: Document management
-        var ignoreDirty: Bool = false
-        var isDirty: Bool {
-            catalog.isDirty && !ignoreDirty
-        }
-        var isShowingDocumentDirtyAlert = false
-
-        // MARK: Feature sample state
-        var tagSource: TagSourceCase = .commonPageTag
-        var firstFeature: Bool = false
-        var userLevel: MembershipCase = .commonArtist
-        var userAlias = "alphabeta"
-        var yourName = "omegazeta"
-        var yourFirstName = "Omega"
-        var pageStaffLevel: StaffLevelCase = .mod
-
         // MARK: Version check
         private var lastVersionCheckResult = VersionCheckResult.complete
-
+        
         func handleVersionCheck(
             _ appState: VersionCheckAppState,
             _ launchURL: @escaping (_ url: URL) -> Void

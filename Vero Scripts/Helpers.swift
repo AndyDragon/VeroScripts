@@ -24,7 +24,9 @@ extension Binding {
 extension View {
     @ViewBuilder func onValueChanged<T: Equatable>(value: T, onChange: @escaping (T) -> Void) -> some View {
         if #available(macOS 14.0, *) {
-            self.onChange(of: value, perform: onChange)
+            self.onChange(of: value) { oldValue, newValue in
+                onChange(newValue)
+            }
         } else {
             self.onReceive(Just(value)) { (value) in
                 onChange(value)

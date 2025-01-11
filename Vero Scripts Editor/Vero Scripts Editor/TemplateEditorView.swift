@@ -10,7 +10,6 @@ import SystemColors
 import SwiftUIIntrospect
 
 struct TemplateEditorView: View {
-    @Bindable var toastManager: ContentView.ToastManager
     @Bindable var viewModel: ContentView.ViewModel
     @Bindable var selectedTemplate: ObservableTemplate
     @State var focusedField: FocusState<FocusField?>.Binding
@@ -36,7 +35,7 @@ struct TemplateEditorView: View {
                     .padding(.horizontal)
                 Button(action: {
                     Pasteboard.copyToClipboard(selectedTemplate.template)
-                    toastManager.showCompletedToast("Copied", "Copied the script template to the clipboard")
+                    viewModel.showSuccessToast("Copied", "Copied the script template to the clipboard")
                 }) {
                     Text("Copy template")
                 }
@@ -201,7 +200,7 @@ struct TemplateEditorView: View {
                 maxHeight: 640,
                 copy: {
                     if copyScript() {
-                        toastManager.showCompletedToast( "Copied", "Copied the feature script to the clipboard")
+                        viewModel.showSuccessToast( "Copied", "Copied the feature script to the clipboard")
                     }
                 },
                 focusedField: focusedField,
@@ -215,7 +214,7 @@ struct TemplateEditorView: View {
                 script: script,
                 closeSheetWithToast: { copiedSuffix in
                     let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
-                    toastManager.showCompletedToast("Copied", "Copied the script\(suffix) to the clipboard")
+                    viewModel.showSuccessToast("Copied", "Copied the script\(suffix) to the clipboard")
                     showingPlaceholderSheet.toggle()
                 })
         }

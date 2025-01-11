@@ -19,7 +19,12 @@
 		49C546D62B78750A0048DEDA /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D52B78750A0048DEDA /* Helpers.swift */; };
 		49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D72B7875630048DEDA /* PlaceholderEditor.swift */; };
 		49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D92B787B340048DEDA /* NewMembershipEditor.swift */; };
-		49E1A4582B7EAA4A003C3272 /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = 49E1A4572B7EAA4A003C3272 /* AlertToast */; };
+		49FE12212D32EDF90018C3DE /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE121A2D32EDF90018C3DE /* View+Extensions.swift */; };
+		49FE12222D32EDF90018C3DE /* AdvancedToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE121F2D32EDF90018C3DE /* AdvancedToastView.swift */; };
+		49FE12232D32EDF90018C3DE /* AdvancedToastStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE121E2D32EDF90018C3DE /* AdvancedToastStyle.swift */; };
+		49FE12242D32EDF90018C3DE /* AdvancedToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE121C2D32EDF90018C3DE /* AdvancedToast.swift */; };
+		49FE12252D32EDF90018C3DE /* AdvancedToastModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE121D2D32EDF90018C3DE /* AdvancedToastModifiers.swift */; };
+		49FE12272D32EE6E0018C3DE /* ContentView.ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FE12262D32EE6E0018C3DE /* ContentView.ViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +42,12 @@
 		49C546D72B7875630048DEDA /* PlaceholderEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderEditor.swift; sourceTree = "<group>"; };
 		49C546D92B787B340048DEDA /* NewMembershipEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMembershipEditor.swift; sourceTree = "<group>"; };
 		49E1A4592B7ED16D003C3272 /* Testing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Testing.xcconfig; sourceTree = "<group>"; };
+		49FE121A2D32EDF90018C3DE /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
+		49FE121C2D32EDF90018C3DE /* AdvancedToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToast.swift; sourceTree = "<group>"; };
+		49FE121D2D32EDF90018C3DE /* AdvancedToastModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToastModifiers.swift; sourceTree = "<group>"; };
+		49FE121E2D32EDF90018C3DE /* AdvancedToastStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToastStyle.swift; sourceTree = "<group>"; };
+		49FE121F2D32EDF90018C3DE /* AdvancedToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToastView.swift; sourceTree = "<group>"; };
+		49FE12262D32EE6E0018C3DE /* ContentView.ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.ViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,7 +55,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49E1A4582B7EAA4A003C3272 /* AlertToast in Frameworks */,
 				4919020E2B8D502000D0CB93 /* SystemColors in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,8 +81,10 @@
 		495CCC4A2B45E3AA00BBA415 /* Vero Scripts */ = {
 			isa = PBXGroup;
 			children = (
+				49FE12202D32EDF90018C3DE /* Advanced Toast */,
 				495CCC4B2B45E3AA00BBA415 /* VeroScriptsApp.swift */,
 				495CCC4D2B45E3AA00BBA415 /* ContentView.swift */,
+				49FE12262D32EE6E0018C3DE /* ContentView.ViewModel.swift */,
 				49C546D92B787B340048DEDA /* NewMembershipEditor.swift */,
 				49C546D72B7875630048DEDA /* PlaceholderEditor.swift */,
 				496BEA2A2B78682F001D36C1 /* FieldEditor.swift */,
@@ -86,6 +98,26 @@
 				49E1A4592B7ED16D003C3272 /* Testing.xcconfig */,
 			);
 			path = "Vero Scripts";
+			sourceTree = "<group>";
+		};
+		49FE121B2D32EDF90018C3DE /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				49FE121A2D32EDF90018C3DE /* View+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		49FE12202D32EDF90018C3DE /* Advanced Toast */ = {
+			isa = PBXGroup;
+			children = (
+				49FE121B2D32EDF90018C3DE /* Extensions */,
+				49FE121C2D32EDF90018C3DE /* AdvancedToast.swift */,
+				49FE121D2D32EDF90018C3DE /* AdvancedToastModifiers.swift */,
+				49FE121E2D32EDF90018C3DE /* AdvancedToastStyle.swift */,
+				49FE121F2D32EDF90018C3DE /* AdvancedToastView.swift */,
+			);
+			path = "Advanced Toast";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -105,7 +137,6 @@
 			);
 			name = "Vero Scripts";
 			packageProductDependencies = (
-				49E1A4572B7EAA4A003C3272 /* AlertToast */,
 				4919020D2B8D502000D0CB93 /* SystemColors */,
 			);
 			productName = "Vero Scripts";
@@ -137,7 +168,6 @@
 			);
 			mainGroup = 495CCC3F2B45E3AA00BBA415;
 			packageReferences = (
-				49E1A4562B7EAA4A003C3272 /* XCRemoteSwiftPackageReference "AlertToast" */,
 				4919020C2B8D502000D0CB93 /* XCRemoteSwiftPackageReference "swiftui-system-colors" */,
 			);
 			productRefGroup = 495CCC492B45E3AA00BBA415 /* Products */;
@@ -171,7 +201,13 @@
 				498FBACD2BA5FF30000F5507 /* Themes.swift in Sources */,
 				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
 				49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */,
+				49FE12272D32EE6E0018C3DE /* ContentView.ViewModel.swift in Sources */,
 				496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */,
+				49FE12212D32EDF90018C3DE /* View+Extensions.swift in Sources */,
+				49FE12222D32EDF90018C3DE /* AdvancedToastView.swift in Sources */,
+				49FE12232D32EDF90018C3DE /* AdvancedToastStyle.swift in Sources */,
+				49FE12242D32EDF90018C3DE /* AdvancedToast.swift in Sources */,
+				49FE12252D32EDF90018C3DE /* AdvancedToastModifiers.swift in Sources */,
 				495CCC4C2B45E3AA00BBA415 /* VeroScriptsApp.swift in Sources */,
 				49C546D42B7874C60048DEDA /* Types.swift in Sources */,
 				496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */,
@@ -312,7 +348,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -329,7 +365,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -352,7 +388,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -369,7 +405,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -450,7 +486,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -468,7 +504,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME) (Script Testing)";
@@ -514,14 +550,6 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		49E1A4562B7EAA4A003C3272 /* XCRemoteSwiftPackageReference "AlertToast" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/elai950/AlertToast.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.9;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -529,11 +557,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4919020C2B8D502000D0CB93 /* XCRemoteSwiftPackageReference "swiftui-system-colors" */;
 			productName = SystemColors;
-		};
-		49E1A4572B7EAA4A003C3272 /* AlertToast */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 49E1A4562B7EAA4A003C3272 /* XCRemoteSwiftPackageReference "AlertToast" */;
-			productName = AlertToast;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
