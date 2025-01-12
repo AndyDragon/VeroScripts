@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct VeroScriptsApp: App {
+    @Environment(\.openWindow) private var openWindow
+
     @State var checkingForUpdates = false
     @State var versionCheckResult: VersionCheckResult = .complete
     @State var versionCheckToast = VersionCheckToast()
@@ -23,6 +25,14 @@ struct VeroScriptsApp: App {
             ContentView(appState)
         }
         .commands {
+            CommandGroup(replacing: CommandGroupPlacement.appInfo) {
+                Button(action: {
+                    // Open the "about" window using the id "about"
+                    openWindow(id: "about")
+                }, label: {
+                    Text("About \(Bundle.main.displayName ?? "Vero Scripts")")
+                })
+            }
             CommandGroup(replacing: .appSettings, addition: {
                 Button(action: {
                     appState.checkForUpdates(true)
@@ -33,5 +43,12 @@ struct VeroScriptsApp: App {
             })
             CommandGroup(replacing: CommandGroupPlacement.newItem) { }
         }
+        
+        // About view window with id "about"
+        Window("About \(Bundle.main.displayName ?? "Vero Scripts")", id: "about") {
+            AboutView()
+        }
+        .defaultPosition(.center)
+        .windowResizability(.contentSize)
     }
 }
