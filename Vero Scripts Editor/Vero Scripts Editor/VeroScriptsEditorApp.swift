@@ -47,7 +47,18 @@ struct VeroScriptsEditorApp: App {
         
         // About view window with id "about"
         Window("About \(Bundle.main.displayName ?? "Vero Scripts Editor")", id: "about") {
-            AboutView()
+            AboutView(packages: [
+                "swiftui-introspect": [
+                    "Siteline ([Github profile](https://github.com/siteline))"
+                ],
+                "SystemColors": [
+                    "Denis ([Github profile](https://github.com/diniska))"
+                ],
+                "ToastView-SwiftUI": [
+                    "Gaurav Tak ([Github profile](https://github.com/gauravtakroro))",
+                    "modified by AndyDragon ([Github profile](https://github.com/AndyDragon))"
+                ]
+            ])
         }
         .defaultPosition(.center)
         .windowResizability(.contentSize)
