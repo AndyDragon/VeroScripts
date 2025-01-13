@@ -1,4 +1,5 @@
 {
+  "originHash" : "ff7df9a6a19a9981238fcb5ce06c8fc4b51e15316a71b7d0b2fd224d4dae3ad4",
   "pins" : [
     {
       "identity" : "swiftui-system-colors",
@@ -8,7 +9,16 @@
         "revision" : "5127afab23337699a714e036588f02d9481ae612",
         "version" : "1.2.0"
       }
+    },
+    {
+      "identity" : "swiftybeaver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
+      "state" : {
+        "revision" : "8cba041db09596183331d123f337d0eb2e6e8e91",
+        "version" : "2.1.1"
+      }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

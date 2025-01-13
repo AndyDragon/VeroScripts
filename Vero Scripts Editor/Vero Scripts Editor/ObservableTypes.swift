@@ -58,13 +58,22 @@ class ObservableTemplatePage: Identifiable, Hashable {
     var pageId: String { self.name }
     let name: String
     var templates: [ObservableTemplate]
+    var originalTemplates: [String]
     var isDirty: Bool {
-        templates.count(where: { $0.isDirty }) > 0
+        templates.count(where: { $0.isDirty }) > 0 || addedTemplates.count > 0 || removedTemplates.count > 0
+    }
+    var addedTemplates: [String] {
+        templates.map({ $0.name }).filter { !originalTemplates.includes($0) }
+    }
+    var removedTemplates: [String] {
+        let currentTemplates = templates.map({ $0.name })
+        return originalTemplates.filter { !currentTemplates.includes($0) }
     }
 
     init(name: String, templates: [ObservableTemplate]) {
         self.name = name
         self.templates = templates
+        self.originalTemplates = templates.map({ template in template.name })
     }
 
     static func == (lhs: ObservableTemplatePage, rhs: ObservableTemplatePage) -> Bool {
@@ -150,28 +159,28 @@ class ObservableTemplate: Identifiable, Hashable {
     var name: String
     var template: String
     var originalTemplate: String
-    var forceDirty: Bool
-    var isDirty: Bool { template != originalTemplate || forceDirty }
+    var isNewTemplate: Bool
+    var isDirty: Bool { template != originalTemplate || isNewTemplate }
 
     init(template: Template) {
         self.name = template.name
         self.template = template.template
         self.originalTemplate = template.template
-        self.forceDirty = false
+        self.isNewTemplate = false
     }
 
     init(name: String, template: String, forceDirty: Bool = false) {
         self.name = name
         self.template = template
         self.originalTemplate = template
-        self.forceDirty = forceDirty
+        self.isNewTemplate = forceDirty
     }
 
     private init() {
         name = ""
         template = ""
         originalTemplate = ""
-        forceDirty = false
+        isNewTemplate = false
     }
 
     static func == (lhs: ObservableTemplate, rhs: ObservableTemplate) -> Bool {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftyBeaver
 
 @main
 struct VeroScriptsEditorApp: App {
@@ -14,6 +15,19 @@ struct VeroScriptsEditorApp: App {
     @State var checkingForUpdates = false
     @State var versionCheckResult: VersionCheckResult = .complete
     @State var versionCheckToast = VersionCheckToast()
+    
+    @ObservedObject var commandModel = AppCommandModel()
+
+    let logger = SwiftyBeaver.self
+    let loggerConsole = ConsoleDestination()
+    let loggerFile = FileDestination()
+
+    init() {
+        loggerConsole.logPrintWay = .logger(subsystem: "Main", category: "UI")
+        loggerFile.logFileURL = getDocumentsDirectory().appendingPathComponent("\(Bundle.main.displayName ?? "Vero Scripts").log", conformingTo: .log)
+        logger.addDestination(loggerConsole)
+        logger.addDestination(loggerFile)
+    }
     
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
@@ -24,10 +38,13 @@ struct VeroScriptsEditorApp: App {
             versionLocation: "https://vero.andydragon.com/static/data/veroscriptseditor/version.json")
         WindowGroup {
             ContentView(appState)
+                .environmentObject(commandModel)
         }
         .commands {
-            CommandGroup(replacing: CommandGroupPlacement.appInfo) {
+            CommandGroup(replacing: .appInfo) {
                 Button(action: {
+                    logger.verbose("Open about view", context: "User")
+
                     // Open the "about" window using the id "about"
                     openWindow(id: "about")
                 }, label: {
@@ -36,13 +53,41 @@ struct VeroScriptsEditorApp: App {
             }
             CommandGroup(replacing: .appSettings, addition: {
                 Button(action: {
+                    logger.verbose("Manual check for updates", context: "User")
+
+                    // Manually check for updates
                     appState.checkForUpdates(true)
                 }, label: {
                     Text("Check for updates...")
                 })
                 .disabled(checkingForUpdates)
             })
-            CommandGroup(replacing: CommandGroupPlacement.newItem) { }
+            CommandGroup(replacing: .saveItem) { }
+            CommandGroup(replacing: .newItem, addition: {
+                Button(
+                    action: {
+                        logger.verbose("Manual reload pages catalog", context: "User")
+
+                        // Manually reload the page catalog using the command model
+                        commandModel.reloadPageCatalog.toggle()
+                    },
+                    label: {
+                        Text("Reload page catalog...")
+                    }
+                )
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+            })
+            CommandMenu("Report") {
+                Button(action: {
+                    logger.verbose("Copy report from menu", context: "User")
+
+                    // Copies a report of the changes to the clipboard
+                    commandModel.copyReport.toggle()
+                }, label: {
+                    Text("Copy report to clipboard")
+                })
+                .keyboardShortcut("r", modifiers: [.command])
+            }
         }
         
         // About view window with id "about"
@@ -50,6 +95,9 @@ struct VeroScriptsEditorApp: App {
             AboutView(packages: [
                 "swiftui-introspect": [
                     "Siteline ([Github profile](https://github.com/siteline))"
+                ],
+                "SwiftyBeaver": [
+                    "SwiftyBeaver ([Github profile](https://github.com/SwiftyBeaver))"
                 ],
                 "SystemColors": [
                     "Denis ([Github profile](https://github.com/diniska))"
@@ -65,6 +113,13 @@ struct VeroScriptsEditorApp: App {
     }
 
     class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+        private let logger = SwiftyBeaver.self
+
+        func applicationWillFinishLaunching(_ notification: Notification) {
+            logger.info("==============================================================================")
+            logger.info("Start of session")
+        }
+
         func applicationDidFinishLaunching(_ notification: Notification) {
             let mainWindow = NSApp.windows[0]
             mainWindow.delegate = self
@@ -77,6 +132,17 @@ struct VeroScriptsEditorApp: App {
         func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
             return DocumentManager.default.canTerminate() ? .terminateNow : .terminateCancel
         }
+
+        func applicationWillTerminate(_ notification: Notification) {
+            logger.info("End of session")
+            logger.info("==============================================================================")
+        }
+    }
+
+    private func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
     }
 }
 
@@ -101,4 +167,9 @@ class DocumentManager {
         }
         return true
     }
+}
+
+class AppCommandModel: ObservableObject {
+    @Published var copyReport: Bool = false
+    @Published var reloadPageCatalog: Bool = false
 }

@@ -6,24 +6,32 @@
 //
 
 import SwiftUI
+import SwiftyBeaver
 
 struct ContentView: View {
     @State private var isDarkModeOn = true
 
     @Environment(\.openURL) private var openURL
+    @EnvironmentObject private var commandModel: AppCommandModel
 
     @State private var viewModel = ViewModel()
     @FocusState private var focusedField: FocusField?
+    @State private var documentDirtyAlertDismissLable = "Quit"
     @State private var documentDirtyAlertConfirmation = "Are you sure you wish to quit?"
-    @State private var documentDirtyAfterDismissAction: () -> Void = {}
+    @State private var documentDirtyAfterDismissAction: (_ longPause: Bool) -> Void = { longPause in }
     @State private var selectedMissingPageTemplate: String?
     @State private var selectedTemplate: ObservableTemplate?
 
-    private var appState: VersionCheckAppState
+    private let appState: VersionCheckAppState
     private let labelWidth: CGFloat = 80
+    private let logger = SwiftyBeaver.self
 
     private func templatePageFromPage(_ page: ObservablePage) -> ObservableTemplatePage? {
         return viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == page.pageId })
+    }
+
+    private func pageFromTemplatePage(_ templatePage: ObservableTemplatePage) -> ObservablePage? {
+        return viewModel.catalog.pages.first(where: { $0.pageId == templatePage.pageId })
     }
 
     private var selectedPageTemplates: [ObservableTemplate]? {
@@ -142,14 +150,17 @@ struct ContentView: View {
                                 {
                                     ForEach(missingPageTemplates, id: \.self) { templateName in
                                         Text(templateName)
+                                            .tag(templateName)
                                     }
                                 }
                                 Button(action: {
+                                    logger.verbose("Tapped add template", context: "User")
                                     if let selectedMissingPageTemplate, !selectedMissingPageTemplate.isEmpty {
                                         if let selectedPage = viewModel.selectedPage, let templatePage = templatePageFromPage(selectedPage) {
                                             let template = ObservableTemplate(name: selectedMissingPageTemplate, template: "- script -", forceDirty: true)
                                             templatePage.templates.append(template)
                                             selectedTemplate = template
+                                            logger.verbose("Added new template", context: "System")
                                         }
                                     }
                                     selectedMissingPageTemplate = nil
@@ -167,7 +178,13 @@ struct ContentView: View {
         }, detail: {
             ZStack {
                 if let selectedTemplate {
-                    TemplateEditorView(viewModel: viewModel, selectedTemplate: selectedTemplate, focusedField: $focusedField)
+                    TemplateEditorView(viewModel: viewModel, selectedTemplate: selectedTemplate, focusedField: $focusedField) {
+                        if let selectedPage = viewModel.selectedPage, let templatePage = templatePageFromPage(selectedPage) {
+                            templatePage.templates.removeAll(where: { $0 == selectedTemplate })
+                            self.selectedTemplate = nil
+                            logger.verbose("Removed template", context: "System")
+                        }
+                    }
                 } else {
                     WelcomeView()
                 }
@@ -180,13 +197,19 @@ struct ContentView: View {
         .sheet(isPresented: $viewModel.isShowingDocumentDirtyAlert) {
             DocumentDirtySheet(
                 isShowing: $viewModel.isShowingDocumentDirtyAlert,
-                confirmationText: $documentDirtyAlertConfirmation,
+                confirmationText: documentDirtyAlertConfirmation,
+                dismissLabel: documentDirtyAlertDismissLable,
+                copyReportAction: {
+                    generateReport()
+                    documentDirtyAfterDismissAction(true)
+                    documentDirtyAfterDismissAction = { longPause in }
+                },
                 dismissAction: {
-                    documentDirtyAfterDismissAction()
-                    documentDirtyAfterDismissAction = {}
+                    documentDirtyAfterDismissAction(false)
+                    documentDirtyAfterDismissAction = { longPause in }
                 },
                 cancelAction: {
-                    documentDirtyAfterDismissAction = {}
+                    documentDirtyAfterDismissAction = { longPause in }
                 })
         }
         .advancedToastView(toasts: $viewModel.toastViews)
@@ -209,10 +232,44 @@ struct ContentView: View {
                 viewModel.dismissToast(loadingPagesToast)
             }
         }
+        .onChange(of: commandModel.reloadPageCatalog) {
+            if viewModel.isDirty {
+                documentDirtyAlertDismissLable = "Reload"
+                documentDirtyAlertConfirmation = "Are you sure you wish to reload the pages?"
+                documentDirtyAfterDismissAction = { longPause in
+                    reloadPages()
+                }
+                viewModel.isShowingDocumentDirtyAlert.toggle()
+            } else {
+                reloadPages()
+            }
+        }
+        .onChange(of: commandModel.copyReport) {
+            generateReport()
+        }
         .preferredColorScheme(isDarkModeOn ? .dark : .light)
     }
 
+    private func reloadPages() {
+        Task {
+            selectedTemplate = nil
+            let loadingPagesToast = viewModel.showToast(
+                .progress,
+                "Loading pages...",
+                "Loading the page catalog from the server"
+            )
+
+            await loadPageCatalog()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                viewModel.dismissToast(loadingPagesToast)
+            }
+        }
+    }
+
     private func loadPageCatalog() async {
+        logger.verbose("Loading page catalog from server", context: "System")
+
         do {
             let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
             let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
@@ -243,8 +300,12 @@ struct ContentView: View {
                 viewModel.selectedPage = viewModel.catalog.pages.first ?? nil
             }
 
+            logger.verbose("Loaded page catalog from server with \(viewModel.catalog.pages.count) pages", context: "System")
+
             // Delay the start of the templates download so the window can be ready faster
             try await Task.sleep(nanoseconds: 200_000_000)
+
+            logger.verbose("Loading template catalog from server", context: "System")
 
             let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
             let templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
@@ -254,6 +315,8 @@ struct ContentView: View {
                 }),
                 specialTemplates: templatesCatalog.specialTemplates.map({ ObservableTemplate(template: $0) }))
             viewModel.catalog.waitingForTemplates = false
+
+            logger.verbose("Loaded template catalog from server with \(viewModel.catalog.templatesCatalog.pages.count) page templates", context: "System")
 
             do {
                 // Delay the start of the disallowed list download so the window can be ready faster
@@ -265,6 +328,7 @@ struct ContentView: View {
                 debugPrint(error.localizedDescription)
             }
         } catch {
+            logger.error("Failed to load page catalog or template catalog from server: \(error.localizedDescription)", context: "System")
             viewModel.dismissAllNonBlockingToasts(includeProgress: true)
             viewModel.showToast(
                 .fatal,
@@ -275,6 +339,7 @@ struct ContentView: View {
                 width: 720,
                 buttonTitle: "Retry",
                 onButtonTapped: {
+                    logger.verbose("Retrying to load pages catalog after failure", context: "System")
                     DispatchQueue.main.async {
                         Task {
                             await loadPageCatalog()
@@ -282,6 +347,7 @@ struct ContentView: View {
                     }
                 },
                 onDismissed: {
+                    logger.verbose("Retrying to load pages catalog after failure", context: "System")
                     DispatchQueue.main.async {
                         Task {
                             await loadPageCatalog()
@@ -292,13 +358,74 @@ struct ContentView: View {
         }
     }
 
-    private func delayAndTerminate() {
+    private func delayAndTerminate(_ longPause: Bool) {
         viewModel.ignoreDirty = true
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + 0.2,
+            deadline: .now() + (longPause ? (AdvancedToastStyle.success.duration + 0.4) : 0.2),
             execute: {
                 NSApplication.shared.terminate(nil)
             })
+    }
+
+    private func generateReport() {
+        if viewModel.isDirty {
+            var lines = [String]()
+            lines.append("REPORT OF CHANGES")
+            lines.append("")
+
+            for page in viewModel.catalog.pages {
+                if page.isDirty {
+                    // TODO andydragon : currently nothing can be dirty in a page?
+                    logger.warning("Page cannot be dirty yet", context: "System")
+                }
+            }
+
+            for templatePage in viewModel.catalog.templatesCatalog.pages {
+                if templatePage.isDirty, let page = pageFromTemplatePage(templatePage) {
+                    lines.append("-----------------")
+                    lines.append("PAGE: '\(page.displayName)'")
+                    let addedTemplates = templatePage.addedTemplates
+                    for template in templatePage.templates {
+                        if template.isDirty {
+                            if template.isNewTemplate && addedTemplates.includes(template.name) {
+                                logger.info("Template '\(template.name)' for page '\(page.displayName)' was added")
+                                lines.append("")
+                                lines.append("    ADD TEMPLATE: '\(template.name)'")
+                                lines.append("    ---")
+                                lines.append("        " + template.template.replacingOccurrences(of: "\n", with: "\n        "))
+                                lines.append("    ---")
+                            } else {
+                                logger.info("Template '\(template.name)' for page '\(page.displayName)' was changed")
+                                lines.append("")
+                                lines.append("    MODIFY TEMPLATE: '\(template.name)'")
+                                lines.append("    ---")
+                                lines.append("        " + template.template.replacingOccurrences(of: "\n", with: "\n        "))
+                                lines.append("    ---")
+                            }
+                        }
+                    }
+                    let removedTemplates = templatePage.removedTemplates
+                    if removedTemplates.count > 0 {
+                        for templateName in removedTemplates {
+                            logger.info("Template '\(templateName)' for page '\(page.displayName)' was removed")
+                            lines.append("")
+                            lines.append("    REMOVE TEMPLATE: '\(templateName)'")
+                        }
+                    }
+                }
+            }
+
+            lines.append("------------------")
+
+            var text = ""
+            for line in lines { text = text + line + "\n" }
+            Pasteboard.copyToClipboard(text)
+            viewModel.showSuccessToast("Report generated!", "Copied the report of changes to the clipboard")
+            logger.verbose("Generated report of changes", context: "System")
+        } else {
+            viewModel.showInfoToast("There are no changes", "There are not changes to report")
+            logger.verbose("There were no changes to report", context: "System")
+        }
     }
 
     private func navigateToPage(_ direction: Direction) {
@@ -340,8 +467,10 @@ struct ContentView: View {
 extension ContentView: DocumentManagerDelegate {
     func onCanTerminate() -> Bool {
         if viewModel.isDirty {
-            documentDirtyAfterDismissAction = {
-                delayAndTerminate()
+            documentDirtyAlertDismissLable = "Quit"
+            documentDirtyAlertConfirmation = "Are you sure you wish to quit?"
+            documentDirtyAfterDismissAction = { longPause in
+                delayAndTerminate(longPause)
             }
             viewModel.isShowingDocumentDirtyAlert.toggle()
         }

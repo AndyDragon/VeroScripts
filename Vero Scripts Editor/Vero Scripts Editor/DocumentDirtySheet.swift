@@ -10,7 +10,9 @@ import UniformTypeIdentifiers
 
 struct DocumentDirtySheet: View {
     @Binding var isShowing: Bool
-    @Binding var confirmationText: String
+    var confirmationText: String
+    var dismissLabel: String
+    var copyReportAction: () -> Void
     var dismissAction: () -> Void
     var cancelAction: () -> Void
 
@@ -41,6 +43,15 @@ struct DocumentDirtySheet: View {
                 Spacer()
                 Button(action: {
                     isShowing.toggle()
+                    copyReportAction()
+                }) {
+                    Text("Copy report")
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+                }
+                Spacer()
+                Button(action: {
+                    isShowing.toggle()
                     cancelAction()
                 }) {
                     Text("Cancel")
@@ -54,14 +65,14 @@ struct DocumentDirtySheet: View {
                     isShowing.toggle()
                     dismissAction()
                 }) {
-                    Text("Quit")
+                    Text(dismissLabel)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 4)
                 }
                 .keyboardShortcut(.defaultAction)
             }
         }
-        .frame(width: 400)
+        .frame(width: 480)
         .padding(24)
     }
 }

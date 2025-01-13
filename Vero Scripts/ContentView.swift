@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftyBeaver
 import CloudKit
 
 struct ContentView: View {
@@ -75,8 +76,9 @@ struct ContentView: View {
         && newMembershipValidation.valid
         && userNameValidation.valid
     }
-    private var appState: VersionCheckAppState
-    private var accordionHeightRatio = 3.5
+    private let appState: VersionCheckAppState
+    private let accordionHeightRatio = 3.5
+    private let logger = SwiftyBeaver.self
 
     init(_ appState: VersionCheckAppState) {
         self.appState = appState
@@ -315,6 +317,7 @@ struct ContentView: View {
                                 force: force,
                                 withPlaceholders: withPlaceholders
                             ) {
+                                logger.verbose("Copied feature script to clipboard", context: "User")
                                 viewModel.showSuccessToast(
                                     "Copied",
                                     String {
@@ -345,6 +348,7 @@ struct ContentView: View {
                                 force: force,
                                 withPlaceholders: withPlaceholders
                             ) {
+                                logger.verbose("Copied comment script to clipboard", context: "User")
                                 viewModel.showSuccessToast(
                                     "Copied",
                                     String {
@@ -375,6 +379,7 @@ struct ContentView: View {
                                 force: force,
                                 withPlaceholders: withPlaceholders
                             ) {
+                                logger.verbose("Copied original post script to clipboard", context: "User")
                                 viewModel.showSuccessToast(
                                     "Copied",
                                     String {
@@ -406,6 +411,7 @@ struct ContentView: View {
                         canCopy: canCopyNewMembershipScript,
                         copy: {
                             copyToClipboard(newMembershipScript)
+                            logger.verbose("Copied new membership script to clipboard", context: "User")
                             viewModel.showSuccessToast(
                                 "Copied",
                                 "Copied the new membership script to the clipboard"
@@ -469,6 +475,7 @@ struct ContentView: View {
                             break
                         }
                         let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
+                        logger.verbose("Copied \(scriptName) script to clipboard", context: "User")
                         viewModel.showSuccessToast("Copied", "Copied the \(scriptName) script\(suffix) to the clipboard")
                     }
                 )
@@ -493,6 +500,7 @@ struct ContentView: View {
 
                 ToolbarItem {
                     Button(action: {
+                        logger.verbose("Tapped clear user", context: "User")
                         userName = ""
                         userNameChanged(to: userName)
                         userNameValidation = validateUserName(value: userName)
@@ -510,6 +518,7 @@ struct ContentView: View {
                         newMembership = NewMembershipCase.none
                         newMembershipChanged(to: newMembership)
                         focusedField = .userName
+                        logger.verbose("Cleared user", context: "System")
                     }) {
                         HStack {
                             Image(systemName: "xmark")
@@ -574,9 +583,13 @@ struct ContentView: View {
 
     private func setTheme(_ newTheme: Theme) {
         if (newTheme == .notSet) {
+            logger.verbose("Set theme to nothing", context: "User")
+
             isDarkModeOn = colorScheme == .dark
             Color.isDarkModeOn = colorScheme == .dark
         } else {
+            logger.verbose("Set theme to \(newTheme.rawValue)", context: "User")
+
             if let details = ThemeDetails[newTheme] {
                 Color.currentTheme = details.colorTheme
                 isDarkModeOn = details.darkTheme
@@ -620,6 +633,8 @@ struct ContentView: View {
     }
 
     private func loadPages() async {
+        logger.verbose("Loading page catalog from server", context: "System")
+
         do {
 #if TESTING
             let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
@@ -647,10 +662,14 @@ struct ContentView: View {
                 return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
             }))
 
+            logger.verbose("Loaded page catalog from server with \(loadedPages.count) pages", context: "System")
+
             updateStaffLevelForPage()
 
             // Delay the start of the templates download so the window can be ready faster
             try await Task.sleep(nanoseconds: 200_000_000)
+
+            logger.verbose("Loading template catalog from server", context: "System")
 
 #if TESTING
             let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
@@ -662,9 +681,13 @@ struct ContentView: View {
             updateScripts()
             updateNewMembershipScripts()
 
+            logger.verbose("Loaded template catalog from server with \(templatesCatalog.pages.count) page templates", context: "System")
+
             do {
                 // Delay the start of the disallowed list download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 1_000_000_000)
+
+                logger.verbose("Loading disallow list from server", context: "System")
 
 #if TESTING
                 let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
@@ -674,8 +697,11 @@ struct ContentView: View {
                 disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
                 updateScripts()
                 updateNewMembershipScripts()
+
+                logger.verbose("Loaded disallow list from server with \(disallowList.count) entries", context: "System")
             } catch {
                 // do nothing, the disallow list is not critical
+                logger.error("Failed to load disallow list from server: \(error.localizedDescription)", context: "System")
                 debugPrint(error.localizedDescription)
             }
 
@@ -689,6 +715,7 @@ struct ContentView: View {
                 debugPrint(error.localizedDescription)
             }
         } catch {
+            logger.error("Failed to load page catalog or template catalog from server: \(error.localizedDescription)", context: "System")
             viewModel.dismissAllNonBlockingToasts(includeProgress: true)
             viewModel.showToast(
                 .fatal,
@@ -699,6 +726,7 @@ struct ContentView: View {
                 width: 720,
                 buttonTitle: "Retry",
                 onButtonTapped: {
+                    logger.verbose("Retrying to load pages catalog after failure", context: "System")
                     DispatchQueue.main.async {
                         Task {
                             await loadPages()
@@ -706,6 +734,7 @@ struct ContentView: View {
                     }
                 },
                 onDismissed: {
+                    logger.verbose("Retrying to load pages catalog after failure", context: "System")
                     DispatchQueue.main.async {
                         Task {
                             await loadPages()
@@ -717,12 +746,15 @@ struct ContentView: View {
     }
 
     private func populateFromClipboard() {
+        logger.verbose("Tapped populate from clipboard", context: "User")
         do {
             let json = pasteFromClipboard()
             let decoder = JSONDecoder()
             let featureUser = try decoder.decode(CodableFeatureUser.self, from: json.data(using: .utf8)!)
             populateFromFeatureUser(featureUser)
+            logger.verbose("Populated from clipboard", context: "System")
         } catch {
+            logger.error("Failed to populate from clipboard", context: "System")
             debugPrint(error)
         }
     }
@@ -1088,6 +1120,7 @@ struct ContentView: View {
         }
         if foundPlaceholders.count != 0 || foundLongPlaceholders.count != 0 {
             if (force || needEditor) && !showingPlaceholderSheet {
+                logger.verbose("Script has manual placeholders, opening editor", context: "System")
                 showingPlaceholderSheet.toggle()
                 return true
             }

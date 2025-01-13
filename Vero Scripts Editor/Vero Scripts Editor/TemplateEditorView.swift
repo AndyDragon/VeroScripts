@@ -8,6 +8,7 @@
 import SwiftUI
 import SystemColors
 import SwiftUIIntrospect
+import SwiftyBeaver
 
 struct TemplateEditorView: View {
     @Bindable var viewModel: ContentView.ViewModel
@@ -19,6 +20,9 @@ struct TemplateEditorView: View {
     @State private var script = ""
     @State private var scriptPlaceholders = PlaceholderList()
     @State private var showingPlaceholderSheet = false
+    let onDeleteTemplate: () -> Void
+
+    private let logger = SwiftyBeaver.self
 
     var body: some View {
         VStack {
@@ -26,31 +30,32 @@ struct TemplateEditorView: View {
                 Text("Template:")
                 Spacer()
                 Button(action: {
-                    selectedTemplate.forceDirty = false
-                    selectedTemplate.originalTemplate = selectedTemplate.template
-                }) {
-                    Text("Mark completed")
-                }
-                Text("|")
-                    .padding(.horizontal)
-                Button(action: {
+                    logger.verbose("Tapped copy template", context: "User")
                     Pasteboard.copyToClipboard(selectedTemplate.template)
                     viewModel.showSuccessToast("Copied", "Copied the script template to the clipboard")
                 }) {
                     Text("Copy template")
                 }
                 Button(action: {
+                    logger.verbose("Tapped paste template", context: "User")
                     state.resetText(Pasteboard.stringFromClipboard(), clearUndo: false)
                 }) {
                     Text("Paste template")
                 }
                 .disabled(!Pasteboard.clipboardHasString)
                 Button(action: {
+                    logger.verbose("Tapped revert template", context: "User")
                     state.resetText(selectedTemplate.originalTemplate)
                 }) {
                     Text("Revert template")
                 }
                 .disabled(!selectedTemplate.isDirty)
+                Button(action: {
+                    logger.verbose("Tapped remove template", context: "User")
+                    onDeleteTemplate()
+                }) {
+                    Text("Remove template")
+                }
             }
 
             HStack {
@@ -58,6 +63,7 @@ struct TemplateEditorView: View {
                     .lineLimit(1)
                 ForEach(staticPlaceholders, id: \.self) { placeholder in
                     Button(action: {
+                        logger.verbose("Tapped to insert placeholder", context: "User")
                         state.pasteTextToEditor("%%\(placeholder)%%")
                     }) {
                         Text("%%\(placeholder)%%")
@@ -78,6 +84,7 @@ struct TemplateEditorView: View {
                 }
                 .frame(maxWidth: 120)
                 Button(action: {
+                    logger.verbose("Tapped to insert short manual placeholder", context: "User")
                     state.pasteTextToEditor("[[\(manualPlaceholderKey)]]")
                 }) {
                     Text("Short")
@@ -86,6 +93,7 @@ struct TemplateEditorView: View {
                 }
                 .disabled(manualPlaceholderKey.isEmpty)
                 Button(action: {
+                    logger.verbose("Tapped to insert long manual placeholder", context: "User")
                     state.pasteTextToEditor("[{\(manualPlaceholderKey)}]")
                 }) {
                     Text("Long")
@@ -118,7 +126,7 @@ struct TemplateEditorView: View {
                                 updateScript()
                             }
                         } else {
-                            print("ID mismatch caught...")
+                            logger.error("ID mismatch caught in state.onTextChanged()", context: "System")
                         }
                     }
                 }
@@ -200,7 +208,8 @@ struct TemplateEditorView: View {
                 maxHeight: 640,
                 copy: {
                     if copyScript() {
-                        viewModel.showSuccessToast( "Copied", "Copied the feature script to the clipboard")
+                        logger.verbose("Copied the sample script", context: "User")
+                        viewModel.showSuccessToast( "Copied", "Copied the sample script to the clipboard")
                     }
                 },
                 focusedField: focusedField,
@@ -295,6 +304,7 @@ struct TemplateEditorView: View {
             }
         }
         if foundPlaceholders.count != 0 || foundLongPlaceholders.count != 0 && !showingPlaceholderSheet {
+            logger.verbose("Script has manual placeholders, opening editor", context: "System")
             showingPlaceholderSheet.toggle()
             return true
         }

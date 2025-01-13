@@ -10,6 +10,7 @@
 		493FDD8F2D2204CF00D5C208 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 493FDD8E2D2204CF00D5C208 /* SwiftUIIntrospect */; };
 		493FDD932D2204CF00D5C208 /* SwiftUIIntrospect-Static in Frameworks */ = {isa = PBXBuildFile; productRef = 493FDD922D2204CF00D5C208 /* SwiftUIIntrospect-Static */; };
 		498ACE142D21D5250057001B /* SystemColors in Frameworks */ = {isa = PBXBuildFile; productRef = 498ACE132D21D5250057001B /* SystemColors */; };
+		49CD183C2D348CC300F08A56 /* SwiftyBeaver in Frameworks */ = {isa = PBXBuildFile; productRef = 49CD183B2D348CC300F08A56 /* SwiftyBeaver */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 				498ACE142D21D5250057001B /* SystemColors in Frameworks */,
 				493FDD8F2D2204CF00D5C208 /* SwiftUIIntrospect in Frameworks */,
 				493FDD932D2204CF00D5C208 /* SwiftUIIntrospect-Static in Frameworks */,
+				49CD183C2D348CC300F08A56 /* SwiftyBeaver in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +79,7 @@
 				498ACE132D21D5250057001B /* SystemColors */,
 				493FDD8E2D2204CF00D5C208 /* SwiftUIIntrospect */,
 				493FDD922D2204CF00D5C208 /* SwiftUIIntrospect-Static */,
+				49CD183B2D348CC300F08A56 /* SwiftyBeaver */,
 			);
 			productName = "Vero Scripts Editor";
 			productReference = 498ACDE72D21D2620057001B /* Vero Scripts Editor.app */;
@@ -109,6 +112,7 @@
 			packageReferences = (
 				498ACE122D21D5250057001B /* XCRemoteSwiftPackageReference "swiftui-system-colors" */,
 				493FDD8D2D2204CF00D5C208 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+				49CD183A2D348CC300F08A56 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 498ACDE82D21D2620057001B /* Products */;
@@ -268,7 +272,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Vero Scripts Editor/Vero_Scripts_Editor.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts Editor/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -298,7 +302,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Vero Scripts Editor/Vero_Scripts_Editor.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts Editor/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -359,6 +363,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		49CD183A2D348CC300F08A56 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -376,6 +388,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 498ACE122D21D5250057001B /* XCRemoteSwiftPackageReference "swiftui-system-colors" */;
 			productName = SystemColors;
+		};
+		49CD183B2D348CC300F08A56 /* SwiftyBeaver */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 49CD183A2D348CC300F08A56 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */;
+			productName = SwiftyBeaver;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
