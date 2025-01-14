@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 
 using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit;
+using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
 using Notification.Wpf;
 
@@ -27,11 +29,14 @@ namespace VeroScriptsEditor
         {
             _ = LoadPages();
             TemplatesCatalog = new TemplatesCatalog();
+
+            ReloadPagesCatalogCommand = new CommandWithParameter(ReloadPages);
+            GenerateReportCommand = new Command(GenerateReport, () => IsDirty);
             AddNewTemplateCommand = new Command(AddNewTemplate, CanAddNewTemplate);
-            MarkTemplateCompleteCommand = new Command(MarkTemplateComplete, CanMarkTemplateComplete);
             CopyTemplateCommand = new Command(CopyTemplate, CanCopyTemplate);
             PasteTemplateCommand = new Command(PasteTemplate);
             RevertTemplateCommand = new Command(RevertTemplate, CanRevertTemplate);
+            RemoveTemplateCommand = new Command(RemoveTemplate, CanRemoveTemplate);
             InsertStaticPlaceholderCommand = new CommandWithParameter(InsertStaticPlaceholder);
             InsertManualPlaceholderCommand = new CommandWithParameter(InsertManualPlaceholder, CanInsertManualPlaceholder);
             CopyScriptCommand = new Command(CopyScript);
@@ -94,10 +99,12 @@ namespace VeroScriptsEditor
 
         #region Server access
 
-        private async Task LoadPages()
+        private async Task LoadPages(bool manual = false)
         {
             try
             {
+                Logger.LogInfo("Loading pages catalog" + (manual ? " (reload)" : ""));
+
                 // Disable client-side caching.
                 httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
                 {
@@ -109,13 +116,20 @@ namespace VeroScriptsEditor
                 {
                     var pagesCatalog = JsonConvert.DeserializeObject<PagesCatalog>(content) ?? new PagesCatalog();
 
+                    Logger.LogInfo($"Loaded pages catalog with {pagesCatalog.Hubs.Count} hubs and {pagesCatalog.Hubs.Sum(hub => hub.Value.Count)} pages");
+
                     // Have the pages, load the templates.
                     _ = LoadTemplates(pagesCatalog);
+                }
+                else
+                {
+                    throw new Exception("No content received");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error occurred: {0}", ex.Message);
+                Logger.LogError($"Failed to load the page catalog: {ex.Message}");
+                Logger.LogError(ex.ToString());
                 ShowErrorToast(
                     "Failed to load the page catalog",
                     "The application requires the catalog to perform its operations: " + ex.Message + "\n\nClick here to retry",
@@ -128,6 +142,8 @@ namespace VeroScriptsEditor
         {
             try
             {
+                Logger.LogInfo("Loading templates catalog");
+
                 // Disable client-side caching.
                 httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
                 {
@@ -145,11 +161,18 @@ namespace VeroScriptsEditor
                     SelectedPage = Catalog.Pages.FirstOrDefault(page => page.Id == lastPage) ?? Catalog.Pages.FirstOrDefault();
                     OnPropertyChanged(nameof(Catalog));
                     UpdateScript();
+
+                    Logger.LogInfo($"Loaded templates catalog with {templatesCatalog.Pages.Length} template pages");
+                }
+                else
+                {
+                    throw new Exception("No content received");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error occurred: {0}", ex.Message);
+                Logger.LogError($"Failed to load the page catalog: {ex.Message}");
+                Logger.LogError(ex.ToString());
                 ShowErrorToast(
                     "Failed to load the page templates",
                     "The application requires the templtes to perform its operations: " + ex.Message + "\n\nClick here to retry",
@@ -174,6 +197,7 @@ namespace VeroScriptsEditor
                 {
                     if (Theme != null)
                     {
+                        Logger.LogInfo($"Set theme to {Theme.Name}");
                         ThemeManager.Current.ChangeTheme(Application.Current, Theme);
                         UserSettings.Store("theme", Theme.Name);
                         OnPropertyChanged(nameof(StatusBarBrush));
@@ -219,23 +243,32 @@ namespace VeroScriptsEditor
 
         public string Title => $"Vero Scripts Editor{(IsDirty ? " - some templates edited" : string.Empty)}";
 
-        public static void HandleDirtyAction(Action<bool> onAction)
+        public enum DirtyActionResult
         {
-            switch (MessageBox.Show(
-                Application.Current.MainWindow,
-                "One or more templates have been edited.\n\nAre you sure you wish to quit?",
-                "Confirm",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question))
-            {
-                case MessageBoxResult.Yes:
-                    onAction(true);
-                    break;
+            Confirm,
+            Cancel,
+            CopyReport,
+        }
 
-                case MessageBoxResult.No:
-                    onAction(false);
-                    break;
-            }
+        public static async Task<DirtyActionResult> HandleDirtyAction(MainWindow window, string actionButon, string action)
+        {
+            var settings = new MetroDialogSettings()
+            {
+                AffirmativeButtonText = "Copy report",
+                NegativeButtonText = "Cancel",
+                FirstAuxiliaryButtonText = actionButon,
+            };
+
+            return await window.ShowMessageAsync(
+                "Confirm",
+                $"One or more templates have been added, removed or modified.\n\n{action}",
+                MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
+                settings) switch
+            {
+                MessageDialogResult.Affirmative => DirtyActionResult.CopyReport,
+                MessageDialogResult.FirstAuxiliary => DirtyActionResult.Confirm,
+                _ => DirtyActionResult.Cancel,
+            };
         }
 
         #endregion
@@ -280,6 +313,7 @@ namespace VeroScriptsEditor
                         StaffLevel = StaffLevels[0];
                     }
                     UpdateScript();
+                    GenerateReportCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -319,10 +353,11 @@ namespace VeroScriptsEditor
                     }
                 }
                 OnPropertyChanged(nameof(IsDirty));
+                GenerateReportCommand.OnCanExecuteChanged();
                 OnPropertyChanged(nameof(Title));
-                MarkTemplateCompleteCommand.OnCanExecuteChanged();
                 CopyTemplateCommand.OnCanExecuteChanged();
                 RevertTemplateCommand.OnCanExecuteChanged();
+                RemoveTemplateCommand.OnCanExecuteChanged();
                 CopyScriptCommand.OnCanExecuteChanged();
             }
         }
@@ -330,10 +365,11 @@ namespace VeroScriptsEditor
         private void SelectedTemplatePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(IsDirty));
+            GenerateReportCommand.OnCanExecuteChanged();
             OnPropertyChanged(nameof(Title));
-            MarkTemplateCompleteCommand.OnCanExecuteChanged();
             CopyTemplateCommand.OnCanExecuteChanged();
             RevertTemplateCommand.OnCanExecuteChanged();
+            RemoveTemplateCommand.OnCanExecuteChanged();
             CopyScriptCommand.OnCanExecuteChanged();
         }
 
@@ -591,6 +627,8 @@ namespace VeroScriptsEditor
                 }
                 catch (COMException ex)
                 {
+                    Logger.LogError($"Failed to copy text to clipboard: {ex.Message}");
+                    Logger.LogError(ex.ToString());
                     if ((uint)ex.ErrorCode != CLIPBRD_E_CANT_OPEN)
                     {
                         throw;
@@ -606,9 +644,105 @@ namespace VeroScriptsEditor
 
         #region Commands
 
+        public CommandWithParameter ReloadPagesCatalogCommand { get; }
+        private async void ReloadPages(object? ignoreDirty)
+        {
+            Logger.LogInfo("Execute ReloadPagesCatalogCommand");
+            if (IsDirty && ignoreDirty == null)
+            {
+                var result = await HandleDirtyAction(MainWindow!, "Reload", "Are you sure you wish to reload the pages?");
+                switch (result)
+                {
+                    case DirtyActionResult.Confirm:
+                        ReloadPagesCatalogCommand?.Execute(true);
+                        break;
+                    case DirtyActionResult.CopyReport:
+                        GenerateReport();
+                        ReloadPagesCatalogCommand?.Execute(true);
+                        break;
+                }
+                return;
+            }
+            SelectedTemplate = null;
+            SelectedPage = null;
+
+            await LoadPages(true);
+        }
+
+        public Command GenerateReportCommand { get; }
+        public void GenerateReport()
+        {
+            Logger.LogInfo("Execute GenerateReportCommand");
+            if (SelectedPage != null)
+            {
+                var builder = new StringBuilder();
+                builder.AppendLine("REPORT OF CHANGES");
+                builder.AppendLine("");
+                
+                foreach (var page in Catalog!.Pages)
+                {
+                    if (page.IsDirty)
+                    {
+                        // TODO andydragon : currently nothing can be dirty in a page?
+                        Logger.LogWarning("Page cannot be dirty yet");
+                    }
+                }
+
+                foreach (var templatePage in Catalog!.TemplatePages)
+                {
+                    var page = Catalog.Pages.FirstOrDefault(page => page.Id == templatePage.Name);
+                    if (templatePage.IsDirty && page != null)
+                    {
+                        builder.AppendLine("-----------------");
+                        builder.AppendLine($"PAGE: '{page.DisplayName}'");
+
+                        var addedTemplates = templatePage.AddedTemplates;
+                        foreach (var template in templatePage.Templates)
+                        {
+                            if (template.IsDirty || template.IsNew)
+                            {
+                                if (template.IsNew && addedTemplates.Contains(template.Name))
+                                {
+                                    Logger.LogInfo($"Template '{template.Name}' for page '{page.DisplayName}' was added");
+                                    builder.AppendLine("");
+                                    builder.AppendLine($"    ADD TEMPLATE: '{template.Name}'");
+                                    builder.AppendLine("    ---");
+                                    builder.AppendLine("        " + template.Template.Replace("\n", "\n        "));
+                                    builder.AppendLine("    ---");
+                                }
+                                else
+                                {
+                                    Logger.LogInfo($"Template '{template.Name}' for page '{page.DisplayName}' was changed");
+                                    builder.AppendLine("");
+                                    builder.AppendLine($"    MODIFY TEMPLATE: '{template.Name}'");
+                                    builder.AppendLine("    ---");
+                                    builder.AppendLine("        " + template.Template.Replace("\n", "\n        "));
+                                    builder.AppendLine("    ---");
+                                }
+                            }
+                        }
+
+                        var removedTemplates = templatePage.RemovedTemplates;
+                        foreach (var template in removedTemplates)
+                        {
+                            Logger.LogInfo($"Template '{template}' for page '{page.DisplayName}' was removed");
+                            builder.AppendLine("");
+                            builder.AppendLine($"    REMOVE TEMPLATE: '{template}'");
+                        }
+                    }
+                }
+
+                builder.AppendLine("------------------");
+
+                Logger.LogInfo("Generated report and copied to clipboard");
+                CopyTextToClipboard(builder.ToString(), "Report generated", "The report has been copied to the clipboard");
+            }
+        }
+
         public Command AddNewTemplateCommand { get; }
         private void AddNewTemplate()
         {
+            Logger.LogInfo($"Execute AddNewTemplateCommand for {SelectedNewTemplate!}");
             if (Catalog != null && SelectedPage != null)
             {
                 var templatePage = Catalog.TemplatePages.FirstOrDefault(page => page.Name == SelectedPage.Id);
@@ -622,23 +756,10 @@ namespace VeroScriptsEditor
             return Catalog != null && SelectedPage != null && !string.IsNullOrEmpty(SelectedNewTemplate);
         }
 
-        public Command MarkTemplateCompleteCommand { get; }
-        private void MarkTemplateComplete()
-        {
-            if (SelectedTemplate != null)
-            {
-                SelectedTemplate.OriginalTemplate = SelectedTemplate.Template;
-                SelectedTemplate.IsNew = false;
-            }
-        }
-        private bool CanMarkTemplateComplete()
-        {
-            return (SelectedTemplate?.IsDirty ?? false) || (SelectedTemplate?.IsNew ?? false);
-        }
-
         public Command CopyTemplateCommand { get; }
         private void CopyTemplate()
         {
+            Logger.LogInfo($"Execute CopyTemplateCommand");
             if (TemplateTextEditor != null)
             {
                 CopyTextToClipboard(TemplateTextEditor.Text, "Copied!", "Copied the script template to the clipboard");
@@ -652,6 +773,7 @@ namespace VeroScriptsEditor
         public Command PasteTemplateCommand { get; }
         private void PasteTemplate()
         {
+            Logger.LogInfo($"Execute PasteTemplateCommand");
             if (Clipboard.ContainsText())
             {
                 PasteTemplateToEditor(Clipboard.GetText());
@@ -661,6 +783,7 @@ namespace VeroScriptsEditor
         public Command RevertTemplateCommand { get; }
         private void RevertTemplate()
         {
+            Logger.LogInfo($"Execute RevertTemplateCommand");
             if (SelectedTemplate != null)
             {
                 PasteTemplateToEditor(SelectedTemplate.OriginalTemplate ?? "");
@@ -671,9 +794,26 @@ namespace VeroScriptsEditor
             return TemplateTextEditor != null && SelectedTemplate != null && SelectedTemplate.IsDirty;
         }
 
+        public Command RemoveTemplateCommand { get; }
+        private void RemoveTemplate()
+        {
+            Logger.LogInfo($"Execute RemoveTemplateCommand");
+            if (SelectedTemplate != null)
+            {
+                Catalog!.TemplatePages.FirstOrDefault(page => page.Name == SelectedPage!.Id)?.Templates.Remove(SelectedTemplate!);
+                SelectedTemplate = null;
+                OnPropertyChanged(nameof(NewTemplates));
+            }
+        }
+        private bool CanRemoveTemplate()
+        {
+            return TemplateTextEditor != null && SelectedTemplate != null;
+        }
+
         public CommandWithParameter InsertStaticPlaceholderCommand { get; }
         private void InsertStaticPlaceholder(object? parameter)
         {
+            Logger.LogInfo($"Execute InsertStaticPlaceholderCommand");
             if (parameter is string placeholder)
             {
                 PasteTextToSelection($"%%{placeholder.ToUpper()}%%");
@@ -685,10 +825,12 @@ namespace VeroScriptsEditor
         {
             if (Convert.ToBoolean(parameter))
             {
+                Logger.LogInfo($"Execute InsertManualPlaceholderCommand (long)");
                 PasteTextToSelection($"[{{{ManualPlaceholderKey}}}]");
             }
             else
             {
+                Logger.LogInfo($"Execute InsertManualPlaceholderCommand (short)");
                 PasteTextToSelection($"[[{ManualPlaceholderKey}]]");
             }
         }
@@ -700,6 +842,7 @@ namespace VeroScriptsEditor
         public Command CopyScriptCommand { get; }
         private void CopyScript()
         {
+            Logger.LogInfo($"Execute CopyScriptCommand");
             if (CheckForPlaceholders())
             {
                 var editor = new PlaceholderEditor(this)
@@ -783,6 +926,7 @@ namespace VeroScriptsEditor
             }
             if (placeholders.Count != 0 || longPlaceholders.Count != 0)
             {
+                Logger.LogInfo("Script contained placeholders, opening editor");
                 return needEditor;
             }
             return false;

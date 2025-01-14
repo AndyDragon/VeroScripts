@@ -12,6 +12,8 @@ namespace VeroScriptsEditor
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private bool ignoreDirtyState = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,7 +47,7 @@ namespace VeroScriptsEditor
             }
         }
 
-        private void OnClosing(object sender, CancelEventArgs e)
+        private async void OnClosing(object sender, CancelEventArgs e)
         {
             if (WindowState == WindowState.Maximized)
             {
@@ -66,10 +68,23 @@ namespace VeroScriptsEditor
             }
             Properties.Settings.Default.Save();
 
-            if (this.DataContext is MainViewModel viewModel && viewModel.IsDirty)
+            if (this.DataContext is MainViewModel viewModel && viewModel.IsDirty && !ignoreDirtyState)
             {
                 e.Cancel = true;
-                MainViewModel.HandleDirtyAction(exit => e.Cancel = !exit);
+                var result = await MainViewModel.HandleDirtyAction(this, "Quit", "Are you sure you wish to quit?");
+                switch (result)
+                {
+                    case MainViewModel.DirtyActionResult.Confirm:
+                        ignoreDirtyState = true;
+                        Close();
+                        break;
+                    case MainViewModel.DirtyActionResult.CopyReport:
+                        viewModel.GenerateReport();
+                        await Task.Delay(1400);
+                        ignoreDirtyState = true;
+                        Close();
+                        break;
+                }
             }
         }
 

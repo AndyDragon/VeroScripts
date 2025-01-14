@@ -111,6 +111,7 @@ namespace VeroScriptsEditor
             {
                 var observableTemplate = new ObservableTemplate(template);
                 Templates.Add(observableTemplate);
+                OriginalTemplates.Add(observableTemplate);
                 observableTemplate.PropertyChanged += OnChildPropertyChanged;
             }
             Templates.CollectionChanged += (object? sender, NotifyCollectionChangedEventArgs e) =>
@@ -148,9 +149,33 @@ namespace VeroScriptsEditor
 
         public ObservableCollection<ObservableTemplate> Templates { get; } = [];
 
+        public ObservableCollection<ObservableTemplate> OriginalTemplates { get; } = [];
+
         public bool IsDirty
         {
-            get => Templates.Any(template => template.IsDirty || template.IsNew);
+            get => Templates.Any(template => template.IsDirty || template.IsNew) || RemovedTemplates.Length > 0 || AddedTemplates.Length > 0;
+        }
+
+        public string[] RemovedTemplates
+        {
+            get
+            {
+                return OriginalTemplates
+                    .Where(originalTemplate => !Templates.Contains(originalTemplate))
+                    .Select(template => template.Name)
+                    .ToArray();
+            }
+        }
+
+        public string[] AddedTemplates
+        {
+            get
+            {
+                return Templates
+                    .Where(template => !OriginalTemplates.Contains(template))
+                    .Select(template => template.Name)
+                    .ToArray();
+            }
         }
     }
 
