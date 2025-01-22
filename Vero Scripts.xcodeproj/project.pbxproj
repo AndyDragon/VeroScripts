@@ -15,7 +15,6 @@
 		496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA282B7861A1001D36C1 /* ScriptEditor.swift */; };
 		496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA2A2B78682F001D36C1 /* FieldEditor.swift */; };
 		496E918C2D338F1A006BCEB4 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496E918B2D338F1A006BCEB4 /* AboutView.swift */; };
-		498FBACD2BA5FF30000F5507 /* Themes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 498FBACC2BA5FF30000F5507 /* Themes.swift */; };
 		49C546D42B7874C60048DEDA /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D32B7874C60048DEDA /* Types.swift */; };
 		49C546D62B78750A0048DEDA /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D52B78750A0048DEDA /* Helpers.swift */; };
 		49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D72B7875630048DEDA /* PlaceholderEditor.swift */; };
@@ -31,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		4923C2322B4A833F0057D781 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		493FA1342D404D5900F4F9D9 /* Standalone.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Standalone.xcconfig; sourceTree = "<group>"; };
 		49498D212BA296F600F125E7 /* VersionCheckAppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCheckAppState.swift; sourceTree = "<group>"; };
 		495CCC482B45E3AA00BBA415 /* Vero Scripts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vero Scripts.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		495CCC4B2B45E3AA00BBA415 /* VeroScriptsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeroScriptsApp.swift; sourceTree = "<group>"; };
@@ -39,12 +39,10 @@
 		496BEA282B7861A1001D36C1 /* ScriptEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptEditor.swift; sourceTree = "<group>"; };
 		496BEA2A2B78682F001D36C1 /* FieldEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldEditor.swift; sourceTree = "<group>"; };
 		496E918B2D338F1A006BCEB4 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
-		498FBACC2BA5FF30000F5507 /* Themes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Themes.swift; sourceTree = "<group>"; };
 		49C546D32B7874C60048DEDA /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		49C546D52B78750A0048DEDA /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		49C546D72B7875630048DEDA /* PlaceholderEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderEditor.swift; sourceTree = "<group>"; };
 		49C546D92B787B340048DEDA /* NewMembershipEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMembershipEditor.swift; sourceTree = "<group>"; };
-		49E1A4592B7ED16D003C3272 /* Testing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Testing.xcconfig; sourceTree = "<group>"; };
 		49FE121A2D32EDF90018C3DE /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		49FE121C2D32EDF90018C3DE /* AdvancedToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToast.swift; sourceTree = "<group>"; };
 		49FE121D2D32EDF90018C3DE /* AdvancedToastModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToastModifiers.swift; sourceTree = "<group>"; };
@@ -96,11 +94,10 @@
 				496BEA282B7861A1001D36C1 /* ScriptEditor.swift */,
 				49C546D52B78750A0048DEDA /* Helpers.swift */,
 				49C546D32B7874C60048DEDA /* Types.swift */,
-				498FBACC2BA5FF30000F5507 /* Themes.swift */,
 				49498D212BA296F600F125E7 /* VersionCheckAppState.swift */,
 				495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */,
 				4923C2322B4A833F0057D781 /* Assets.xcassets */,
-				49E1A4592B7ED16D003C3272 /* Testing.xcconfig */,
+				493FA1342D404D5900F4F9D9 /* Standalone.xcconfig */,
 			);
 			path = "Vero Scripts";
 			sourceTree = "<group>";
@@ -206,7 +203,6 @@
 				49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */,
 				496E918C2D338F1A006BCEB4 /* AboutView.swift in Sources */,
 				49C546D62B78750A0048DEDA /* Helpers.swift in Sources */,
-				498FBACD2BA5FF30000F5507 /* Themes.swift in Sources */,
 				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
 				49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */,
 				49FE12272D32EE6E0018C3DE /* ContentView.ViewModel.swift in Sources */,
@@ -225,6 +221,104 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		493FA1352D404D9B00F4F9D9 /* Standalone */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 493FA1342D404D5900F4F9D9 /* Standalone.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Standalone;
+		};
+		493FA1362D404D9B00F4F9D9 /* Standalone */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 493FA1342D404D5900F4F9D9 /* Standalone.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Vero Scripts/Vero_Scripts.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 47;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
+				DEVELOPMENT_TEAM = 7U6K972H9Q;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Vero Scripts";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Standalone;
+		};
 		495CCC552B45E3AC00BBA415 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -356,7 +450,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 46;
+				CURRENT_PROJECT_VERSION = 47;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -396,7 +490,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 46;
+				CURRENT_PROJECT_VERSION = 47;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -425,105 +519,6 @@
 			};
 			name = Release;
 		};
-		49E1A45A2B7ED247003C3272 /* Testing */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 49E1A4592B7ED16D003C3272 /* Testing.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-			};
-			name = Testing;
-		};
-		49E1A45B2B7ED247003C3272 /* Testing */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 49E1A4592B7ED16D003C3272 /* Testing.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "Vero Scripts/Vero_Scripts.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 46;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
-				DEVELOPMENT_TEAM = 7U6K972H9Q;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Vero Scripts";
-				"INFOPLIST_KEY_CFBundleDisplayName[sdk=macosx*]" = "Vero Scripts (Script Testing)";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
-				PRODUCT_NAME = "$(TARGET_NAME) (Script Testing)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SUPPORTED_PLATFORMS = macosx;
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Testing;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -532,7 +527,7 @@
 			buildConfigurations = (
 				495CCC552B45E3AC00BBA415 /* Debug */,
 				495CCC562B45E3AC00BBA415 /* Release */,
-				49E1A45A2B7ED247003C3272 /* Testing */,
+				493FA1352D404D9B00F4F9D9 /* Standalone */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -542,7 +537,7 @@
 			buildConfigurations = (
 				495CCC582B45E3AC00BBA415 /* Debug */,
 				495CCC592B45E3AC00BBA415 /* Release */,
-				49E1A45B2B7ED247003C3272 /* Testing */,
+				493FA1362D404D9B00F4F9D9 /* Standalone */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

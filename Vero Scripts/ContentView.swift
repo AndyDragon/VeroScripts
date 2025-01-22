@@ -9,12 +9,17 @@ import SwiftUI
 import SwiftyBeaver
 import CloudKit
 
-struct ContentView: View {
-    // THEME
-    @State private var theme = Theme.notSet
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
-    @State private var isDarkModeOn = true
+public extension Color {
+#if os(macOS)
+    static let backgroundColor = Color(NSColor.windowBackgroundColor)
+    static let secondaryBackgroundColor = Color(NSColor.controlBackgroundColor)
+#else
+    static let backgroundColor = Color(UIColor.systemBackground)
+    static let secondaryBackgroundColor = Color(UIColor.secondarySystemBackground)
+#endif
+}
 
+struct ContentView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var viewModel = ViewModel()
@@ -76,17 +81,19 @@ struct ContentView: View {
         && newMembershipValidation.valid
         && userNameValidation.valid
     }
-    private let appState: VersionCheckAppState
     private let accordionHeightRatio = 3.5
     private let logger = SwiftyBeaver.self
 
+#if STANDALONE
+    private let appState: VersionCheckAppState
     init(_ appState: VersionCheckAppState) {
         self.appState = appState
     }
+#endif
 
     var body: some View {
         ZStack {
-            Color.BackgroundColor.edgesIgnoringSafeArea(.all)
+            Color.backgroundColor.edgesIgnoringSafeArea(.all)
 
             VStack {
                 // Fields
@@ -96,14 +103,14 @@ struct ContentView: View {
                         // Page picker
                         if !pageValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
+                                .foregroundStyle(Color.accentColor, Color.red)
                                 .help(pageValidation.reason ?? "unknown error")
                                 .imageScale(.small)
                         }
                         Text("Page: ")
                             .foregroundStyle(
-                                pageValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
-                                Color.TextColorSecondary)
+                                pageValidation.valid ? Color.label : Color.red,
+                                Color.secondaryLabel)
                             .frame(width: 36, alignment: .leading)
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -118,12 +125,12 @@ struct ContentView: View {
                             ForEach(loadedPages) { page in
                                 Text(page.displayName)
                                     .tag(page.id)
-                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
+                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
                             }
                         }
-                        .tint(Color.AccentColor)
-                        .accentColor(Color.AccentColor)
-                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
+                        .tint(Color.accentColor)
+                        .accentColor(Color.accentColor)
+                        .foregroundStyle(Color.accentColor, Color.label)
                         .focusable()
                         .focused($focusedField, equals: .page)
                         .onAppear {
@@ -143,12 +150,12 @@ struct ContentView: View {
                             ForEach(StaffLevelCase.casesFor(hub: currentPage?.hub)) { staffLevelCase in
                                 Text(staffLevelCase.rawValue)
                                     .tag(staffLevelCase)
-                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
+                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
                             }
                         }
-                        .tint(Color.AccentColor)
-                        .accentColor(Color.AccentColor)
-                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
+                        .tint(Color.accentColor)
+                        .accentColor(Color.accentColor)
+                        .foregroundStyle(Color.accentColor, Color.label)
                         .focusable()
                         .focused($focusedField, equals: .staffLevel)
                     }
@@ -211,15 +218,15 @@ struct ContentView: View {
                         // User level picker
                         if !membershipValidation.valid {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
+                                .foregroundStyle(Color.accentColor, Color.red)
                                 .help(membershipValidation.reason ?? "unknown error")
                                 .imageScale(.small)
                                 .padding([.leading], 8)
                         }
                         Text("Level: ")
                             .foregroundStyle(
-                                membershipValidation.valid ? Color.TextColorPrimary : Color.TextColorRequired,
-                                Color.TextColorSecondary)
+                                membershipValidation.valid ? Color.label : Color.red,
+                                Color.secondaryLabel)
                             .frame(width: 36, alignment: .leading)
                             .padding([.leading], membershipValidation.valid ? 8 : 0)
                         Picker("", selection: $membership.onChange { value in
@@ -229,12 +236,12 @@ struct ContentView: View {
                             ForEach(MembershipCase.casesFor(hub: currentPage?.hub)) { level in
                                 Text(level.rawValue)
                                     .tag(level)
-                                    .foregroundStyle(Color.TextColorSecondary, Color.TextColorSecondary)
+                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
                             }
                         }
-                        .tint(Color.AccentColor)
-                        .accentColor(Color.AccentColor)
-                        .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
+                        .tint(Color.accentColor)
+                        .accentColor(Color.accentColor)
+                        .foregroundStyle(Color.accentColor, Color.label)
                         .onAppear {
                             membershipValidation = validateMembership(value: membership)
                         }
@@ -422,7 +429,7 @@ struct ContentView: View {
                     )
                 }
             }
-            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .foregroundStyle(Color.label, Color.secondaryLabel)
             .padding()
             .alert(
                 alertTitle,
@@ -483,23 +490,6 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem {
                     Button(action: {
-                        populateFromClipboard()
-                    }) {
-                        HStack {
-                            Image(systemName: "list.clipboard")
-                                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
-                            Text("From Logging")
-                                .font(.system(.body, design: .rounded).bold())
-                                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
-                        }
-                        .padding(4)
-                        .buttonStyle(.plain)
-                    }
-                    .disabled(viewModel.hasModalToasts)
-                }
-
-                ToolbarItem {
-                    Button(action: {
                         logger.verbose("Tapped clear user", context: "User")
                         userName = ""
                         userNameChanged(to: userName)
@@ -522,49 +512,30 @@ struct ContentView: View {
                     }) {
                         HStack {
                             Image(systemName: "xmark")
-                                .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
+                                .foregroundStyle(Color.red, Color.secondaryLabel)
                             Text("Clear user")
                                 .font(.system(.body, design: .rounded).bold())
-                                .foregroundStyle(Color.TextColorRequired, Color.TextColorSecondary)
+                                .foregroundStyle(Color.red, Color.secondaryLabel)
                         }
                         .padding(4)
                         .buttonStyle(.plain)
                     }
                     .disabled(viewModel.hasModalToasts)
                 }
-
-                ToolbarItem {
-                    Menu("Theme", systemImage: "paintpalette") {
-                        Picker("Theme:", selection: $theme.onChange(setTheme)) {
-                            ForEach(Theme.allCases) { itemTheme in
-                                if itemTheme != .notSet {
-                                    Text(itemTheme.rawValue).tag(itemTheme)
-                                }
-                            }
-                        }
-                        .pickerStyle(.inline)
-                    }
-                    .foregroundStyle(Color.AccentColor, Color.TextColorSecondary)
-                    .disabled(viewModel.hasModalToasts)
-                }
             }
         }
         .frame(minWidth: 1024, minHeight: 600)
-        .background(Color.BackgroundColor)
+        .background(Color.backgroundColor)
         .advancedToastView(toasts: $viewModel.toastViews)
+#if STANDALONE
         .attachVersionCheckState(viewModel, appState) { url in
             openURL(url)
         }
-#if TESTING
-        .navigationTitle("Vero Scripts - Script Testing")
+        .navigationTitle("Vero Scripts - Standalone Version")
 #endif
         .task {
             // Hack for page staff level to handle changes (otherwise they are not persisted)
             lastPageStaffLevel = pageStaffLevel
-
-            DispatchQueue.main.async {
-                setTheme(UserDefaultsUtils.shared.getTheme())
-            }
 
             let loadingPagesToast = viewModel.showToast(
                 .progress,
@@ -576,26 +547,6 @@ struct ContentView: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 viewModel.dismissToast(loadingPagesToast)
-            }
-        }
-        .preferredColorScheme(isDarkModeOn ? .dark : .light)
-    }
-
-    private func setTheme(_ newTheme: Theme) {
-        if (newTheme == .notSet) {
-            logger.verbose("Set theme to nothing", context: "User")
-
-            isDarkModeOn = colorScheme == .dark
-            Color.isDarkModeOn = colorScheme == .dark
-        } else {
-            logger.verbose("Set theme to \(newTheme.rawValue)", context: "User")
-
-            if let details = ThemeDetails[newTheme] {
-                Color.currentTheme = details.colorTheme
-                isDarkModeOn = details.darkTheme
-                Color.isDarkModeOn = details.darkTheme
-                theme = newTheme
-                UserDefaultsUtils.shared.setTheme(theme: newTheme)
             }
         }
     }
@@ -636,11 +587,7 @@ struct ContentView: View {
         logger.verbose("Loading page catalog from server", context: "System")
 
         do {
-#if TESTING
-            let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/pages.json")!
-#else
             let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
-#endif
             let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
             var pages = [LoadedPage]()
             for hubPair in (pagesCatalog.hubs) {
@@ -671,11 +618,7 @@ struct ContentView: View {
 
             logger.verbose("Loading template catalog from server", context: "System")
 
-#if TESTING
-            let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/testing/templates.json")!
-#else
             let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
-#endif
             templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
             waitingForTemplates = false
             updateScripts()
@@ -689,11 +632,7 @@ struct ContentView: View {
 
                 logger.verbose("Loading disallow list from server", context: "System")
 
-#if TESTING
-                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/testing/disallowlist.json")!
-#else
                 let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
-#endif
                 disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
                 updateScripts()
                 updateNewMembershipScripts()
@@ -705,6 +644,7 @@ struct ContentView: View {
                 debugPrint(error.localizedDescription)
             }
 
+#if STANDALONE
             do {
                 // Delay the start of the disallowed list download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 100_000_000)
@@ -714,6 +654,7 @@ struct ContentView: View {
                 // do nothing, the version check is not critical
                 debugPrint(error.localizedDescription)
             }
+#endif
         } catch {
             logger.error("Failed to load page catalog or template catalog from server: \(error.localizedDescription)", context: "System")
             viewModel.dismissAllNonBlockingToasts(includeProgress: true)
@@ -742,146 +683,6 @@ struct ContentView: View {
                     }
                 }
             )
-        }
-    }
-
-    private func populateFromClipboard() {
-        logger.verbose("Tapped populate from clipboard", context: "User")
-        do {
-            let json = pasteFromClipboard()
-            let decoder = JSONDecoder()
-            let featureUser = try decoder.decode(CodableFeatureUser.self, from: json.data(using: .utf8)!)
-            populateFromFeatureUser(featureUser)
-            logger.verbose("Populated from clipboard", context: "System")
-        } catch {
-            logger.error("Failed to populate from clipboard", context: "System")
-            debugPrint(error)
-        }
-    }
-
-    private func populateFromFeatureUser(_ featureUser: CodableFeatureUser) {
-        if let loadedPage = loadedPages.first(where: { $0.id == featureUser.page }) {
-            currentPage = loadedPage
-            page = currentPage!.id
-            pageChanged(to: currentPage!.id)
-            if page.isEmpty {
-                pageValidation = (false, "Page is required")
-            } else {
-                pageValidation = (true, nil)
-            }
-
-            updateStaffLevelForPage()
-            pageStaffLevelChanged(to: pageStaffLevel)
-
-            userName = featureUser.userAlias
-            userNameChanged(to: userName)
-            userNameValidation = validateUserName(value: userName)
-
-            membership = featureUser.userLevel
-            membershipChanged(to: membership)
-            membershipValidation = validateMembership(value: membership)
-
-            firstForPage = featureUser.firstFeature
-            firstForPageChanged(to: firstForPage)
-
-            if loadedPage.hub == "click" {
-                if featureUser.tagSource == TagSourceCase.commonPageTag {
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.clickCommunityTag {
-                    fromCommunityTag = true
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.clickHubTag {
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = true
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                }
-            } else if loadedPage.hub == "snap" {
-                if featureUser.tagSource == TagSourceCase.commonPageTag {
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.snapRawPageTag {
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = true
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.snapCommunityTag {
-                    fromCommunityTag = true
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.snapRawCommunityTag {
-                    fromCommunityTag = true
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = true
-                    fromRawTagChanged(to: fromRawTag)
-                } else if featureUser.tagSource == TagSourceCase.snapMembershipTag {
-                    // TODO need to handle this...
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                } else {
-                    fromCommunityTag = false
-                    fromCommunityTagChanged(to: fromCommunityTag)
-                    fromHubTag = false
-                    fromHubTagChanged(to: fromHubTag)
-                    fromRawTag = false
-                    fromRawTagChanged(to: fromRawTag)
-                }
-            }
-
-            newMembership = featureUser.newLevel
-            newMembershipChanged(to: newMembership)
-
-            focusedField = .userName
-
-            viewModel.showSuccessToast(
-                "Populated from Feature Logging",
-                "Populated feature for user \(featureUser.userName) from the Feature Logging app"
-            )
-        } else {
-            userName = ""
-            userNameChanged(to: userName)
-            userNameValidation = validateUserName(value: userName)
-            membership = MembershipCase.none
-            membershipChanged(to: membership)
-            membershipValidation = validateMembership(value: membership)
-            firstForPage = false
-            firstForPageChanged(to: firstForPage)
-            fromCommunityTag = false
-            fromCommunityTagChanged(to: fromCommunityTag)
-            fromHubTag = false
-            fromHubTagChanged(to: fromHubTag)
-            fromRawTag = false
-            fromRawTagChanged(to: fromRawTag)
-            newMembership = NewMembershipCase.none
-            newMembershipChanged(to: newMembership)
-            focusedField = .userName
-            updateStaffLevelForPage()
         }
     }
 

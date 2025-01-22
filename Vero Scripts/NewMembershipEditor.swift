@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SystemColors
 
 struct NewMembershipEditor: View {
     @Binding var newMembership: NewMembershipCase
@@ -28,12 +29,12 @@ struct NewMembershipEditor: View {
                 ForEach(NewMembershipCase.casesFor(hub: currentPage?.hub)) { level in
                     Text(level.rawValue)
                         .tag(level)
-                        .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                        .foregroundStyle(Color.label, Color.secondaryLabel)
                 }
             }
-            .tint(Color.AccentColor)
-            .accentColor(Color.AccentColor)
-            .foregroundStyle(Color.AccentColor, Color.TextColorPrimary)
+            .tint(Color.accentColor)
+            .accentColor(Color.accentColor)
+            .foregroundStyle(Color.accentColor, Color.label)
             .frame(width: 320)
 
             Button(action: {
@@ -55,10 +56,10 @@ struct NewMembershipEditor: View {
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
                 .focused(focus, equals: focusField)
                 .textEditorStyle(.plain)
-                .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
+                .foregroundStyle(valid ? Color.label : Color.red, Color.secondaryLabel)
                 .scrollContentBackground(.hidden)
                 .padding(4)
-                .background(Color.BackgroundColorEditor)
+                .background(Color.controlBackground.opacity(0.5))
                 .border(Color.gray.opacity(0.25))
                 .cornerRadius(4)
         } else {
@@ -66,10 +67,10 @@ struct NewMembershipEditor: View {
                 .font(.system(size: 14))
                 .frame(minWidth: 200, maxWidth: .infinity, minHeight: minHeight, maxHeight: maxHeight)
                 .focused(focus, equals: focusField)
-                .foregroundStyle(valid ? Color.TextColorPrimary : Color.TextColorRequired, Color.TextColorSecondary)
+                .foregroundStyle(valid ? Color.label : Color.red, Color.secondaryLabel)
                 .scrollContentBackground(.hidden)
                 .padding(4)
-                .background(Color.BackgroundColorEditor)
+                .background(Color.controlBackground.opacity(0.5))
                 .border(Color.gray.opacity(0.25))
                 .cornerRadius(4)
         }

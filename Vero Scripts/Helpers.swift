@@ -76,11 +76,6 @@ func copyToClipboard(_ text: String) -> Void {
         pasteBoard.writeObjects([text as NSString])
 }
 
-func pasteFromClipboard() -> String {
-    let pasteBoard = NSPasteboard.general
-    return pasteBoard.string(forType: .string) ?? ""
-}
-
 extension Bundle {
     var releaseVersionNumber: String? {
         return infoDictionary?["CFBundleShortVersionString"] as? String

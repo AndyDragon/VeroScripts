@@ -9,6 +9,10 @@ import SwiftUI
 import SwiftyBeaver
 
 struct AboutView: View {
+    // THEME
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    @State private var isDarkModeOn = true
+
     @Environment(\.dismissWindow) var dismissWindow
 
     @State private var showCredits = false
@@ -48,19 +52,21 @@ struct AboutView: View {
                 .frame(maxWidth: .infinity)
             }
             .padding(20)
-            .padding(.vertical, showCredits ? 10 : 64)
+            .padding(.vertical, showCredits ? 27 : 66)
             .frame(maxWidth: .infinity)
-            .background(.white.opacity(0.08))
-            .background()
+            .background(isDarkModeOn ? .white.opacity(0.08) : .black.opacity(0.08))
+            .background(isDarkModeOn ? .black : .white)
+            .foregroundStyle(isDarkModeOn ? .white : .black)
 
             VStack {
                 HStack(alignment: .center) {
                     Spacer()
                     Text(showCredits ? "This app uses the following packages / code:" : "")
-                        .font(.body)
+                        .font(.footnote)
                         .fontWeight(.bold)
-                        .foregroundStyle(Color(red: 0.5, green: 0.1, blue: 0.6 ))
+                        .foregroundStyle(isDarkModeOn ? Color(red: 0.5, green: 0.1, blue: 0.6 ) : Color(red: 0.8, green: 0.4, blue: 0.9))
                         .animation(.easeIn(duration: showCredits ? 1.6 : 0).delay(showCredits ? 0.1 : 0), value: showCredits)
+                        .padding(.top, 4)
                     Spacer()
                     Button {
                         withAnimation {
@@ -72,11 +78,12 @@ struct AboutView: View {
                         }
                     } label: {
                         Triangle()
-                            .fill(showCredits ? .black : .white)
+                            .fill(isDarkModeOn ? (showCredits ? .black : .white) : (showCredits ? .white : .black))
                             .frame(width: 12, height: 12)
                             .rotationEffect(.degrees(showCredits ? -180.0 : -90.0), anchor: .center)
                     }
                     .buttonStyle(.borderless)
+                    .padding(.top, 8)
                     .help(showCredits ? "Hide the credits" : "Show the credits")
                 }
                 .padding(.horizontal)
@@ -87,14 +94,14 @@ struct AboutView: View {
                             Text(key)
                                 .font(.caption2)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(isDarkModeOn ? .black : .white)
                                 .gridColumnAlignment(.trailing)
                             VStack(alignment: .leading) {
                                 ForEach(value, id: \.self) { author in
                                     Text(.init(author))
                                         .font(.caption2)
                                         .fontWeight(.bold)
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(isDarkModeOn ? .black : .white)
                                 }
                             }
                             .gridColumnAlignment(.leading)
@@ -103,11 +110,12 @@ struct AboutView: View {
                 }
                 .opacity(showCredits ? 1 : 0)
                 .animation(.easeIn(duration: showCredits ? 1 : 0).delay(showCredits ? 0.4 : 0), value: showCredits)
+
                 Spacer()
             }
-            .frame(maxWidth: .infinity, maxHeight: showCredits ? 200 : 20)
-            .background(.white.opacity(showCredits ? 0.9 : 0.08))
-            .background()
+            .frame(maxWidth: .infinity, maxHeight: showCredits ? 232 : 20)
+            .background(isDarkModeOn ? .white.opacity(showCredits ? 0.9 : 0.08) : .black.opacity(showCredits ? 0.9 : 0.08))
+            .background(isDarkModeOn ? .black : .white)
 
             HStack {
                 Spacer()
@@ -115,7 +123,7 @@ struct AboutView: View {
                     dismissWindow(id: "about")
                 } label: {
                     Text("Close")
-                        .foregroundStyle(.black)
+                        .foregroundStyle(isDarkModeOn ? .black : .black)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 16)
                 }
@@ -126,16 +134,36 @@ struct AboutView: View {
             .frame(maxWidth: .infinity)
             .padding(.top)
         }
-        .background(.white.opacity(0.9))
-        .background()
         .frame(width: 600, height: 400)
-        .frame(minWidth: 600, maxWidth: 600, minHeight: 400, maxHeight: 400)
+        .frame(minWidth: 600, maxWidth: 600, minHeight: 412, maxHeight: 412)
+        .background(isDarkModeOn ? .white.opacity(0.9) : .black.opacity(0.9))
+        .background(isDarkModeOn ? .black : .white)
+        .onAppear {
+            updateTheme()
+        }
+        .onChange(of: colorScheme) {
+            updateTheme()
+        }
     }
 }
+
+extension AboutView {
+    // MARK: - utilities
+
+    private func updateTheme() {
+        withAnimation {
+            isDarkModeOn = colorScheme == .dark
+        }
+    }
+}
+
+// MARK: - preview
 
 #Preview {
     AboutView(packages: ["Application": ["AndyDragon ([Github profile](https://github.com/AndyDragon))"]])
 }
+
+// MARK: - utility types
 
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {

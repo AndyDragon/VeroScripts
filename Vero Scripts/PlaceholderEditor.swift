@@ -34,10 +34,10 @@ struct PlaceholderView: View {
                     .font(.body)
                     .frame(height: 48)
                     .frame(minWidth: 320)
-                    .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                    .foregroundStyle(Color.label, Color.secondaryLabel)
                     .scrollContentBackground(.hidden)
                     .padding(4)
-                    .background(Color.BackgroundColorEditor)
+                    .background(Color.controlBackground.opacity(0.5))
                     .border(Color.gray.opacity(0.25))
                     .cornerRadius(4)
                     .textEditorStyle(.plain)
@@ -46,10 +46,10 @@ struct PlaceholderView: View {
                     .font(.body)
                     .frame(height: 48)
                     .frame(minWidth: 320)
-                    .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                    .foregroundStyle(Color.label, Color.secondaryLabel)
                     .scrollContentBackground(.hidden)
                     .padding(4)
-                    .background(Color.BackgroundColorEditor)
+                    .background(Color.controlBackground.opacity(0.5))
                     .border(Color.gray.opacity(0.25))
                     .cornerRadius(4)
                 }
@@ -58,10 +58,10 @@ struct PlaceholderView: View {
                 .lineLimit(1)
                 .font(.body)
                 .frame(minWidth: 320)
-                .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+                .foregroundStyle(Color.label, Color.secondaryLabel)
                 .textFieldStyle(.plain)
                 .padding(4)
-                .background(Color.BackgroundColorEditor)
+                .background(Color.controlBackground.opacity(0.5))
                 .border(Color.gray.opacity(0.25))
                 .cornerRadius(4)
             }
@@ -96,7 +96,7 @@ struct PlaceholderSheet: View {
     
     var body: some View {
         ZStack {
-            Color.BackgroundColor.edgesIgnoringSafeArea(.all)
+            Color.backgroundColor.edgesIgnoringSafeArea(.all)
             
             VStack {
                 Text("There are manual placeholders that need to be filled out:")
@@ -117,7 +117,7 @@ struct PlaceholderSheet: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .padding(4)
-                .background(Color.BackgroundColorList)
+                .background(Color.controlBackground)
                 .border(Color.gray.opacity(0.25))
                 .cornerRadius(4)
 
@@ -152,7 +152,7 @@ struct PlaceholderSheet: View {
                     })
                 }
             }
-            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .foregroundStyle(Color.label, Color.secondaryLabel)
             .frame(minWidth: 800, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
             .padding()
         }

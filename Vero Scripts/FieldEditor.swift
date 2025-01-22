@@ -28,7 +28,7 @@ struct FieldEditor: View {
             // Title validator
             if !fieldValidation.valid {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(Color.AccentColor, Color.TextColorRequired)
+                    .foregroundStyle(Color.accentColor, Color.red)
                     .help(fieldValidation.reason ?? "")
                     .imageScale(.small)
             }
@@ -38,15 +38,15 @@ struct FieldEditor: View {
                 if titleWidth.isEmpty {
                     Text(title)
                         .foregroundStyle(fieldValidation.valid ?
-                                         Color.TextColorPrimary : Color.TextColorRequired,
-                                         Color.TextColorSecondary)
+                                         Color.label : Color.red,
+                                         Color.secondaryLabel)
                         .lineLimit(1)
                         .truncationMode(.tail)
                 } else {
                     Text(title)
                         .foregroundStyle(fieldValidation.valid ?
-                                         Color.TextColorPrimary : Color.TextColorRequired,
-                                         Color.TextColorSecondary)
+                                         Color.label : Color.red,
+                                         Color.secondaryLabel)
                         .frame(width: titleWidth[0], alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -62,10 +62,10 @@ struct FieldEditor: View {
             })
             .focused(focus, equals: focusField)
             .lineLimit(1)
-            .foregroundStyle(Color.TextColorPrimary, Color.TextColorSecondary)
+            .foregroundStyle(Color.label, Color.secondaryLabel)
             .textFieldStyle(.plain)
             .padding(4)
-            .background(Color.BackgroundColorEditor)
+            .background(Color.controlBackground.opacity(0.5))
             .border(Color.gray.opacity(0.25))
             .cornerRadius(4)
         }

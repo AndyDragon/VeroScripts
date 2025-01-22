@@ -12,10 +12,12 @@ import SwiftyBeaver
 struct VeroScriptsApp: App {
     @Environment(\.openWindow) private var openWindow
 
+#if STANDALONE
     @State var checkingForUpdates = false
     @State var versionCheckResult: VersionCheckResult = .complete
     @State var versionCheckToast = VersionCheckToast()
-    
+#endif
+
     let logger = SwiftyBeaver.self
     let loggerConsole = ConsoleDestination()
     let loggerFile = FileDestination()
@@ -30,17 +32,27 @@ struct VeroScriptsApp: App {
     }
 
     var body: some Scene {
+#if STANDALONE
         let appState = VersionCheckAppState(
             isCheckingForUpdates: $checkingForUpdates,
             versionCheckResult: $versionCheckResult,
             versionCheckToast: $versionCheckToast,
             versionLocation: "https://vero.andydragon.com/static/data/veroscripts/version.json")
+#endif
         WindowGroup {
+#if STANDALONE
             ContentView(appState)
                 .onDisappear {
                     logger.info("End of session")
                     logger.info("==============================================================================")
                 }
+#else
+            ContentView()
+                .onDisappear {
+                    logger.info("End of session")
+                    logger.info("==============================================================================")
+                }
+#endif
         }
         .commands {
             CommandGroup(replacing: CommandGroupPlacement.appInfo) {
@@ -53,6 +65,7 @@ struct VeroScriptsApp: App {
                     Text("About \(Bundle.main.displayName ?? "Vero Scripts")")
                 })
             }
+#if STANDALONE
             CommandGroup(replacing: .appSettings, addition: {
                 Button(action: {
                     logger.verbose("Manual check for updates", context: "User")
@@ -64,6 +77,7 @@ struct VeroScriptsApp: App {
                 })
                 .disabled(checkingForUpdates)
             })
+#endif
             CommandGroup(replacing: CommandGroupPlacement.newItem) { }
         }
         
