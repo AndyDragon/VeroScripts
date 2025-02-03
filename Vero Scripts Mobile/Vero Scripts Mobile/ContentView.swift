@@ -19,8 +19,14 @@ enum Stage {
 }
 
 struct ContentView: View {
+    @AppStorage(
+        "preference_includespace",
+        store: UserDefaults(suiteName: "com.andydragon.com.Vero-Scripts-Mobile")
+    ) var includeSpace = false
+
     @Environment(\.openURL) private var openURL
     @Environment(\.showAbout) private var showAbout: ShowAboutAction?
+    @Environment(\.showSettings) private var showSettings: ShowSettingsAction?
 
     @State private var viewModel = ViewModel()
     
@@ -114,19 +120,34 @@ struct ContentView: View {
                                 }
                                 .buttonStyle(.bordered)
                                 .disabled(!canCopyScripts)
-                                
-                                Button(action: {
-                                    logger.verbose("Tapped about", context: "User")
-                                    showAbout?()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "info.circle")
-                                            .foregroundStyle(Color.accentColor, Color.primary)
-                                        Text("About")
+
+                                HStack {
+                                    Button(action: {
+                                        logger.verbose("Tapped about", context: "User")
+                                        showAbout?()
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "info.circle")
+                                                .foregroundStyle(Color.accentColor, Color.primary)
+                                            Text("About")
+                                        }
+                                        .foregroundColor(.primary)
                                     }
-                                    .foregroundColor(.primary)
+                                    .buttonStyle(.bordered)
+
+                                    Button(action: {
+                                        logger.verbose("Tapped settings", context: "User")
+                                        showSettings?()
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "gear.circle")
+                                                .foregroundStyle(Color.accentColor, Color.primary)
+                                            Text("Settings")
+                                        }
+                                        .foregroundColor(.primary)
+                                    }
+                                    .buttonStyle(.bordered)
                                 }
-                                .buttonStyle(.bordered)
                             }
                         }
                     }
@@ -395,6 +416,9 @@ struct ContentView: View {
                 }
                 .disabled(viewModel.hasModalToasts)
             }
+        }
+        .onChange(of: includeSpace) {
+            updateScripts()
         }
         .background(Color.backgroundColor)
         .advancedToastView(toasts: $viewModel.toastViews)
@@ -1117,6 +1141,7 @@ struct ContentView: View {
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag,
                 hubTag: fromHubTag) ?? ""
+
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
@@ -1127,6 +1152,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .insertSpacesInUserTags(includeSpace)
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
@@ -1137,6 +1163,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .insertSpacesInUserTags(includeSpace)
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
@@ -1147,6 +1174,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .insertSpacesInUserTags(includeSpace)
         }
     }
 
@@ -1267,6 +1295,7 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .insertSpacesInUserTags(includeSpace)
         } else {
             newMembershipScript = ""
         }

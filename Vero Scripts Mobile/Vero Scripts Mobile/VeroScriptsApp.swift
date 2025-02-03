@@ -15,9 +15,19 @@ struct ShowAboutAction {
         action()
     }
 }
-
 struct ShowAboutActionKey: EnvironmentKey {
     static var defaultValue: ShowAboutAction? = nil
+}
+
+struct ShowSettingsAction {
+    typealias Action = () -> Void
+    let action: Action
+    func callAsFunction() {
+        action()
+    }
+}
+struct ShowSettingsActionKey: EnvironmentKey {
+    static var defaultValue: ShowSettingsAction? = nil
 }
 
 extension EnvironmentValues {
@@ -25,11 +35,16 @@ extension EnvironmentValues {
         get { self[ShowAboutActionKey.self] }
         set { self[ShowAboutActionKey.self] = newValue }
     }
+    var showSettings: ShowSettingsAction? {
+        get { self[ShowSettingsActionKey.self] }
+        set { self[ShowSettingsActionKey.self] = newValue }
+    }
 }
 
 @main
 struct VeroScriptsApp: App {
-    @State private var showingAboutBox = false
+    @State private var showingAboutView = false
+    @State private var showingSettingsView = false
 
     let logger = SwiftyBeaver.self
     let loggerConsole = ConsoleDestination()
@@ -47,7 +62,7 @@ struct VeroScriptsApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .sheet(isPresented: $showingAboutBox) {
+                .sheet(isPresented: $showingAboutView) {
                     AboutView(packages: [
                         "SwiftyBeaver": [
                             "SwiftyBeaver ([Github profile](https://github.com/SwiftyBeaver))",
@@ -60,7 +75,14 @@ struct VeroScriptsApp: App {
                     .presentationDetents([.height(440)])
                 }
                 .environment(\.showAbout, ShowAboutAction(action: {
-                    showingAboutBox.toggle()
+                    showingAboutView.toggle()
+                }))
+                .sheet(isPresented: $showingSettingsView) {
+                    SettingsView()
+                        .presentationDetents([.height(440)])
+                }
+                .environment(\.showSettings, ShowSettingsAction(action: {
+                    showingSettingsView.toggle()
                 }))
                 .onDisappear {
                     logger.info("End of session")
