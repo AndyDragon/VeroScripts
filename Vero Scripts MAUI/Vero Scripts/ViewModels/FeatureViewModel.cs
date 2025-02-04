@@ -6,6 +6,7 @@ using CommunityToolkit.Maui.Core;
 using Newtonsoft.Json;
 using VeroScripts.Base;
 using VeroScripts.Models;
+using VeroScripts.Views;
 
 namespace VeroScripts.ViewModels;
 
@@ -51,6 +52,76 @@ public class FeatureViewModel : NotifyPropertyChanged
 
         _ = LoadPages();
     }
+    
+    #region Commands
+
+    public SimpleCommand FeatureScriptCommand => new(() =>
+    {
+        Application.Current?.Windows[0].Page?.Navigation.PushAsync(new ScriptPage(new ScriptViewModel(this, Script.Feature)));
+    }, () => CanCopyScripts);
+
+    public SimpleCommandWithParameter CopyScriptCommand => new(parameter =>
+    {
+        if (parameter is Script script)
+        {
+            switch (script)
+            {
+                case Script.Feature:
+                case Script.Comment:
+                case Script.OriginalPost:
+                    CopyScript(script, force: true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }, _ => CanCopyScripts);
+    
+    public SimpleCommand CopyNewMembershipScriptCommand => new(() =>
+    {
+        _ = CopyTextToClipboardAsync(NewMembershipScript, "Copied the new membership script to the clipboard");
+    }, () => CanCopyNewMembershipScript);
+
+
+    public SimpleCommandWithParameter NextScriptCommand => new (parameter =>
+    {
+        if (parameter is Script script)
+        {
+            switch (script)
+            {
+                case Script.Feature:
+                    Application.Current?.Windows[0].Page?.Navigation
+                        .PushAsync(new ScriptPage(new ScriptViewModel(this, Script.Comment)));
+                    break;
+
+                case Script.Comment:
+                    Application.Current?.Windows[0].Page?.Navigation
+                        .PushAsync(new ScriptPage(new ScriptViewModel(this, Script.OriginalPost)));
+                    break;
+
+                case Script.OriginalPost:
+                    Application.Current?.Windows[0].Page?.Navigation
+                        .PushAsync(new NewMembershipPage(this));
+                    break;
+            }
+        }
+    });
+
+    public SimpleCommand NextFeatureCommand => new(() =>
+    {
+        Application.Current?.Windows[0].Page?.Navigation.PopToRootAsync();
+        UserName = "";
+        Membership = "None";
+        NewMembershipScript = "None";
+        FirstForPage = false;
+        RawTag = false;
+        CommunityTag = false;
+        HubTag = false;
+        UpdateScripts();
+        UpdateNewMembershipScripts();
+    });
+
+    #endregion
 
     #region User settings
 
@@ -122,17 +193,18 @@ public class FeatureViewModel : NotifyPropertyChanged
 
                 _ = Toast.Make($"Loaded {LoadedPages.Count} pages from the server").Show();
             }
-
-            SelectedPage = LoadedPages.FirstOrDefault(loadedPage => loadedPage.Id == Page);
+            var page = UserSettings.Get(nameof(Page), "");
+            SelectedPage = LoadedPages.FirstOrDefault(loadedPage => loadedPage.Id == page);
             WaitingForPages = false;
+            
             await LoadTemplates();
             await LoadDisallowList();
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error occurred loading page catalog (will retry): {0}", ex.Message);
-            _ = Toast.Make($"Failed to load the page catalog: {ex.Message}", ToastDuration.Long).Show()
-                .ContinueWith(_ => LoadPages());
+            await Toast.Make($"Failed to load the page catalog: {ex.Message}", ToastDuration.Long).Show();
+            Application.Current!.Quit();
         }
     }
 
@@ -155,8 +227,8 @@ public class FeatureViewModel : NotifyPropertyChanged
         catch (Exception ex)
         {
             Console.WriteLine("Error occurred loading the template catalog (will retry): {0}", ex.Message);
-            _ = Toast.Make($"Failed to load the page templates: {ex.Message}", ToastDuration.Long).Show()
-                .ContinueWith(_ => LoadTemplates());
+            await Toast.Make($"Failed to load the page templates: {ex.Message}", ToastDuration.Long).Show();
+            Application.Current!.Quit();
         }
     }
 
@@ -193,10 +265,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     private bool WaitingForPages
     {
         get => _waitingForPages;
-        set => Set(ref _waitingForPages, value, [
-            nameof(CanChangePage),
-            nameof(CanChangeStaffLevel),
-        ]);
+        set => Set(ref _waitingForPages, value, [nameof(CanChangePage), nameof(CanChangeStaffLevel)]);
     }
 
     #endregion
@@ -249,18 +318,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         return Validation.ValidateValueNotEmpty(page);
     }
 
-    static string FixPageHub(string page)
-    {
-        var parts = page.Split(':', 2);
-        if (parts.Length > 1)
-        {
-            return page;
-        }
-
-        return "snap:" + page;
-    }
-
-    private string _page = FixPageHub(UserSettings.Get(nameof(Page), ""));
+    private string _page = UserSettings.Get(nameof(Page), "");
 
     public string Page
     {
@@ -410,6 +468,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             if (Set(ref _userNameValidation, value))
             {
                 OnPropertyChanged(nameof(CanCopyScripts));
+                OnPropertyChanged(nameof(FeatureScriptCommand));
                 OnPropertyChanged(nameof(CanCopyNewMembershipScript));
             }
         }
@@ -484,6 +543,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             if (Set(ref _membershipValidation, value))
             {
                 OnPropertyChanged(nameof(CanCopyScripts));
+                OnPropertyChanged(nameof(FeatureScriptCommand));
             }
         }
     }
@@ -568,13 +628,13 @@ public class FeatureViewModel : NotifyPropertyChanged
 
     #region Clipboard support
 
-    private static async Task CopyTextToClipboardAsync(string text, string title, string successMessage)
+    private static async Task CopyTextToClipboardAsync(string text, string successMessage)
     {
         await TrySetClipboardText(text);
-        await Toast.Make($"{title}: {successMessage}").Show();
+        await Toast.Make(successMessage).Show();
     }
 
-    public static async Task TrySetClipboardText(string text)
+    private static async Task TrySetClipboardText(string text)
     {
         await Clipboard.SetTextAsync(text);
     }
@@ -1140,6 +1200,71 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
     }
 
+    private readonly Dictionary<Script, string> _scriptNames = new()
+    {
+        { Script.Feature, "feature" },
+        { Script.Comment, "comment" },
+        { Script.OriginalPost, "original post" },
+    };
+    
+    public void CopyScript(Script script, bool force = false, bool withPlaceholders = false)
+    {
+        if (withPlaceholders)
+        {
+            var unprocessedScript = Scripts[script];
+            _ = CopyTextToClipboardAsync(unprocessedScript, "Copied the " + _scriptNames[script] + " script with placeholders to the clipboard");
+        }
+        else if (CheckForPlaceholders(script, force))
+        {
+            var editor = new PlaceholderEditor(this, script);
+            Application.Current?.Windows[0].Navigation.PushAsync(editor);
+        }
+        else
+        {
+            var processedScript = ProcessPlaceholders(script);
+            TransferPlaceholders(script);
+            _ = CopyTextToClipboardAsync(processedScript, "Copied the " + _scriptNames[script] + " script to the clipboard");
+        }
+    }
+    
+    public void CopyScriptFromPlaceholders(Script script, bool withPlaceholders = false)
+    {
+        if (withPlaceholders)
+        {
+            _ = CopyTextToClipboardAsync(Scripts[script], "Copied the " + _scriptNames[script] + " script with placeholders to the clipboard");
+        }
+        else
+        {
+            TransferPlaceholders(script);
+            _ = CopyTextToClipboardAsync(ProcessPlaceholders(script), "Copied the " + _scriptNames[script] + " script to the clipboard");
+        }
+    }
+
+    #endregion
+    
+    #region Script
+
+    public string GetScriptTitle(Script script)
+    {
+        return script switch
+        {
+            Script.Feature => "Feature",
+            Script.Comment => "Comment",
+            Script.OriginalPost => "Original post",
+            _ => ""
+        };
+    }
+
+    public string GetScriptText(Script script)
+    {
+        return Scripts[script];
+    }
+    
+    public void SetScriptText(Script script, string scriptText)
+    {
+        Scripts[script] = scriptText;
+    }
+    
     #endregion
 
     private static readonly Regex PlaceholderRegex = new(@"\[\[([^\]]*)\]\]");
@@ -1150,6 +1275,6 @@ public static class StringExtensions
 {
     public static string InsertSpacesInUserTags(this string input, bool doReplacements = false)
     {
-        return Regex.Replace(input, @"(^|\s|\()@([\w]+)(\s|$|,|\.|\:|\))", "$1@ $2$3");
+        return !doReplacements ? input : Regex.Replace(input, @"(^|\s|\()@([\w]+)(\s|$|,|\.|\:|\))", "$1@ $2$3");
     }
 }

@@ -1,0 +1,54 @@
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localConverters="clr-namespace:VeroScripts.Converters"
+    xmlns:localViewModels="clr-namespace:VeroScripts.ViewModels"
+    x:Class="VeroScripts.Views.ScriptPage"
+    x:DataType="localViewModels:ScriptViewModel"
+    Title="{Binding ScriptTitle}">
+
+    <Shell.ToolbarItems>
+        <ToolbarItem
+            Text="{Binding NextScript}"
+            Command="{Binding ViewModel.NextScriptCommand}"
+            CommandParameter="{Binding Script}"
+            Priority="1"
+            Order="Primary" />
+        <ToolbarItem
+            Text="Next feature"
+            Command="{Binding ViewModel.NextFeatureCommand}"
+            Order="Secondary" />
+    </Shell.ToolbarItems>
+
+    <ContentPage.Resources>
+        <localConverters:ValidationBooleanColorConverter x:Key="ValidationBooleanColorConverter" />
+    </ContentPage.Resources>
+
+    <Grid
+        Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Script header -->
+        <Button
+            Grid.Row="0"
+            Text="Copy"
+            IsEnabled="{Binding ViewModel.CanCopyScripts}"
+            VerticalOptions="Center"
+            Margin="4,0,0,0"
+            Padding="24,0"
+            HeightRequest="32"
+            MaximumHeightRequest="32"
+            Command="{Binding ViewModel.CopyScriptCommand}"
+            CommandParameter="{Binding Script}" />
+        
+        <!-- Feature script -->
+        <Editor
+            Grid.Row="1"
+            Text="{Binding ScriptText, Mode=TwoWay}"
+            Margin="0,0,0,8"
+            TextColor="{Binding ViewModel.CanCopyScripts, Converter={StaticResource ValidationBooleanColorConverter}}" />
+    </Grid>
+</ContentPage>

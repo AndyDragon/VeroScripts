@@ -1,0 +1,58 @@
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localConverters="clr-namespace:VeroScripts.Converters"
+    xmlns:localViewModels="clr-namespace:VeroScripts.ViewModels"
+    x:Class="VeroScripts.Views.NewMembershipPage"
+    x:DataType="localViewModels:FeatureViewModel"
+    Title="New membership">
+
+    <Shell.ToolbarItems>
+        <ToolbarItem
+            Text="Next feature"
+            Command="{Binding NextFeatureCommand}"
+            Priority="1"
+            Order="Primary" />
+    </Shell.ToolbarItems>
+
+    <ContentPage.Resources>
+        <localConverters:ValidationBooleanColorConverter x:Key="ValidationBooleanColorConverter" />
+    </ContentPage.Resources>
+
+    <Grid
+        Margin="20"
+        RowDefinitions="Auto, Auto, Auto, *">
+
+        <!-- New membership -->
+        <Label
+            Grid.Row="0"
+            Text="New membership script:"
+            VerticalOptions="Center"
+            FontAttributes="Bold"
+            FontSize="11" />
+        <Picker
+            Grid.Row="1"
+            VerticalOptions="Center"
+            ItemsSource="{Binding HubNewMemberships}"
+            SelectedItem="{Binding NewMembership, Mode=TwoWay}" />
+
+        <!-- Script header -->
+        <Button
+            Grid.Row="2"
+            Text="Copy"
+            IsEnabled="{Binding CanCopyNewMembershipScript}"
+            VerticalOptions="Center"
+            Margin="4,0,0,0"
+            Padding="24,0"
+            HeightRequest="32"
+            MaximumHeightRequest="32"
+            Command="{Binding CopyNewMembershipScriptCommand}" />
+        
+        <!-- Script -->
+        <Editor
+            Grid.Row="3"
+            Text="{Binding NewMembershipScript, Mode=TwoWay}"
+            Margin="0,0,0,8"
+            TextColor="{Binding CanCopyNewMembershipScript, Converter={StaticResource ValidationBooleanColorConverter}}" />
+    </Grid>
+</ContentPage>

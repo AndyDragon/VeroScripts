@@ -10,6 +10,14 @@
     x:DataType="localViewModels:FeatureViewModel"
     Title="Feature">
     
+    <Shell.ToolbarItems>
+        <ToolbarItem
+            Text="Feature script ➤"
+            Command="{Binding FeatureScriptCommand}"
+            Priority="1"
+            Order="Primary" />
+    </Shell.ToolbarItems>
+
     <ContentPage.Resources>
         <localConverters:ValidationResultColorConverter x:Key="ValidationResultColorConverter" />
         <localConverters:ValidationResultVisibilityConverter x:Key="ValidationResultVisibilityConverter" />
@@ -72,13 +80,18 @@
                     IsEnabled="{Binding CanChangeStaffLevel}" />
             </Grid>
             
-            <Border Grid.Row="2" HeightRequest="1" Margin="0, 4" />
+            <Border 
+                Grid.Row="2" 
+                HeightRequest="1" 
+                Margin="0, 4"
+                IsVisible="{Binding HasSelectedPage}" />
             
             <!-- Your name -->
             <Grid
                 Grid.Row="3"
                 ColumnDefinitions="Auto, *"
-                RowDefinitions="Auto, Auto">
+                RowDefinitions="Auto, Auto"
+                IsVisible="{Binding HasSelectedPage}">
                 <mi:MauiIcon
                     Grid.Row="0"
                     Grid.Column="0"
@@ -107,7 +120,8 @@
             <Grid
                 Grid.Row="4"
                 ColumnDefinitions="Auto, *"
-                RowDefinitions="Auto, Auto">
+                RowDefinitions="Auto, Auto"
+                IsVisible="{Binding HasSelectedPage}">
                 <mi:MauiIcon
                     Grid.Row="0"
                     Grid.Column="0"
@@ -131,13 +145,18 @@
                     IsVisible="{Binding YourFirstNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
             </Grid>
             
-            <Border Grid.Row="5" HeightRequest="1" Margin="0, 4" />
+            <Border 
+                Grid.Row="5" 
+                HeightRequest="1" 
+                Margin="0, 4"
+                IsVisible="{Binding HasSelectedPage}" />
             
             <!-- User name -->
             <Grid
                 Grid.Row="6"
                 ColumnDefinitions="Auto, *"
-                RowDefinitions="Auto, Auto">
+                RowDefinitions="Auto, Auto"
+                IsVisible="{Binding HasSelectedPage}">
                 <mi:MauiIcon
                     Grid.Row="0"
                     Grid.Column="0"
@@ -161,7 +180,8 @@
                     IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
             </Grid>
             <Grid
-                Grid.Row="7">
+                Grid.Row="7"
+                IsVisible="{Binding HasSelectedPage}">
                 <Button
                     HorizontalOptions="Start"
                     Padding="24,0"
@@ -171,13 +191,18 @@
                     Text="Paste from post link" />
             </Grid>
             
-            <Border Grid.Row="8" HeightRequest="1" Margin="0, 4" />
+            <Border 
+                Grid.Row="8" 
+                HeightRequest="1" 
+                Margin="0, 4"
+                IsVisible="{Binding HasSelectedPage}" />
             
             <!-- Membership level -->
             <Grid 
                 Grid.Row="9"
                 ColumnDefinitions="Auto, Auto, *"
-                RowDefinitions="Auto, Auto">
+                RowDefinitions="Auto, Auto"
+                IsVisible="{Binding HasSelectedPage}">
                 <mi:MauiIcon
                     Grid.Row="0"
                     Grid.Column="0"
@@ -206,11 +231,16 @@
                     IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
             </Grid>
             
-            <Border Grid.Row="10" HeightRequest="1" />
+            <Border 
+                Grid.Row="10" 
+                HeightRequest="1" 
+                Margin="0, 4"
+                IsVisible="{Binding HasSelectedPage}" />
             
             <Grid 
                 Grid.Row="11"
-                ColumnDefinitions="Auto, Auto">
+                ColumnDefinitions="Auto, Auto"
+                IsVisible="{Binding HasSelectedPage}">
                 <Switch
                     Grid.Column="0"
                     IsToggled="{Binding FirstForPage}" />
@@ -258,11 +288,12 @@
                     VerticalOptions="Center"
                     Text="From hub tag" />
             </Grid> 
-            
-            <Button
-                Grid.Row="15"
-                Text="Feature script"
-                Command="{Binding FeatureScriptCommand}" />
+            <!-- -->
+            <!-- <Button -->
+            <!--     Grid.Row="15" -->
+            <!--     Text="Feature script" -->
+            <!--     Command="{Binding FeatureScriptCommand}" -->
+            <!--     IsVisible="{Binding HasSelectedPage}" /> -->
         </Grid>
     </ScrollView>
     
