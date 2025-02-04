@@ -5,6 +5,7 @@ Script Templates/PrepareTemplates/*.csproj.user
 Script Templates/PrepareTemplates-linux
 Script Templates/PrepareTemplates-mac
 Script Templates/PrepareTemplates.exe
+
 Vero Scripts Windows/.vs/
 Vero Scripts Windows/Vero Scripts/bin/
 Vero Scripts Windows/Vero Scripts/obj/
@@ -15,6 +16,10 @@ Vero Scripts Editor Windows/Vero Scripts Editor/bin/
 Vero Scripts Editor Windows/Vero Scripts Editor/obj/
 Vero Scripts Editor Windows/Vero Scripts Editor/*.csproj.user
 Vero Scripts Editor Windows/Vero Scripts Editor/Properties/PublishProfiles/*.user
+
+Vero Scripts MAUI/.idea/
+Vero Scripts MAUI/Vero Scripts/bin/
+Vero Scripts MAUI/Vero Scripts/obj/
 
 *.xcbkptlist
 **/xcuserdata/

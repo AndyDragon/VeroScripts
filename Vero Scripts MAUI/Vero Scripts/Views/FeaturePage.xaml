@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+    xmlns:localConverters="clr-namespace:VeroScripts.Converters"
+    xmlns:localViewModels="clr-namespace:VeroScripts.ViewModels"
+    x:Class="VeroScripts.Views.FeaturePage"
+    x:DataType="localViewModels:FeatureViewModel"
+    Title="Feature">
+    
+    <ContentPage.Resources>
+        <localConverters:ValidationResultColorConverter x:Key="ValidationResultColorConverter" />
+        <localConverters:ValidationResultVisibilityConverter x:Key="ValidationResultVisibilityConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView
+        Orientation="Vertical">
+        <Grid
+            Margin="20,0,20,20"
+            RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, *, Auto, Auto"
+            >
+            <!-- Page -->
+            <Grid
+                Grid.Row="0"
+                ColumnDefinitions="Auto, Auto, *"
+                RowDefinitions="Auto, Auto">
+                <mi:MauiIcon
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Icon="{mi:MaterialRounded Icon=Warning}"
+                    IconColor="{Binding PageValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    IconSize="18"
+                    IsVisible="{Binding PageValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                <Label 
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="Feature Page:" />
+                <Picker
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    ItemDisplayBinding="{Binding DisplayName}"
+                    SelectedItem="{Binding SelectedPage, Mode=TwoWay}"
+                    ItemsSource="{Binding LoadedPages}"
+                    IsEnabled="{Binding CanChangePage}" />
+                <Label 
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Text="{Binding PageValidation.Message}"
+                    TextColor="{Binding PageValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    FontSize="11"
+                    IsVisible="{Binding PageValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+            </Grid>
+            
+            <!-- Page staff level -->
+            <Grid 
+                Grid.Row="1"
+                ColumnDefinitions="Auto, *">
+                <Label
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Text="Page staff level:"
+                    Margin="0,0,10,0" />
+                <Picker
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    ItemsSource="{Binding StaffLevels}"
+                    SelectedItem="{Binding StaffLevel, Mode=TwoWay}"
+                    IsEnabled="{Binding CanChangeStaffLevel}" />
+            </Grid>
+            
+            <Border Grid.Row="2" HeightRequest="1" Margin="0, 4" />
+            
+            <!-- Your name -->
+            <Grid
+                Grid.Row="3"
+                ColumnDefinitions="Auto, *"
+                RowDefinitions="Auto, Auto">
+                <mi:MauiIcon
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Icon="{mi:MaterialRounded Icon=Warning}"
+                    IconColor="{Binding YourAliasValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    IconSize="18"
+                    IsVisible="{Binding YourAliasValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                <Editor
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    Text="{Binding YourAlias, Mode=TwoWay}"
+                    Placeholder="enter your user name without the '@'"/>
+                <Label 
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding YourAliasValidation.Message}"
+                    TextColor="{Binding YourAliasValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    FontSize="11"
+                    IsVisible="{Binding YourAliasValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+            </Grid>
+            
+            <!-- Your first name -->
+            <Grid
+                Grid.Row="4"
+                ColumnDefinitions="Auto, *"
+                RowDefinitions="Auto, Auto">
+                <mi:MauiIcon
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Icon="{mi:MaterialRounded Icon=Warning}"
+                    IconColor="{Binding YourFirstNameValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    IconSize="18"
+                    IsVisible="{Binding YourFirstNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                <Editor
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="{Binding YourFirstName, Mode=TwoWay}"
+                    Placeholder="enter your first name" />
+                <Label 
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding YourFirstNameValidation.Message}"
+                    TextColor="Red"
+                    FontSize="11"
+                    IsVisible="{Binding YourFirstNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+            </Grid>
+            
+            <Border Grid.Row="5" HeightRequest="1" Margin="0, 4" />
+            
+            <!-- User name -->
+            <Grid
+                Grid.Row="6"
+                ColumnDefinitions="Auto, *"
+                RowDefinitions="Auto, Auto">
+                <mi:MauiIcon
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Icon="{mi:MaterialRounded Icon=Warning}"
+                    IconColor="{Binding UserNameValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    IconSize="18"
+                    IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                <Entry
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Placeholder="enter the user's name without the '@'"
+                    Text="{Binding UserName, Mode=TwoWay}" />
+                <Label 
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding UserNameValidation.Message}"
+                    TextColor="{Binding UserNameValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    FontSize="11"
+                    IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+            </Grid>
+            <Grid
+                Grid.Row="7">
+                <Button
+                    HorizontalOptions="Start"
+                    Padding="24,0"
+                    Margin="0,0,0,4"
+                    HeightRequest="28"
+                    MaximumHeightRequest="28"
+                    Text="Paste from post link" />
+            </Grid>
+            
+            <Border Grid.Row="8" HeightRequest="1" Margin="0, 4" />
+            
+            <!-- Membership level -->
+            <Grid 
+                Grid.Row="9"
+                ColumnDefinitions="Auto, Auto, *"
+                RowDefinitions="Auto, Auto">
+                <mi:MauiIcon
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    Icon="{mi:MaterialRounded Icon=Warning}"
+                    IconColor="{Binding MembershipValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    IconSize="18"
+                    IsVisible="{Binding MembershipValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="User level: " />
+                <Picker
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    VerticalOptions="Center"
+                    ItemsSource="{Binding Memberships}"
+                    SelectedItem="{Binding Membership, Mode=TwoWay}" />
+                <Label 
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Text="{Binding UserNameValidation.Message}"
+                    TextColor="{Binding MembershipValidation, Converter={StaticResource ValidationResultColorConverter}}"
+                    FontSize="11"
+                    IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+            </Grid>
+            
+            <Border Grid.Row="10" HeightRequest="1" />
+            
+            <Grid 
+                Grid.Row="11"
+                ColumnDefinitions="Auto, Auto">
+                <Switch
+                    Grid.Column="0"
+                    IsToggled="{Binding FirstForPage}" />
+                <Label
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="First feature for page" />
+            </Grid> 
+            
+            <Grid 
+                Grid.Row="12"
+                ColumnDefinitions="Auto, Auto"
+                IsVisible="{Binding SnapHubVisibility}">
+                <Switch
+                    Grid.Column="0"
+                    IsToggled="{Binding RawTag}" />
+                <Label
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="From RAW tag" />
+            </Grid> 
+            
+            <Grid 
+                Grid.Row="13"
+                ColumnDefinitions="Auto, Auto"
+                IsVisible="{Binding SnapHubVisibility}">
+                <Switch
+                    Grid.Column="0"
+                    IsToggled="{Binding CommunityTag}" />
+                <Label
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="From community tag" />
+            </Grid>
+            
+            <Grid 
+                Grid.Row="12"
+                ColumnDefinitions="Auto, Auto"
+                IsVisible="{Binding ClickHubVisibility}">
+                <Switch
+                    Grid.Column="0"
+                    IsToggled="{Binding HubTag}" />
+                <Label
+                    Grid.Column="1"
+                    VerticalOptions="Center"
+                    Text="From hub tag" />
+            </Grid> 
+            
+            <Button
+                Grid.Row="15"
+                Text="Feature script"
+                Command="{Binding FeatureScriptCommand}" />
+        </Grid>
+    </ScrollView>
+    
+</ContentPage>

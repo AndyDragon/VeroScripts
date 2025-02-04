@@ -1,0 +1,36 @@
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localViewModels="clr-namespace:VeroScripts.ViewModels"
+    x:Class="VeroScripts.Views.Settings"
+    x:DataType="localViewModels:SettingsViewModel"
+    Title="Settings">
+
+    <ScrollView>
+        <Grid 
+            Margin="20" 
+            RowDefinitions="Auto, Auto">
+            
+            <!-- Options -->
+            <Border 
+                Grid.Row="0" 
+                Grid.ColumnSpan="2" 
+                Background="{AppThemeBinding Light={DynamicResource Gray100}, Dark={DynamicResource Gray700}}" 
+                Margin="0,0,0,8">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"></RoundRectangle>
+                </Border.StrokeShape>
+                <VerticalStackLayout Margin="8,4,8,8">
+                    <Label FontAttributes="Bold" TextColor="{DynamicResource Primary}">Options:</Label>
+                    <HorizontalStackLayout>
+                        <Switch IsToggled="{Binding IncludeSpace, Mode=TwoWay}" Margin="0,0,8,0" VerticalOptions="Center" />
+                        <Label Text="Insert a space in activation tags" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Label Text="● Inserts a space after '@' in user tags when copying tags to the clipboard" FontSize="12" Margin="20,0,10,8" />
+                    <Label Text="● For example, for the user tag '@alphabeta', the script will be '@ alphabeta'" FontSize="12" Margin="20,0,10,8" />
+                    <Label Text="● And for the page tag '@snap_longexposure', the script will be '@ snap_longexposure'" FontSize="12" Margin="20,0,10,8" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </ScrollView>
+</ContentPage>

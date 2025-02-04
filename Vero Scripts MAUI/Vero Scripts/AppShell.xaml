@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="VeroScripts.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localViews="clr-namespace:VeroScripts.Views"
+    FlyoutBehavior="Flyout"
+    Title="Vero Scripts">
+
+    <ShellContent
+        Title="Feature"
+        ContentTemplate="{DataTemplate localViews:FeaturePage}"
+        Route="Feature" />
+    
+    <ShellContent
+        Title="Settings"
+        ContentTemplate="{DataTemplate localViews:Settings}"
+        Route="Settings" />
+
+    <ShellContent
+        Title="About"
+        ContentTemplate="{DataTemplate localViews:About}"
+        Route="About Vero Scripts" />
+
+</Shell>

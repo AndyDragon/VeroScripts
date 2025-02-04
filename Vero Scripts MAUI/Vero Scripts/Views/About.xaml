@@ -1,0 +1,33 @@
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localViewModels="clr-namespace:VeroScripts.ViewModels"
+    x:Class="VeroScripts.Views.About"
+    x:DataType="localViewModels:AboutViewModel"
+    Title="{Binding Title}">
+    
+    <Grid 
+        Margin="20" 
+        RowDefinitions="Auto">
+        <Border 
+            Grid.Row="0" 
+            Grid.ColumnSpan="2" 
+            Background="{AppThemeBinding Light={DynamicResource Gray100}, Dark={DynamicResource Gray700}}" 
+            Margin="0,0,0,8" 
+            Padding="10,20">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"></RoundRectangle>
+            </Border.StrokeShape>
+            <Grid RowDefinitions="148, *">
+                <Image Grid.Row="0" Source="app_image.png" Aspect="AspectFit" VerticalOptions="Center" Margin="0,0,0,20" />
+                <VerticalStackLayout Grid.Row="1" Spacing="0" VerticalOptions="Center">
+                    <Label Text="{Binding AppTitle}" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource PrimaryTextColor}" FontFamily="OpenSansExtraBold" />
+                    <Label Text="{Binding Version}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource PrimaryTextColor}" FontFamily="OpenSansBold" />
+                    <Label Text="{Binding Author}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource Tertiary}" FontFamily="OpenSansBold" />
+                    <Label Text="{Binding Copyright}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource Tertiary}" FontFamily="OpenSans" />
+                    <Label Text="{Binding Rights}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource Tertiary}" FontFamily="OpenSans" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+    </Grid>    
+</ContentPage>
