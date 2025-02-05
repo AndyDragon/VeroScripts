@@ -1019,8 +1019,6 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
@@ -1031,8 +1029,6 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
@@ -1043,8 +1039,6 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
     }
@@ -1196,8 +1190,6 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%USERNAME%%", with: userName)
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                .replacingOccurrences(of: "[[YOUR FIRST NAME]]", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
         }
     }
