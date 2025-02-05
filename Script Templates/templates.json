@@ -943,6 +943,10 @@
           "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨ CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: %%YOURFIRSTNAME%% @%%YOURNAME%%\n%%STAFFLEVEL%% for: @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\nJane @snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community #vero #verofamily #verofriends #petal_perfection #Flower #flowers #flowerhead #blooms #verofriends #verohubs #flowersofvero #top_macro #flowerphotography #macrophotography #macroflowers #flowerartist #colors_flowers #flowerobsession #flower_whisperers #bokeh_artistic\n#bokeh_and_blur\n•\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
         },
         {
+          "name": "first comment",
+          "template": "💫 🌺Congratulations 🌺💫 [[USER'S FIRST NAME]] 💫 @%%USERNAME%% on your first feature on the Snap Flowers Gallery! What a lovely image with a beautiful composition and detail! Thank you for sharing with us!\n"
+        },
+        {
           "name": "original post",
           "template": "✨✨ Featured ✨ [[USER'S FIRST NAME]] ✨ @%%USERNAME%%"
         }
@@ -1041,11 +1045,15 @@
       "templates": [
         {
           "name": "comment",
-          "template": "💫 ⭐️💫 Congratulations on your feature [[USER'S FIRST NAME]] @%%USERNAME%% 💫 ⭐️💫\nThank you for tagging and sharing your image with Snap community 💫⭐️💫\n"
+          "template": "💫 ⭐️💫 Congratulations on your feature [[USER'S FIRST NAME]] @%%USERNAME%% 💫 ⭐️💫\nThank you for tagging and sharing your image with the Snap community 💫⭐️💫\n"
         },
         {
           "name": "feature",
           "template": "• #snap_%%PAGENAME%% •\n.\n⭐️Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐\n.\n________________________________________________\nC O N G R A T U L A T I O N S ! ! !\n________________________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%%: @snap_%%PAGENAME%%\n.\n.\nJoin us in our fresh. creative. and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our SNAP_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n.\n#wewalkaround #hikingaddicts #livelifeoutdoors #enjoythescenery #naturebreak\n#trailblazer #climbmountains #findyourmountain #forest #woodland #thegreatoutdoors\n#beachwallker #sandytoes #sandbetweenyourtoes #dunewalking #footprintsinthesand\n#exploremore #wandermore  #outdooors #nature\n.\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n.\n"
+        },
+        {
+          "name": "first comment",
+          "template": "💫 ⭐️💫 Congratulations [[USER'S FIRST NAME]] @%%USERNAME%% on your first feature in the\n@snap_%%PAGENAME%% gallery!💫 ⭐️💫\nThank you for tagging and sharing your image with the Snap community 💫⭐️💫\n"
         },
         {
           "name": "original post",
