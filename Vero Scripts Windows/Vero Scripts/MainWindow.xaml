@@ -441,20 +441,36 @@
                     </mah:DropDownButton.ItemContainerStyle>
                 </mah:DropDownButton>
             </StackPanel>
-            <TextBlock Grid.Column="2" Text="|" Margin="8,0,8,2" VerticalAlignment="Center" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" Opacity="0.5" />
+            <TextBlock 
+                Grid.Column="2" 
+                Text="|" 
+                Margin="8,0,8,2" 
+                VerticalAlignment="Center" 
+                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" 
+                Opacity="0.5" />
             <StackPanel Grid.Column="3" Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Setter Property= "Opacity" Value="0.5" />
-                        <Style.Triggers>
-                            <Trigger Property ="IsMouseOver" Value="True">
-                                <Setter Property= "Opacity" Value="1" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <TextBlock Text="Version:" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" />
-                <TextBlock Text="{Binding Version}" VerticalAlignment="Center" Margin="0,0,24,0" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+                <mah:WindowCommands>
+                    <Button
+                        BorderThickness="0"
+                        Command="{Binding LaunchAboutCommand}"
+                        Content="{Binding Version}"
+                        Style="{DynamicResource MahApps.Styles.Button.WindowCommands}">
+                        <Button.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock 
+                                        Margin="0,0,8,0" 
+                                        VerticalAlignment="Center" 
+                                        Text="Version:" />
+                                    <TextBlock 
+                                        Margin="0,0,24,0"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </Button.ContentTemplate>
+                    </Button>
+                </mah:WindowCommands>
             </StackPanel>
         </Grid>
     </Grid>

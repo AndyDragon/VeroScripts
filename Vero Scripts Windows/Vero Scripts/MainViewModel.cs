@@ -26,14 +26,15 @@ namespace VeroScripts
     {
         #region Field validation
 
-        public static ValidationResult ValidateUser(string userName)
+        public static ValidationResult ValidateUser(string hubName, string userName)
         {
             var userNameValidationResult = ValidateUserName(userName);
             if (!userNameValidationResult.Valid)
             {
                 return userNameValidationResult;
             }
-            if (disallowList.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
+            if (DisallowList.TryGetValue(hubName, out List<string>? value) &&
+                value.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
             {
                 return new ValidationResult(false, "User is on the disallow list");
             }
@@ -68,13 +69,31 @@ namespace VeroScripts
             {
                 return new ValidationResult(false, "Don't include the '@' in user names");
             }
+            if (userName.Length <= 1)
+            {
+                return new ValidationResult(false, "User name should be more than 1 character long");
+            }
+            return new ValidationResult(true);
+        }
+
+        internal static ValidationResult ValidateValueNotEmptyAndContainsNoNewlines(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return new ValidationResult(false, "Required value");
+            }
+            if (value.Contains('\n'))
+            {
+                return new ValidationResult(false, "Value cannot contain newline");
+            }
+            if (value.Contains('\r'))
+            {
+                return new ValidationResult(false, "Value cannot contain newline");
+            }
             return new ValidationResult(true);
         }
 
         #endregion
-
-        // Change this to 'true' to load the testing scripts.
-        const bool ScriptTesting = false;
 
         private readonly HttpClient httpClient = new();
         private readonly NotificationManager notificationManager = new();
@@ -122,17 +141,27 @@ namespace VeroScripts
                     Theme = theme;
                 }
             });
+            LaunchAboutCommand = new Command(() =>
+            {
+                var panel = new AboutDialog
+                {
+                    DataContext = new AboutViewModel(),
+                    Owner = Application.Current.MainWindow,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
+                panel.ShowDialog();
+            });
         }
 
         #region User settings
 
-        public static string GetDataLocationPath(bool shared = false)
+        public static string GetDataLocationPath()
         {
             var user = WindowsIdentity.GetCurrent();
             var dataLocationPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "AndyDragonSoftware",
-                shared ? "VeroTools" : "FeatureLogging",
+                "FeatureLogging",
                 user.Name);
             if (!Directory.Exists(dataLocationPath))
             {
@@ -141,9 +170,9 @@ namespace VeroScripts
             return dataLocationPath;
         }
 
-        public static string GetUserSettingsPath(bool shared = false)
+        public static string GetUserSettingsPath()
         {
-            var dataLocationPath = GetDataLocationPath(shared);
+            var dataLocationPath = GetDataLocationPath();
             return Path.Combine(dataLocationPath, "settings.json");
         }
 
@@ -160,9 +189,7 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var pagesUri = new Uri(ScriptTesting
-                    ? "https://vero.andydragon.com/static/data/testing/pages.json"
-                    : "https://vero.andydragon.com/static/data/pages.json");
+                var pagesUri = new Uri("https://vero.andydragon.com/static/data/pages.json");
                 var content = await httpClient.GetStringAsync(pagesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -191,94 +218,6 @@ namespace VeroScripts
                 }
                 _ = LoadTemplates();
                 _ = LoadDisallowList();
-
-                // Try populate from Feature Logging
-                try
-                {
-                    var sharedSettingsPath = GetDataLocationPath(true);
-                    var featureFile = Path.Combine(sharedSettingsPath, "feature.json");
-                    if (File.Exists(featureFile))
-                    {
-                        // Load the feature, then delete the feature file.
-                        var feature = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(File.ReadAllText(featureFile)) ?? [];
-                        File.Delete(featureFile);
-
-                        var page = LoadedPages.FirstOrDefault(page => page.Id == (string)feature["page"]);
-                        if (page != null)
-                        {
-                            Page = page.Id;
-                            UserName = (string)feature["userAlias"];
-                            Membership = HubMemberships.Contains((string)feature["userLevel"]) ? (string)feature["userLevel"] : HubMemberships[0];
-                            if (page.HubName == "click")
-                            {
-                                RawTag = false;
-                                switch ((string)feature["tagSource"])
-                                {
-                                    case "Page tag":
-                                    default:
-                                        CommunityTag = false;
-                                        HubTag = false;
-                                        break;
-                                    case "Click community tag":
-                                        CommunityTag = true;
-                                        HubTag = false;
-                                        break;
-                                    case "Click hub tag":
-                                        CommunityTag = false;
-                                        HubTag = true;
-                                        break;
-                                }
-                            }
-                            else if (page.HubName == "snap")
-                            {
-                                HubTag = false;
-                                switch ((string)feature["tagSource"])
-                                {
-                                    case "Page tag":
-                                    default:
-                                        RawTag = false;
-                                        CommunityTag = false;
-                                        break;
-                                    case "RAW page tag":
-                                        RawTag = true;
-                                        CommunityTag = false;
-                                        break;
-                                    case "Snap community tag":
-                                        RawTag = false;
-                                        CommunityTag = true;
-                                        break;
-                                    case "RAW community tag":
-                                        RawTag = true;
-                                        CommunityTag = true;
-                                        break;
-                                    case "Snap membership tag":
-                                        // TODO andydragon : need to handle this...
-                                        RawTag = false;
-                                        CommunityTag = false;
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                RawTag = false;
-                                CommunityTag = false;
-                                HubTag = false;
-                            }
-                            NewMembership = HubNewMemberships.Contains((string)feature["newLevel"]) ? (string)feature["newLevel"] : HubNewMemberships[0];
-
-                            ShowToast(
-                                "Populated from Feature Logging",
-                                $"Populated feature for user {UserName} from the Feature Logging app",
-                                type: NotificationType.Information,
-                                expirationTime: TimeSpan.FromSeconds(3));
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // TODO andydragon : handle errors
-                    Console.WriteLine("Error occurred: {0}", ex.Message);
-                }
             }
             catch (Exception ex)
             {
@@ -300,9 +239,7 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var templatesUri = new Uri(ScriptTesting 
-                    ? "https://vero.andydragon.com/static/data/testing/templates.json"
-                    : "https://vero.andydragon.com/static/data/templates.json");
+                var templatesUri = new Uri("https://vero.andydragon.com/static/data/templates.json");
                 var content = await httpClient.GetStringAsync(templatesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
@@ -331,13 +268,11 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var templatesUri = new Uri(ScriptTesting
-                    ? "https://vero.andydragon.com/static/data/testing/disallowlist.json"
-                    : "https://vero.andydragon.com/static/data/disallowlist.json");
+                var templatesUri = new Uri("https://vero.andydragon.com/static/data/disallowlists.json");
                 var content = await httpClient.GetStringAsync(templatesUri);
                 if (!string.IsNullOrEmpty(content))
                 {
-                    disallowList = JsonConvert.DeserializeObject<List<string>>(content) ?? [];
+                    disallowList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(content) ?? [];
                     OnPropertyChanged(nameof(UserNameValidation));
                     UpdateScripts();
                     UpdateNewMembershipScripts();
@@ -360,6 +295,8 @@ namespace VeroScripts
 
         public ICommand CopyFeatureScriptWithPlaceholdersCommand { get; }
 
+        public ICommand LaunchAboutCommand { get; }
+
         public ICommand CopyCommentScriptCommand { get; }
 
         public ICommand CopyCommentScriptWithPlaceholdersCommand { get; }
@@ -376,7 +313,12 @@ namespace VeroScripts
 
         public TemplatesCatalog TemplatesCatalog { get; private set; }
 
-        private static List<string> disallowList = [];
+        private static Dictionary<string, List<string>> disallowList = [];
+        public static Dictionary<string, List<string>> DisallowList
+        {
+            get => disallowList;
+            set => disallowList = value;
+        }
 
         private Theme? theme = ThemeManager.Current.DetectTheme();
         public Theme? Theme
@@ -446,7 +388,7 @@ namespace VeroScripts
             {
                 if (Set(ref userName, value))
                 {
-                    UserNameValidation = ValidateUser(UserName);
+                    UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
                     ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
@@ -454,7 +396,7 @@ namespace VeroScripts
             }
         }
 
-        private ValidationResult userNameValidation = ValidateUser("");
+        private ValidationResult userNameValidation = ValidateUser("", "");
 
         public ValidationResult UserNameValidation
         {
@@ -1162,8 +1104,6 @@ namespace VeroScripts
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 CommentScript = commentScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
@@ -1174,8 +1114,6 @@ namespace VeroScripts
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
                 OriginalPostScript = originalPostScriptTemplate
                     .Replace("%%PAGENAME%%", scriptPageName)
@@ -1186,8 +1124,6 @@ namespace VeroScripts
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                    // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                    .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
             }
         }
@@ -1330,8 +1266,6 @@ namespace VeroScripts
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
                 else if (NewMembership == "Member")
@@ -1345,8 +1279,6 @@ namespace VeroScripts
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
                 else if (NewMembership == "VIP Member")
@@ -1360,8 +1292,6 @@ namespace VeroScripts
                         .Replace("%%USERNAME%%", UserName)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
-                        // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-                        .Replace("[[YOUR FIRST NAME]]", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);
                 }
             }

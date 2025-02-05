@@ -385,8 +385,6 @@ function App() {
           .replaceAll("%%USERNAME%%", userName)
           .replaceAll("%%YOURNAME%%", yourName)
           .replaceAll("%%YOURFIRSTNAME%%", firstName)
-          // Special case for 'YOUR FIRST NAME' since it's now autofilled.
-          .replaceAll("[[YOUR FIRST NAME]]", firstName)
           .replaceAll("%%STAFFLEVEL%%", staffLevelString)
       );
     }
