@@ -21,10 +21,7 @@ public class ScriptViewModel(FeatureViewModel viewModel, Script script) : Notify
         }
     }
 
-    public string ScriptTitle
-    {
-        get => ViewModel.GetScriptTitle(Script);
-    }
+    public string ScriptTitle => ViewModel.GetScriptTitle(Script);
 
     public string ScriptText
     {

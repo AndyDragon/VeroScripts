@@ -2,7 +2,6 @@
 
 namespace VeroScripts.Models;
 
-// TODO andydragon - need to review if the property change monitoring is needed?
 public class Placeholder : NotifyPropertyChanged
 {
     public Placeholder(string name, string value)
@@ -11,17 +10,17 @@ public class Placeholder : NotifyPropertyChanged
         Value = value;
     }
 
-    private readonly string name = "";
+    private readonly string _name = "";
     public string Name
     {
-        get => name;
-        private init => Set(ref name, value);
+        get => _name;
+        private init => Set(ref _name, value);
     }
 
-    private string currentValue = "";
+    private string _currentValue = "";
     public string Value
     {
-        get => currentValue;
-        set => Set(ref currentValue, value);
+        get => _currentValue;
+        set => Set(ref _currentValue, value);
     }
 }

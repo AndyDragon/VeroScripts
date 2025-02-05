@@ -273,7 +273,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     #region Pages
 
     public ObservableCollection<LoadedPage> LoadedPages { get; } = [];
-    public TemplatesCatalog TemplatesCatalog { get; set; } = new();
+    private TemplatesCatalog TemplatesCatalog { get; set; } = new();
 
     private LoadedPage? _selectedPage;
 
@@ -780,7 +780,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         return PlaceholderRegex.Matches(Scripts[script]).Count != 0 || LongPlaceholderRegex.Matches(Scripts[script]).Count != 0;
     }
 
-    public bool CheckForPlaceholders(Script script, bool force = false)
+    private bool CheckForPlaceholders(Script script, bool force = false)
     {
         var needEditor = false;
 
@@ -852,7 +852,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         return false;
     }
 
-    internal void TransferPlaceholders(Script script)
+    private void TransferPlaceholders(Script script)
     {
         foreach (var placeholder in PlaceholdersMap[script])
         {
@@ -893,7 +893,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
     }
 
-    public string ProcessPlaceholders(Script script)
+    private string ProcessPlaceholders(Script script)
     {
         var result = Scripts[script];
         foreach (var placeholder in PlaceholdersMap[script])
@@ -1206,8 +1206,8 @@ public class FeatureViewModel : NotifyPropertyChanged
         { Script.Comment, "comment" },
         { Script.OriginalPost, "original post" },
     };
-    
-    public void CopyScript(Script script, bool force = false, bool withPlaceholders = false)
+
+    private void CopyScript(Script script, bool force = false, bool withPlaceholders = false)
     {
         if (withPlaceholders)
         {
