@@ -62,7 +62,11 @@ export default function General(props: GeneralProps) {
         <div style={{ margin: "10px" }}>
             <Subtitle1>{applicationName} v{currentVersion} for {platformString[platform]} is available for installation now.</Subtitle1><br /><br />
             {links[platform]?.actions.map(flavor => {
-                const location = "https://vero.andydragon.com/app/" + links[platform]?.location(currentVersion, flavor.suffix);
+                const flavorVersion = (version?.[platform] as (Record<string, string> | undefined))?.["current"];
+                if (!flavorVersion) {
+                    return undefined;
+                }
+                const location = "https://vero.andydragon.com/app/" + links[platform]?.location(flavorVersion, flavor.suffix);
                 return (
                     <>
                         <Subtitle2 key={"link-" + (index++)} style={{ marginLeft: "40px" }}>You can {flavor.action} the <Link target={flavor.target} href={location}>{flavor.name} version here</Link></Subtitle2>
@@ -72,6 +76,9 @@ export default function General(props: GeneralProps) {
             })}
             {(platform === "macOS" && version?.["macOS_v2"]?.current) &&
                 <Subtitle1 style={{ display: "block", marginTop: "60px" }}><span style={{ color: "red" }}>NEW!</span> There is a new V2 version available for {platformString[platform]}. You can download it <RouterLink className={styles.cleanLink} to="/macInstall_v2">from here</RouterLink></Subtitle1>
+            }
+            {(platform === "windows" && version?.["windows_v2"]?.current) &&
+                <Subtitle1 style={{ display: "block", marginTop: "60px" }}><span style={{ color: "red" }}>NEW!</span> There is a new V2 version available for {platformString[platform]}. You can download it <RouterLink className={styles.cleanLink} to="/windowsInstall_v2">from here</RouterLink></Subtitle1>
             }
         </div>
     );

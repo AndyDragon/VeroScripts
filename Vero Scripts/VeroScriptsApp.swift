@@ -27,10 +27,9 @@ struct VeroScriptsApp: App {
         loggerFile.logFileURL = getDocumentsDirectory().appendingPathComponent("\(Bundle.main.displayName ?? "Vero Scripts").log", conformingTo: .log)
         logger.addDestination(loggerConsole)
         logger.addDestination(loggerFile)
-        logger.info("==============================================================================")
-        logger.info("Start of session")
     }
 
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
 #if STANDALONE
         let appState = VersionCheckAppState(
@@ -42,16 +41,8 @@ struct VeroScriptsApp: App {
         WindowGroup {
 #if STANDALONE
             ContentView(appState)
-                .onDisappear {
-                    logger.info("End of session")
-                    logger.info("==============================================================================")
-                }
 #else
             ContentView()
-                .onDisappear {
-                    logger.info("End of session")
-                    logger.info("==============================================================================")
-                }
 #endif
         }
         .commands {
@@ -98,6 +89,37 @@ struct VeroScriptsApp: App {
         }
         .defaultPosition(.center)
         .windowResizability(.contentSize)
+    }
+
+    class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+        private let logger = SwiftyBeaver.self
+
+        func applicationWillFinishLaunching(_ notification: Notification) {
+            logger.info("==============================================================================")
+            logger.info("Start of session")
+        }
+
+        func applicationDidFinishLaunching(_ notification: Notification) {
+            let mainWindow = NSApp.windows[0]
+            mainWindow.delegate = self
+        }
+
+        func windowShouldClose(_ sender: NSWindow) -> Bool {
+            return true
+        }
+
+        func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+            return .terminateNow
+        }
+
+        func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+            return true
+        }
+
+        func applicationWillTerminate(_ notification: Notification) {
+            logger.info("End of session")
+            logger.info("==============================================================================")
+        }
     }
 
     private func getDocumentsDirectory() -> URL {

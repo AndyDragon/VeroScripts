@@ -31,14 +31,21 @@ export const showWindowsInfo = true;
 export const windowsInstallerLocation = "veroscripts/windows";
 export const windowsReleaseNotesLocation = "releaseNotes-windows.json";
 
+export const showWindowsV2Info = false;
+export const windowsV2InstallerLocation = "veroscripts/windowsV2";
+export const windowsV2ReleaseNotesLocation = "releaseNotes-windows_v2.json";
+
+export const supportEmail = "andydragon@live.com";
+
 export const hasTutorial = false;
 
-export type Platform = "macOS" | "macOS_v2" | "windows";
+export type Platform = "macOS" | "macOS_v2" | "windows" | "windows_v2";
 
 export const platformString: Record<Platform, string> = {
     macOS: "macOS",
     macOS_v2: "macOS v2",
-    windows: "Windows"
+    windows: "Windows",
+    windows_v2: "Windows v2",
 }
 
 export interface Links {
@@ -76,6 +83,23 @@ export const links: Record<Platform, Links | undefined> = {
     },
     windows: {
         location: (_version, suffix) => `${windowsInstallerLocation}${suffix}`,
+        actions: [
+            {
+                name: "current",
+                action: "install",
+                target: "",
+                suffix: "/setup.exe",
+            },
+            {
+                name: "current",
+                action: "read more about",
+                target: "_blank",
+                suffix: "",
+            }
+        ]
+    },
+    windows_v2: {
+        location: (_version, suffix) => `${windowsV2InstallerLocation}${suffix}`,
         actions: [
             {
                 name: "current",
