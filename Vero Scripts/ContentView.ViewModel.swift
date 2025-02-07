@@ -8,8 +8,8 @@
 import SwiftUI
 import SwiftyBeaver
 
-extension View {
 #if STANDALONE
+extension View {
     func attachVersionCheckState(_ viewModel: ContentView.ViewModel, _ appState: VersionCheckAppState, _ launchUrl: @escaping (_ url: URL) -> Void) -> some View {
         self.onChange(of: appState.versionCheckResult.wrappedValue) {
             viewModel.handleVersionCheck(appState) { url in
@@ -17,8 +17,8 @@ extension View {
             }
         }
     }
-#endif
 }
+#endif
 
 extension ContentView {
     @Observable
