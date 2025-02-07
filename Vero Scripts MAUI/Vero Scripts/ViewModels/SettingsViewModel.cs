@@ -4,7 +4,7 @@ namespace VeroScripts.ViewModels;
 
 public class SettingsViewModel : NotifyPropertyChanged
 {
-    private bool _includeSpace = UserSettings.Get(nameof(IncludeSpace), false);
+    private bool _includeSpace = Preferences.Default.Get(nameof(IncludeSpace), false);
     public bool IncludeSpace
     {
         get => _includeSpace;
@@ -12,7 +12,7 @@ public class SettingsViewModel : NotifyPropertyChanged
         {
             if (Set(ref _includeSpace, value))
             {
-                UserSettings.Store(nameof(IncludeSpace), _includeSpace);
+                Preferences.Default.Set(nameof(IncludeSpace), value);
                 UserSettings.OnPropertyChanged();
             }
         }

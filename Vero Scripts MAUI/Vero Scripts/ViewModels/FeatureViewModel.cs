@@ -46,7 +46,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         {
             if (e.PropertyName == nameof(SettingsViewModel.IncludeSpace))
             {
-                IncludeSpace = UserSettings.Get(nameof(IncludeSpace), false);
+                IncludeSpace = Preferences.Default.Get(nameof(IncludeSpace), false);
             }
         };
 
@@ -124,28 +124,8 @@ public class FeatureViewModel : NotifyPropertyChanged
     #endregion
 
     #region User settings
-
-    private static string GetDataLocationPath()
-    {
-        var dataLocationPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "AndyDragonSoftware",
-            "VeroScripts");
-        if (!Directory.Exists(dataLocationPath))
-        {
-            Directory.CreateDirectory(dataLocationPath);
-        }
-
-        return dataLocationPath;
-    }
-
-    public static string GetUserSettingsPath()
-    {
-        var dataLocationPath = GetDataLocationPath();
-        return Path.Combine(dataLocationPath, "settings.json");
-    }
-
-    private bool _includeSpace = UserSettings.Get(nameof(IncludeSpace), false);
+    
+    private bool _includeSpace = Preferences.Default.Get(nameof(IncludeSpace), false);
     public bool IncludeSpace
     {
         get => _includeSpace;
@@ -193,7 +173,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
                 _ = Toast.Make($"Loaded {LoadedPages.Count} pages from the server").Show();
             }
-            var page = UserSettings.Get(nameof(Page), "");
+            var page = Preferences.Default.Get(nameof(Page), "");
             SelectedPage = LoadedPages.FirstOrDefault(loadedPage => loadedPage.Id == page);
             WaitingForPages = false;
             
@@ -292,8 +272,8 @@ public class FeatureViewModel : NotifyPropertyChanged
                 OnPropertyChanged(nameof(HasSelectedPage));
                 OnPropertyChanged(nameof(NoSelectedPage));
                 StaffLevel = SelectedPage != null
-                    ? UserSettings.Get(nameof(StaffLevel) + ":" + SelectedPage.Id, StaffLevels[0])
-                    : UserSettings.Get(nameof(StaffLevel), StaffLevels[0]);
+                    ? Preferences.Default.Get(nameof(StaffLevel) + ":" + SelectedPage.Id, StaffLevels[0])
+                    : Preferences.Default.Get(nameof(StaffLevel), StaffLevels[0]);
                 if (!StaffLevels.Contains(StaffLevel))
                 {
                     StaffLevel = StaffLevels[0];
@@ -318,7 +298,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         return Validation.ValidateValueNotEmpty(page);
     }
 
-    private string _page = UserSettings.Get(nameof(Page), "");
+    private string _page = Preferences.Default.Get(nameof(Page), "");
 
     public string Page
     {
@@ -327,13 +307,13 @@ public class FeatureViewModel : NotifyPropertyChanged
         {
             if (Set(ref _page, value, [nameof(StaffLevels)]))
             {
-                UserSettings.Store(nameof(Page), Page);
+                Preferences.Default.Set(nameof(Page), Page);
                 PageValidation = CalculatePageValidation(Page);
             }
         }
     }
 
-    private ValidationResult _pageValidation = CalculatePageValidation(UserSettings.Get(nameof(Page), ""));
+    private ValidationResult _pageValidation = CalculatePageValidation(Preferences.Default.Get(nameof(Page), ""));
 
     public ValidationResult PageValidation
     {
@@ -372,7 +352,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         SelectedPage?.HubName == "snap" ? SnapStaffLevels :
         OtherStaffLevels;
 
-    private string _staffLevel = UserSettings.Get(nameof(StaffLevel), "Mod");
+    private string _staffLevel = Preferences.Default.Get(nameof(StaffLevel), "Mod");
 
     public string StaffLevel
     {
@@ -383,11 +363,11 @@ public class FeatureViewModel : NotifyPropertyChanged
             {
                 if (SelectedPage != null)
                 {
-                    UserSettings.Store(nameof(StaffLevel) + ":" + SelectedPage.Id, StaffLevel);
+                    Preferences.Default.Set(nameof(StaffLevel) + ":" + SelectedPage.Id, StaffLevel);
                 }
                 else
                 {
-                    UserSettings.Store(nameof(StaffLevel), StaffLevel);
+                    Preferences.Default.Set(nameof(StaffLevel), StaffLevel);
                 }
             }
         }
@@ -399,7 +379,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
     #region Your alias
 
-    private string _yourAlias = UserSettings.Get(nameof(YourAlias), "");
+    private string _yourAlias = Preferences.Default.Get(nameof(YourAlias), "");
 
     public string YourAlias
     {
@@ -408,7 +388,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         {
             if (Set(ref _yourAlias, value, [nameof(YourAliasValidation)]))
             {
-                UserSettings.Store(nameof(YourAlias), YourAlias);
+                Preferences.Default.Set(nameof(YourAlias), YourAlias);
                 ClearAllPlaceholders();
             }
         }
@@ -420,7 +400,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
     #region Your first name
 
-    private string _yourFirstName = UserSettings.Get(nameof(YourFirstName), "");
+    private string _yourFirstName = Preferences.Default.Get(nameof(YourFirstName), "");
 
     public string YourFirstName
     {
@@ -429,7 +409,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         {
             if (Set(ref _yourFirstName, value, [nameof(YourFirstNameValidation)]))
             {
-                UserSettings.Store(nameof(YourFirstName), YourFirstName);
+                Preferences.Default.Set(nameof(YourFirstName), YourFirstName);
                 ClearAllPlaceholders();
             }
         }
