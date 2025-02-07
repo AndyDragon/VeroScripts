@@ -6,9 +6,9 @@ export interface VersionEntry {
 
 export interface Version {
   readonly macOS?: VersionEntry;
-  readonly macOS_v2?: VersionEntry;
+  readonly iOS?: VersionEntry;
   readonly windows?: VersionEntry;
-  readonly windows_v2?: VersionEntry;
+  readonly android?: VersionEntry;
 }
 
 export async function readVersion(versionLocation: string): Promise<Version> {
