@@ -4,6 +4,7 @@ using System.Windows;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MahApps.Metro.Controls;
+using Notification.Wpf;
 
 namespace VeroScriptsEditor
 {
@@ -79,10 +80,34 @@ namespace VeroScriptsEditor
                         Close();
                         break;
                     case MainViewModel.DirtyActionResult.CopyReport:
-                        viewModel.GenerateReport();
-                        await Task.Delay(1400);
-                        ignoreDirtyState = true;
-                        Close();
+                        {
+                            var report = viewModel.GenerateReport();
+                            if (!string.IsNullOrEmpty(report))
+                            {
+                                viewModel.CopyTextToClipboard(report, "Report generated", "The report has been copied to the clipboard");
+                                Logger.LogInfo("Generated report and copied to clipboard");
+                                await Task.Delay(1400);
+                            }
+                            ignoreDirtyState = true;
+                            Close();
+                        }
+                        break;
+                    case MainViewModel.DirtyActionResult.SaveReport:
+                        {
+                            var report = viewModel.GenerateReport();
+                            if (string.IsNullOrEmpty(report))
+                            {
+                                ignoreDirtyState = true;
+                                Close();
+                            }
+                            if (viewModel.SaveReport(report))
+                            {
+                                Logger.LogInfo("Generated report and saved to file");
+                                await Task.Delay(1400);
+                                ignoreDirtyState = true;
+                                Close();
+                            }
+                        }
                         break;
                 }
             }

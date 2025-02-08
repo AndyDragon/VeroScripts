@@ -41,7 +41,8 @@
 
     <Window.InputBindings>
         <KeyBinding Key="R" Modifiers="Ctrl+Alt" Command="{Binding ReloadPagesCatalogCommand}" />
-        <KeyBinding Key="R" Modifiers="Ctrl" Command="{Binding GenerateReportCommand}" />
+        <KeyBinding Key="R" Modifiers="Ctrl" Command="{Binding CopyReportCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveReportCommand}" />
     </Window.InputBindings>
 
     <mah:MetroWindow.RightWindowCommands>
@@ -66,7 +67,25 @@
                 </Button.ContentTemplate>
             </Button>
             <Button 
-                Command="{Binding GenerateReportCommand}" 
+                Command="{Binding SaveReportCommand}" 
+                Content="Save report" 
+                ToolTip="Generates a report of the changes and saves it to a file (Ctrl+S)">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconEntypo 
+                                Width="20"
+                                Height="20"
+                                Kind="Save" />
+                            <TextBlock Margin="4 0 0 0"
+                                VerticalAlignment="Center"
+                                Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            <Button 
+                Command="{Binding CopyReportCommand}" 
                 Content="Generate report" 
                 ToolTip="Generates a report of the changes and copies it to the clipboard (Ctrl+R)">
                 <Button.ContentTemplate>

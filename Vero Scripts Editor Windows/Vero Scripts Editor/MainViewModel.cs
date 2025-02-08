@@ -15,6 +15,7 @@ using System.Windows.Media;
 using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Notification.Wpf;
 
@@ -31,7 +32,23 @@ namespace VeroScriptsEditor
             TemplatesCatalog = new TemplatesCatalog();
 
             ReloadPagesCatalogCommand = new CommandWithParameter(ReloadPages);
-            GenerateReportCommand = new Command(GenerateReport, () => IsDirty);
+            CopyReportCommand = new Command(() =>
+            {
+                var report = GenerateReport();
+                if (!string.IsNullOrEmpty(report))
+                {
+                    CopyTextToClipboard(report, "Report generated", "The report has been copied to the clipboard");
+                    Logger.LogInfo("Generated report and copied to clipboard");
+                }
+            }, () => IsDirty);
+            SaveReportCommand = new Command(() => 
+            { 
+                var report = GenerateReport();
+                if (!string.IsNullOrEmpty(report) && SaveReport(report))
+                {
+                    Logger.LogInfo("Generated report and saved to file");
+                }
+            }, () => IsDirty);
             AddNewTemplateCommand = new Command(AddNewTemplate, CanAddNewTemplate);
             CopyTemplateCommand = new Command(CopyTemplate, CanCopyTemplate);
             PasteTemplateCommand = new Command(PasteTemplate);
@@ -248,25 +265,29 @@ namespace VeroScriptsEditor
             Confirm,
             Cancel,
             CopyReport,
+            SaveReport,
         }
 
         public static async Task<DirtyActionResult> HandleDirtyAction(MainWindow window, string actionButon, string action)
         {
             var settings = new MetroDialogSettings()
             {
-                AffirmativeButtonText = "Copy report",
-                NegativeButtonText = "Cancel",
-                FirstAuxiliaryButtonText = actionButon,
+                AffirmativeButtonText = "Save report",
+                NegativeButtonText = "Copy report",
+                FirstAuxiliaryButtonText = "Cancel",
+                SecondAuxiliaryButtonText = actionButon,
+                DefaultButtonFocus = MessageDialogResult.Affirmative,
             };
 
             return await window.ShowMessageAsync(
                 "Confirm",
                 $"One or more templates have been added, removed or modified.\n\n{action}",
-                MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
+                MessageDialogStyle.AffirmativeAndNegativeAndDoubleAuxiliary,
                 settings) switch
             {
-                MessageDialogResult.Affirmative => DirtyActionResult.CopyReport,
-                MessageDialogResult.FirstAuxiliary => DirtyActionResult.Confirm,
+                MessageDialogResult.Affirmative => DirtyActionResult.SaveReport,
+                MessageDialogResult.Negative => DirtyActionResult.CopyReport,
+                MessageDialogResult.SecondAuxiliary => DirtyActionResult.Confirm,
                 _ => DirtyActionResult.Cancel,
             };
         }
@@ -313,7 +334,8 @@ namespace VeroScriptsEditor
                         StaffLevel = StaffLevels[0];
                     }
                     UpdateScript();
-                    GenerateReportCommand.OnCanExecuteChanged();
+                    CopyReportCommand.OnCanExecuteChanged();
+                    SaveReportCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -353,7 +375,8 @@ namespace VeroScriptsEditor
                     }
                 }
                 OnPropertyChanged(nameof(IsDirty));
-                GenerateReportCommand.OnCanExecuteChanged();
+                CopyReportCommand.OnCanExecuteChanged();
+                SaveReportCommand.OnCanExecuteChanged();
                 OnPropertyChanged(nameof(Title));
                 CopyTemplateCommand.OnCanExecuteChanged();
                 RevertTemplateCommand.OnCanExecuteChanged();
@@ -365,7 +388,8 @@ namespace VeroScriptsEditor
         private void SelectedTemplatePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(IsDirty));
-            GenerateReportCommand.OnCanExecuteChanged();
+            CopyReportCommand.OnCanExecuteChanged();
+            SaveReportCommand.OnCanExecuteChanged();
             OnPropertyChanged(nameof(Title));
             CopyTemplateCommand.OnCanExecuteChanged();
             RevertTemplateCommand.OnCanExecuteChanged();
@@ -657,8 +681,29 @@ namespace VeroScriptsEditor
                         ReloadPagesCatalogCommand?.Execute(true);
                         break;
                     case DirtyActionResult.CopyReport:
-                        GenerateReport();
-                        ReloadPagesCatalogCommand?.Execute(true);
+                        {
+                            var report = GenerateReport();
+                            if (!string.IsNullOrEmpty(report))
+                            {
+                                CopyTextToClipboard(report, "Report generated", "The report has been copied to the clipboard");
+                                Logger.LogInfo("Generated report and copied to clipboard");
+                            }
+                            ReloadPagesCatalogCommand?.Execute(true);
+                        }
+                        break;
+                    case DirtyActionResult.SaveReport:
+                        {
+                            var report = GenerateReport();
+                            if (string.IsNullOrEmpty(report))
+                            {
+                                ReloadPagesCatalogCommand?.Execute(true);
+                            }
+                            else if (SaveReport(report))
+                            {
+                                Logger.LogInfo("Generated report and saved to file");
+                                ReloadPagesCatalogCommand?.Execute(true);
+                            }
+                        }
                         break;
                 }
                 return;
@@ -669,10 +714,49 @@ namespace VeroScriptsEditor
             await LoadPages(true);
         }
 
-        public Command GenerateReportCommand { get; }
-        public void GenerateReport()
+        public Command CopyReportCommand { get; }
+
+        public Command SaveReportCommand { get; }
+
+        public bool SaveReport(string report)
         {
-            Logger.LogInfo("Execute GenerateReportCommand");
+            SaveFileDialog dialog = new()
+            {
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                Title = "Save the report to a file",
+                OverwritePrompt = true,
+                FileName = $"Change report - {DateTime.Now:yyyy-MM-dd}.txt",
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    File.WriteAllText(dialog.FileName, report);
+                    notificationManager.Show(
+                        "Saved the report",
+                        "The report has been saved to the file",
+                        type: NotificationType.Information,
+                        areaName: "WindowArea",
+                        expirationTime: TimeSpan.FromSeconds(3));
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Failed to save the report: {ex.Message}");
+                    Logger.LogError(ex.ToString());
+                    ShowErrorToast(
+                        "Failed to save the report",
+                        "The application failed to save the report to the selected file: " + ex.Message,
+                        NotificationType.Error, 
+                        () => { });
+                }
+            }
+            return false;
+        }
+
+        public string GenerateReport()
+        {
+            Logger.LogInfo("Execute CopyReportCommand");
             if (SelectedPage != null)
             {
                 var builder = new StringBuilder();
@@ -734,9 +818,9 @@ namespace VeroScriptsEditor
 
                 builder.AppendLine("------------------");
 
-                Logger.LogInfo("Generated report and copied to clipboard");
-                CopyTextToClipboard(builder.ToString(), "Report generated", "The report has been copied to the clipboard");
+                return builder.ToString();
             }
+            return "";
         }
 
         public Command AddNewTemplateCommand { get; }
