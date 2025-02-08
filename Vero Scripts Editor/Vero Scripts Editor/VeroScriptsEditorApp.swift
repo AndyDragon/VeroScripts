@@ -12,10 +12,11 @@ import SwiftyBeaver
 struct VeroScriptsEditorApp: App {
     @Environment(\.openWindow) private var openWindow
 
+#if STANDALONE
     @State var checkingForUpdates = false
     @State var versionCheckResult: VersionCheckResult = .complete
     @State var versionCheckToast = VersionCheckToast()
-    
+#endif
     @ObservedObject var commandModel = AppCommandModel()
 
     let logger = SwiftyBeaver.self
@@ -31,14 +32,21 @@ struct VeroScriptsEditorApp: App {
     
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
+#if STANDALONE
         let appState = VersionCheckAppState(
             isCheckingForUpdates: $checkingForUpdates,
             versionCheckResult: $versionCheckResult,
             versionCheckToast: $versionCheckToast,
             versionLocation: "https://vero.andydragon.com/static/data/veroscriptseditor/version.json")
+#endif
         WindowGroup {
+#if STANDALONE
             ContentView(appState)
                 .environmentObject(commandModel)
+#else
+            ContentView()
+                .environmentObject(commandModel)
+#endif
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
@@ -51,6 +59,7 @@ struct VeroScriptsEditorApp: App {
                     Text("About \(Bundle.main.displayName ?? "Vero Scripts Editor")")
                 })
             }
+#if STANDALONE
             CommandGroup(replacing: .appSettings, addition: {
                 Button(action: {
                     logger.verbose("Manual check for updates", context: "User")
@@ -62,6 +71,7 @@ struct VeroScriptsEditorApp: App {
                 })
                 .disabled(checkingForUpdates)
             })
+#endif
             CommandGroup(replacing: .saveItem) { }
             CommandGroup(replacing: .newItem, addition: {
                 Button(
@@ -78,6 +88,16 @@ struct VeroScriptsEditorApp: App {
                 .keyboardShortcut("r", modifiers: [.command, .shift])
             })
             CommandMenu("Report") {
+                Button(action: {
+                    logger.verbose("Save report from menu", context: "User")
+
+                    // Copies a report of the changes to the clipboard
+                    commandModel.saveReport.toggle()
+                }, label: {
+                    Text("Save report to file")
+                })
+                .keyboardShortcut("r", modifiers: [.command])
+
                 Button(action: {
                     logger.verbose("Copy report from menu", context: "User")
 
@@ -126,7 +146,11 @@ struct VeroScriptsEditorApp: App {
         }
 
         func windowShouldClose(_ sender: NSWindow) -> Bool {
-            return false
+            return DocumentManager.default.canTerminate()
+        }
+
+        func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+            return true
         }
 
         func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -171,5 +195,6 @@ class DocumentManager {
 
 class AppCommandModel: ObservableObject {
     @Published var copyReport: Bool = false
+    @Published var saveReport: Bool = false
     @Published var reloadPageCatalog: Bool = false
 }

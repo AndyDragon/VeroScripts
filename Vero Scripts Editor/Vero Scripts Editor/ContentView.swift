@@ -18,13 +18,22 @@ struct ContentView: View {
     @FocusState private var focusedField: FocusField?
     @State private var documentDirtyAlertDismissLable = "Quit"
     @State private var documentDirtyAlertConfirmation = "Are you sure you wish to quit?"
+    @State private var documentDirtyAfterSaveAction: (_ longPause: Bool) -> Void = { longPause in }
     @State private var documentDirtyAfterDismissAction: (_ longPause: Bool) -> Void = { longPause in }
     @State private var selectedMissingPageTemplate: String?
     @State private var selectedTemplate: ObservableTemplate?
+    @State private var showingFileExporter = false
+    @State private var reportDocument = ReportDocument()
 
-    private let appState: VersionCheckAppState
     private let labelWidth: CGFloat = 80
     private let logger = SwiftyBeaver.self
+
+    private var fileNameDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }
 
     private func templatePageFromPage(_ page: ObservablePage) -> ObservableTemplatePage? {
         return viewModel.catalog.templatesCatalog.pages.first(where: { $0.pageId == page.pageId })
@@ -83,9 +92,12 @@ struct ContentView: View {
         return []
     }
 
+#if STANDALONE
+    private let appState: VersionCheckAppState
     init(_ appState: VersionCheckAppState) {
         self.appState = appState
     }
+#endif
 
     var body: some View {
         NavigationSplitView(sidebar: {
@@ -142,7 +154,9 @@ struct ContentView: View {
                         .listStyle(.sidebar)
                         .navigationSplitViewColumnWidth(min: 240, ideal: 320)
                         .frame(minWidth: 240)
+
                         Spacer()
+
                         if !missingPageTemplates.isEmpty {
                             Text("Missing scripts:")
                             HStack(alignment: .center) {
@@ -188,10 +202,10 @@ struct ContentView: View {
                 } else {
                     WelcomeView()
                 }
+
+                FileExporterView()
             }
         })
-        .navigationTitle("Vero Scripts Editor")
-        .navigationSubtitle(viewModel.isDirty ? "templates modified" : "")
         .frame(minWidth: 1280, minHeight: 800)
         .background(Color.BackgroundColor)
         .sheet(isPresented: $viewModel.isShowingDocumentDirtyAlert) {
@@ -200,22 +214,45 @@ struct ContentView: View {
                 confirmationText: documentDirtyAlertConfirmation,
                 dismissLabel: documentDirtyAlertDismissLable,
                 copyReportAction: {
-                    generateReport()
+                    if let report = generateReport() {
+                        Pasteboard.copyToClipboard(report)
+                        viewModel.showSuccessToast("Report generated!", "Copied the report of changes to the clipboard")
+                        logger.verbose("Generated report of changes", context: "System")
+                    }
                     documentDirtyAfterDismissAction(true)
+                    documentDirtyAfterSaveAction = { longPause in }
                     documentDirtyAfterDismissAction = { longPause in }
+                },
+                saveReportAction: {
+                    if let report = generateReport() {
+                        reportDocument = ReportDocument(report: report)
+                        showingFileExporter.toggle()
+                    } else {
+                        documentDirtyAfterDismissAction(true)
+                        documentDirtyAfterSaveAction = { longPause in }
+                        documentDirtyAfterDismissAction = { longPause in }
+                    }
                 },
                 dismissAction: {
                     documentDirtyAfterDismissAction(false)
+                    documentDirtyAfterSaveAction = { longPause in }
                     documentDirtyAfterDismissAction = { longPause in }
                 },
                 cancelAction: {
+                    documentDirtyAfterSaveAction = { longPause in }
                     documentDirtyAfterDismissAction = { longPause in }
                 })
         }
         .advancedToastView(toasts: $viewModel.toastViews)
+#if STANDALONE
         .attachVersionCheckState(viewModel, appState) { url in
             openURL(url)
         }
+        .navigationTitle("Vero Scripts Editor Standalone")
+#else
+        .navigationTitle("Vero Scripts Editor")
+#endif
+        .navigationSubtitle(viewModel.isDirty ? "templates modified" : "")
         .onAppear(perform: {
             DocumentManager.default.registerReceiver(receiver: self)
         })
@@ -239,15 +276,51 @@ struct ContentView: View {
                 documentDirtyAfterDismissAction = { longPause in
                     reloadPages()
                 }
+                documentDirtyAfterSaveAction = { longPause in
+                    reloadPages()
+                }
                 viewModel.isShowingDocumentDirtyAlert.toggle()
             } else {
                 reloadPages()
             }
         }
         .onChange(of: commandModel.copyReport) {
-            generateReport()
+            if let report = generateReport() {
+                Pasteboard.copyToClipboard(report)
+                viewModel.showSuccessToast("Report generated!", "Copied the report of changes to the clipboard")
+                logger.verbose("Generated report of changes", context: "System")
+            }
+        }
+        .onChange(of: commandModel.saveReport) {
+            if let report = generateReport() {
+                reportDocument = ReportDocument(report: report)
+                showingFileExporter.toggle()
+            }
         }
         .preferredColorScheme(isDarkModeOn ? .dark : .light)
+    }
+
+    fileprivate func FileExporterView() -> some View {
+        HStack { }
+            .frame(width: 0, height: 0)
+            .fileExporter(
+                isPresented: $showingFileExporter,
+                document: reportDocument,
+                contentType: .plainText,
+                defaultFilename: "Change report - \(fileNameDateFormatter.string(from: Date.now)).txt"
+            ) { result in
+                switch result {
+                case .success(_):
+                    logger.verbose("Saved the report", context: "System")
+                    documentDirtyAfterSaveAction(false)
+                    documentDirtyAfterSaveAction = { longPause in }
+                    documentDirtyAfterDismissAction = { longPause in }
+                case let .failure(error):
+                    debugPrint(error.localizedDescription)
+                }
+            }
+            .fileExporterFilenameLabel("Save report as: ") // filename label
+            .fileDialogConfirmationLabel("Save report")
     }
 
     private func reloadPages() {
@@ -318,6 +391,7 @@ struct ContentView: View {
 
             logger.verbose("Loaded template catalog from server with \(viewModel.catalog.templatesCatalog.pages.count) page templates", context: "System")
 
+#if STANDALONE
             do {
                 // Delay the start of the disallowed list download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 100_000_000)
@@ -327,6 +401,7 @@ struct ContentView: View {
                 // do nothing, the version check is not critical
                 debugPrint(error.localizedDescription)
             }
+#endif
         } catch {
             logger.error("Failed to load page catalog or template catalog from server: \(error.localizedDescription)", context: "System")
             viewModel.dismissAllNonBlockingToasts(includeProgress: true)
@@ -367,7 +442,7 @@ struct ContentView: View {
             })
     }
 
-    private func generateReport() {
+    private func generateReport() -> String? {
         if viewModel.isDirty {
             var lines = [String]()
             lines.append("REPORT OF CHANGES")
@@ -419,12 +494,11 @@ struct ContentView: View {
 
             var text = ""
             for line in lines { text = text + line + "\n" }
-            Pasteboard.copyToClipboard(text)
-            viewModel.showSuccessToast("Report generated!", "Copied the report of changes to the clipboard")
-            logger.verbose("Generated report of changes", context: "System")
+            return text
         } else {
             viewModel.showInfoToast("There are no changes", "There are not changes to report")
             logger.verbose("There were no changes to report", context: "System")
+            return nil
         }
     }
 
@@ -470,6 +544,9 @@ extension ContentView: DocumentManagerDelegate {
             documentDirtyAlertDismissLable = "Quit"
             documentDirtyAlertConfirmation = "Are you sure you wish to quit?"
             documentDirtyAfterDismissAction = { longPause in
+                delayAndTerminate(longPause)
+            }
+            documentDirtyAfterSaveAction = { longPause in
                 delayAndTerminate(longPause)
             }
             viewModel.isShowingDocumentDirtyAlert.toggle()

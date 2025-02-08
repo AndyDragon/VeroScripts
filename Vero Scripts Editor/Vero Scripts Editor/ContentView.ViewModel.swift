@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftyBeaver
 
+#if STANDALONE
 extension View {
     func attachVersionCheckState(_ viewModel: ContentView.ViewModel, _ appState: VersionCheckAppState, _ launchUrl: @escaping (_ url: URL) -> Void) -> some View {
         self.onChange(of: appState.versionCheckResult.wrappedValue) {
@@ -17,6 +18,7 @@ extension View {
         }
     }
 }
+#endif
 
 extension ContentView {
     @Observable
@@ -46,6 +48,7 @@ extension ContentView {
         var yourFirstName = "Omega"
         var pageStaffLevel: StaffLevelCase = .mod
 
+#if STANDALONE
         // MARK: Version check
         private var lastVersionCheckResult = VersionCheckResult.complete
 
@@ -151,7 +154,8 @@ extension ContentView {
                 break
             }
         }
-
+#endif
+        
         // MARK: Toasts
         var toastViews = [AdvancedToast]()
         var hasModalToasts: Bool {

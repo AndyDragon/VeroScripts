@@ -13,6 +13,7 @@ struct DocumentDirtySheet: View {
     var confirmationText: String
     var dismissLabel: String
     var copyReportAction: () -> Void
+    var saveReportAction: () -> Void
     var dismissAction: () -> Void
     var cancelAction: () -> Void
 
@@ -46,6 +47,15 @@ struct DocumentDirtySheet: View {
                     copyReportAction()
                 }) {
                     Text("Copy report")
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+                }
+                Spacer()
+                Button(action: {
+                    isShowing.toggle()
+                    saveReportAction()
+                }) {
+                    Text("Save report")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 4)
                 }
