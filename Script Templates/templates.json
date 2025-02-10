@@ -349,7 +349,11 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n#player #game #Team #athlete #GroupOfPeople #People\n#Competition #sports #Sport #leisureActivity #TeamSport #extremesport\n#sportsphotography\n\n•\n    For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n#player #game #Team #athlete #GroupOfPeople #People\n#Competition #sports #Sport #leisureActivity #TeamSport #extremesport\n#sportsphotography\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
         },
         {
           "name": "original post",
@@ -726,15 +730,19 @@
       "templates": [
         {
           "name": "comment",
-          "template": "🌟Congratulations! You have been featured  @%%USERNAME%% 👏\n😍 Just an amazing shot. ✨✨\n💕  Thanks for tagging this great picture with @snap_%%PAGENAME%% ✨🙏\n🌟 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕\n"
+          "template": "🌟Congratulations! You have been featured  @%%USERNAME%% 👏\n😍 Just an amazing shot. ✨✨\n💕  Thanks for tagging this great picture with @snap_%%PAGENAME%% ✨\n🌟 Keep tagging #snap_%%PAGENAME%% for a chance of more features. 💕\n"
         },
         {
           "name": "community comment",
-          "template": "🌟 You have been featured @%%USERNAME%% 👏\n🌟 Huge congratulations on your beautiful feature with @snap_%%PAGENAME%% ✨\n💕Thank you for tagging and sharing your image with the Snap Community 💫🙏\n🌟 Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features. 💕\n"
+          "template": "🏆Congratulations You have been featured @%%USERNAME%% 💫\n😍 Just an amazing shot. ✨✨\n💕Thank you for tagging and sharing your image with the Snap Community 💫🙏\n🏆Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features👍💕🌟\n"
         },
         {
           "name": "feature",
           "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n#pictureframe #framed #border #collage\n#photography #picoftheday\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
         },
         {
           "name": "original post",
@@ -893,6 +901,10 @@
           "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n.\n________________________________\n✨CONGRATULATIONS ✨\n________________________________\n.\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n.\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n.\nCC Snap Community Owner Jane\n@snap_owner\n.\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#verofamily\n#verofriends\n#snap\n\n#fishing #fish #flyfishing #photography #outdoors #sports\n#bodyofwater #scenicsnature #sea #nature #ocean #coast\n#leisureactivity #tranquilscene #people #lensculture\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
         },
         {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
+        },
+        {
           "name": "original post",
           "template": "✨✨✨ FEATURED on @snap_%%PAGENAME%% ✨✨✨"
         }
@@ -975,6 +987,10 @@
         {
           "name": "feature",
           "template": "• #snap_%%PAGENAME%% •\n.\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by:  @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#snap\n#verofamily\n#verofriends\n\n#crocuses #flowersofvero #floweroftheday #gooutside #flower4ever #garden #gardening #gardeninglife #flower4you #growagarden  #gardeninglove  #gardensofvero #flowers #growsomething #verogardening #gardeningphoto #gardening_feature\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
         },
         {
           "name": "original post",
@@ -1285,15 +1301,19 @@
       "templates": [
         {
           "name": "comment",
-          "template": "😍 Huge congratulations @%%USERNAME%% on your fantastic feature with @snap_%%PAGENAME%% ✨✨\n🙏Thank you for tagging and sharing your image with the Snap Community 💫🙏\n💕Please keep tagging #snap_%%PAGENAME%% for a chance of more features 🙏💫\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
+          "template": "🌟Congratulations! You have been featured  @%%USERNAME%% 👏\n🙏Thank you for tagging and sharing your image with the Snap Community 💫\n💕Keep tagging #snap_%%PAGENAME%% for a chance of more features 🙏\n🙏 We are looking forward to see more of your wonderful images 🙏\n"
         },
         {
           "name": "community comment",
-          "template": "😍 Huge congratulations you have been featured @%%USERNAME%% ✨✨\n💕Thank you for tagging and sharing your image with the Snap Community 💫🙏\n🏆Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features 👍💕🌟\n"
+          "template": "🌟Congratulations! You have been featured  @%%USERNAME%% 👏\n💕Thank you for tagging and sharing your image with the Snap Community 💫🙏\n🏆Consider visiting and follow our gallery @snap_%%PAGENAME%% and using our page hashtag #snap_%%PAGENAME%% in your future posts for a chance of more features 👍💕🌟\n"
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% and #snap_africa •\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n#middleeast #africa\n#world #travel #tourism #photography #picoftheday\n\n•\n    For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% and #snap_africa •\n.\n⭐️ Featured %%MEMBERLEVEL%% : @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#snap\n#vero\n#verofamily\n#verofriends\n\n#middleeast #africa\n#world #travel #tourism #photography #picoftheday\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
         },
         {
           "name": "original post",
@@ -1702,7 +1722,11 @@
         },
         {
           "name": "feature",
-          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#snap\n#verofamily\n#verofriends\n\n#toy #toys #Mini_Monday #toyphotography #toycollector\n#toycommunity #toypics #marvel #starwars #collectibles\n#neca #lego #hottoys #toysphotographer #macro\n\n•\n    For internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+          "template": "• #snap_%%PAGENAME%% •\n\n⭐️ Featured %%MEMBERLEVEL%%: @%%USERNAME%% ⭐️\n•\n__________________________________\n✨CONGRATULATIONS ✨\n__________________________________\n•\nSelected by: @%%YOURNAME%%\n%%STAFFLEVEL%% on @snap_%%PAGENAME%%\n•\nJoin us in our fresh, creative and supportive community on VERO. Please follow @snap_community\n•\nCC Snap Community Owner Jane\n@snap_owner\n•\nPlease check out @snap_kingdom for more of our Snap_community pages.\n•\n#snap_community\n#vero\n#snap\n#verofamily\n#verofriends\n\n#toy #toys #Mini_Monday #toyphotography #toycollector\n#toycommunity #toypics #marvel #starwars #collectibles\n#neca #lego #hottoys #toysphotographer #macro\n\n•\nFor internal use only!\n#snap_%%PAGENAME%%_%%USERNAME%%\n#snap_featured_%%USERNAME%%\n•\n"
+        },
+        {
+          "name": "first comment",
+          "template": "🏆Congratulations! You have been featured @%%USERNAME%%🏆\n😍Just an amazing shot. ✨✨\n🏆Congratulations on your first feature here at the @snap_%%PAGENAME%%💫\n💕Thanks for tagging this great picture with #snap_%%PAGENAME%% 🙏\n🏆Keep tagging #snap_%%PAGENAME%% for a chance of more features.💕\n"
         },
         {
           "name": "original post",
