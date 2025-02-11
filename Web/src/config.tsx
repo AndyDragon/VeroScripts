@@ -39,8 +39,8 @@ export const showWindowsInfo: PlatformLocation = PlatformLocation.AppPortal;
 export const windowsInstallerLocation = "veroscripts/windows";
 export const windowsReleaseNotesLocation = "releaseNotes-windows.json";
 
-export const showAndroidInfo: PlatformLocation = PlatformLocation.DoNotShow;
-export const androidInstallerLocation = "TODO";
+export const showAndroidInfo: PlatformLocation = PlatformLocation.AppStore;
+export const androidInstallerLocation = "https://play.google.com/store/apps/details?id=com.andydragon.vero_scripts";
 export const androidReleaseNotesLocation = "releaseNotes-android.json";
 
 export const supportEmail = "andydragon@live.com";
