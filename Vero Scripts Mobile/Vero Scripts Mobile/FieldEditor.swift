@@ -12,37 +12,35 @@ struct FieldEditor: View {
     var placeholder: String
     @Binding var field: String
     var fieldChanged: (_ to: String) -> Void
-    @Binding var fieldValidation: (valid: Bool, reason: String?)
-    var validate: (String) -> (valid: Bool, reason: String?) = { value in
+    @Binding var fieldValidation: (validation: ValidationResult, reason: String?)
+    var validate: (String) -> (validation: ValidationResult, reason: String?) = { value in
         if value.count == 0 {
-            return (false, "Required value")
+            return (.error, "Required value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 // Title validator
-                if !fieldValidation.valid {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(Color.accentColor, Color.red)
+                if fieldValidation.validation != .valid {
+                    Image(systemName: fieldValidation.validation.icon)
+                        .foregroundStyle(fieldValidation.validation.iconColor1, fieldValidation.validation.iconColor2)
                         .help(fieldValidation.reason ?? "")
                         .imageScale(.small)
                 }
-                
+
                 // Title
                 if !title.isEmpty {
                     Text(title)
-                        .foregroundStyle(fieldValidation.valid ?
-                                         Color(UIColor.label) : Color.red,
-                                         Color(UIColor.secondaryLabel))
+                        .foregroundStyle(fieldValidation.validation.color, Color(UIColor.secondaryLabel))
                 }
             }
-            if !fieldValidation.valid {
+            if fieldValidation.validation != .valid {
                 Text(fieldValidation.reason ?? "")
                     .font(.footnote)
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(fieldValidation.validation.color)
             }
 
             // Editor

@@ -25,17 +25,17 @@ struct ScriptEditor: View {
 
             Button(action: {
                 copy(true, false)
-            }, label: {
-                Text("Copy")
-                    .padding(.horizontal, 20)
-            })
+            }) {
+                Label("Copy", systemImage: "list.clipboard")
+                    .padding(.horizontal, 4)
+            }
             .disabled(!canCopy)
 
             Button(action: {
                 copy(false, true)
             }, label: {
-                Text("Copy (with Placeholders)")
-                    .padding(.horizontal, 20)
+                Label("Copy (with Placeholders)", systemImage: "list.bullet.clipboard")
+                    .padding(.horizontal, 4)
             })
             .disabled(!hasPlaceholders)
 

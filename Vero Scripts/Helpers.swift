@@ -5,9 +5,9 @@
 //  Created by Andrew Forget on 2024-02-10.
 //
 
-import SwiftUI
 import Combine
 import CommonCrypto
+import SwiftUI
 
 extension Binding {
     func onChange(_ handler: @escaping (Value) -> Void) -> Binding<Value> {
@@ -24,11 +24,11 @@ extension Binding {
 extension View {
     @ViewBuilder func onValueChanged<T: Equatable>(value: T, onChange: @escaping (T) -> Void) -> some View {
         if #available(macOS 14.0, *) {
-            self.onChange(of: value) { oldValue, newValue in
+            self.onChange(of: value) { _, newValue in
                 onChange(newValue)
             }
         } else {
-            self.onReceive(Just(value)) { (value) in
+            onReceive(Just(value)) { value in
                 onChange(value)
             }
         }
@@ -70,25 +70,34 @@ extension URLSession {
     }
 }
 
-func copyToClipboard(_ text: String) -> Void {
-        let pasteBoard = NSPasteboard.general
-        pasteBoard.clearContents()
-        pasteBoard.writeObjects([text as NSString])
+func copyToClipboard(_ text: String) {
+    let pasteBoard = NSPasteboard.general
+    pasteBoard.clearContents()
+    pasteBoard.writeObjects([text as NSString])
+}
+
+func stringFromClipboard() -> String? {
+    let pasteBoard = NSPasteboard.general
+    return pasteBoard.string(forType: .string)
 }
 
 extension Bundle {
     var releaseVersionNumber: String? {
         return infoDictionary?["CFBundleShortVersionString"] as? String
     }
+
     var buildVersionNumber: String? {
         return infoDictionary?["CFBundleVersion"] as? String
     }
+
     var releaseVersionNumberPretty: String {
         return "\(releaseVersionNumber ?? "1.0").\(buildVersionNumber ?? "0")"
     }
+
     func releaseVersionOlder(than: String) -> Bool {
         return releaseVersionNumberPretty.compare(than, options: .numeric) == .orderedAscending
     }
+
     var displayName: String? {
         return infoDictionary?["CFBundleDisplayName"] as? String
     }
@@ -109,11 +118,11 @@ public extension String {
 
 extension Array<String> {
     func includes(_ element: String) -> Bool {
-        return self.contains(where: { item in item == element })
+        return contains(where: { item in item == element })
     }
 
     func includesWithoutCase(_ element: String) -> Bool {
-        return self.contains(where: { item in item.lowercased() == element.lowercased() })
+        return contains(where: { item in item.lowercased() == element.lowercased() })
     }
 }
 
@@ -138,7 +147,7 @@ extension Data {
         let hexDigits = options.contains(.upperCase) ? "0123456789ABCDEF" : "0123456789abcdef"
         if #available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *) {
             let utf8Digits = Array(hexDigits.utf8)
-            return String(unsafeUninitializedCapacity: 2 * self.count) { (ptr) -> Int in
+            return String(unsafeUninitializedCapacity: 2 * self.count) { ptr -> Int in
                 var p = ptr.baseAddress!
                 for byte in self {
                     p[0] = utf8Digits[Int(byte / 16)]
@@ -150,7 +159,7 @@ extension Data {
         } else {
             let utf16Digits = Array(hexDigits.utf16)
             var chars: [unichar] = []
-            chars.reserveCapacity(2 * self.count)
+            chars.reserveCapacity(2 * count)
             for byte in self {
                 chars.append(utf16Digits[Int(byte / 16)])
                 chars.append(utf16Digits[Int(byte % 16)])
@@ -162,6 +171,6 @@ extension Data {
 
 extension URL {
     var lastPathComponentWithoutExtension: String {
-        return String(NSString(string: self.lastPathComponent).deletingPathExtension)
+        return String(NSString(string: lastPathComponent).deletingPathExtension)
     }
 }

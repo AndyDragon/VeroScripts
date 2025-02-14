@@ -40,8 +40,8 @@ struct NewMembershipEditor: View {
             Button(action: {
                 copy()
             }, label: {
-                Text("Copy")
-                    .padding(.horizontal, 20)
+                Label("Copy", systemImage: "list.clipboard")
+                    .padding(.horizontal, 4)
             })
             .disabled(!canCopy)
             

@@ -24,62 +24,68 @@ struct ContentView: View {
 
     @State private var viewModel = ViewModel()
 
-    @State private var membership = MembershipCase.none
-    @State private var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var userName = ""
-    @State private var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
-    @State private var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
-    @State private var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
-    @State private var page = UserDefaults.standard.string(forKey: "Page") ?? ""
-    @State private var pageValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var loadedPages = [LoadedPage]()
+    @State private var waitingForTemplates = true
+    @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
+    @State private var disallowLists = [String:[String]]()
+    @State private var cautionLists = [String:[String]]()
+
+//    @State private var page = UserDefaults.standard.string(forKey: "Page") ?? ""
+    @State private var currentPage: LoadedPage? = nil
+    @State private var pageValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var pageStaffLevel = StaffLevelCase.mod
+
+    @State private var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
+    @State private var yourNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
+    @State private var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+    @State private var yourFirstNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
+
+    @State private var userName = ""
+    @State private var userNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
+    @State private var membership = MembershipCase.none
+    @State private var membershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var firstForPage = false
     @State private var fromCommunityTag = false
     @State private var fromHubTag = false
     @State private var fromRawTag = false
+
     @State private var featureScript = ""
     @State private var commentScript = ""
     @State private var originalPostScript = ""
+
     @State private var newMembership = NewMembershipCase.none
-    @State private var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var newMembershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var newMembershipScript = ""
-    @State private var showingAlert = false
-    @State private var alertTitle = ""
-    @State private var alertMessage = ""
-    @State private var terminalAlert = false
+
     @State private var placeholderSheetCase = PlaceholderSheetCase.featureScript
     @State private var showingPlaceholderSheet = false
-    @State private var loadedPages = [LoadedPage]()
-    @State private var currentPage: LoadedPage? = nil
-    @State private var waitingForTemplates = true
-    @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
-    @State private var disallowList = [String]()
+
     @ObservedObject private var featureScriptPlaceholders = PlaceholderList()
     @ObservedObject private var commentScriptPlaceholders = PlaceholderList()
     @ObservedObject private var originalPostScriptPlaceholders = PlaceholderList()
     @State private var scriptWithPlaceholdersInPlace = ""
     @State private var scriptWithPlaceholders = ""
-    @State private var lastMembership = MembershipCase.none
-    @State private var lastUserName = ""
+
+    @State private var lastPage: LoadedPage?
+    @State private var lastPageStaffLevel = StaffLevelCase.mod
     @State private var lastYourName = ""
     @State private var lastYourFirstName = ""
-    @State private var lastPage = ""
-    @State private var lastPageStaffLevel = StaffLevelCase.mod
+    @State private var lastUserName = ""
+    @State private var lastMembership = MembershipCase.none
+
     @FocusState private var focusedField: FocusedField?
 
     private var canCopyScripts: Bool {
-        return membershipValidation.valid
-        && userNameValidation.valid
-        && yourNameValidation.valid
-        && yourFirstNameValidation.valid
-        && pageValidation.valid
+        return membershipValidation.validation != .error
+        && userNameValidation.validation != .error
+        && yourNameValidation.validation != .error
+        && yourFirstNameValidation.validation != .error
+        && pageValidation.validation != .error
     }
     private var canCopyNewMembershipScript: Bool {
         return newMembership != NewMembershipCase.none
-        && newMembershipValidation.valid
-        && userNameValidation.valid
+        && newMembershipValidation.validation != .error
+        && userNameValidation.validation != .error
     }
     private let accordionHeightRatio = 3.5
     private let logger = SwiftyBeaver.self
@@ -90,355 +96,141 @@ struct ContentView: View {
         self.appState = appState
     }
 #endif
-
+    
     var body: some View {
         ZStack {
             Color.backgroundColor.edgesIgnoringSafeArea(.all)
 
             VStack {
-                // Fields
-                Group {
-                    // Page and staff level
-                    HStack {
-                        // Page picker
-                        if !pageValidation.valid {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(Color.accentColor, Color.red)
-                                .help(pageValidation.reason ?? "unknown error")
-                                .imageScale(.small)
-                        }
-                        Text("Page: ")
-                            .foregroundStyle(
-                                pageValidation.valid ? Color.label : Color.red,
-                                Color.secondaryLabel)
-                            .frame(width: 36, alignment: .leading)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Picker("", selection: $page.onChange { value in
-                            if page.isEmpty {
-                                pageValidation = (false, "Page is required")
-                            } else {
-                                pageValidation = (true, nil)
-                            }
-                            pageChanged(to: value)
-                        }) {
-                            ForEach(loadedPages) { page in
-                                Text(page.displayName)
-                                    .tag(page.id)
-                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
-                            }
-                        }
-                        .tint(Color.accentColor)
-                        .accentColor(Color.accentColor)
-                        .foregroundStyle(Color.accentColor, Color.label)
-                        .focusable()
-                        .focused($focusedField, equals: .page)
-                        .onAppear {
-                            if page.isEmpty {
-                                pageValidation = (false, "Page must not be 'default' or a page name is required")
-                            } else {
-                                pageValidation = (true, nil)
-                            }
-                        }
+                // Page and staff level
+                PageAndStaffLevelView()
 
-                        // Page staff level picker
-                        Text("Page staff level: ")
-                            .padding([.leading], 8)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
-                            ForEach(StaffLevelCase.casesFor(hub: currentPage?.hub)) { staffLevelCase in
-                                Text(staffLevelCase.rawValue)
-                                    .tag(staffLevelCase)
-                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
-                            }
-                        }
-                        .tint(Color.accentColor)
-                        .accentColor(Color.accentColor)
-                        .foregroundStyle(Color.accentColor, Color.label)
-                        .focusable()
-                        .focused($focusedField, equals: .staffLevel)
-                    }
+                // You and your first name
+                ModeratorView()
 
-                    // You
-                    HStack {
-                        // Your name editor
-                        FieldEditor(
-                            title: "You:",
-                            titleWidth: [42, 60],
-                            placeholder: "Enter your user name without '@'",
-                            field: $yourName,
-                            fieldChanged: yourNameChanged,
-                            fieldValidation: $yourNameValidation,
-                            validate: { value in
-                                if value.count == 0 {
-                                    return (false, "Required value")
-                                } else if value.first! == "@" {
-                                    return (false, "Don't include the '@' in user names")
-                                }
-                                return (true, nil)
-                            },
-                            focus: $focusedField,
-                            focusField: .yourName
-                        )
+                // User, membership and options
+                UserAndOptionsView()
 
-                        // Your first name editor
-                        FieldEditor(
-                            title: "Your first name:",
-                            placeholder: "Enter your first name (capitalized)",
-                            field: $yourFirstName,
-                            fieldChanged: yourFirstNameChanged,
-                            fieldValidation: $yourFirstNameValidation,
-                            validate: { value in
-                                if value.count == 0 {
-                                    return (false, "Required value")
-                                }
-                                return (true, nil)
-                            },
-                            focus: $focusedField,
-                            focusField: .yourFirstName
-                        ).padding([.leading], 8)
-                    }
-
-                    // User / Options
-                    HStack {
-                        // User name editor
-                        FieldEditor(
-                            title: "User: ",
-                            titleWidth: [42, 60],
-                            placeholder: "Enter user name without '@'",
-                            field: $userName,
-                            fieldChanged: userNameChanged,
-                            fieldValidation: $userNameValidation,
-                            validate: validateUserName,
-                            focus: $focusedField,
-                            focusField: .userName
-                        )
-
-                        // User level picker
-                        if !membershipValidation.valid {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(Color.accentColor, Color.red)
-                                .help(membershipValidation.reason ?? "unknown error")
-                                .imageScale(.small)
-                                .padding([.leading], 8)
-                        }
-                        Text("Level: ")
-                            .foregroundStyle(
-                                membershipValidation.valid ? Color.label : Color.red,
-                                Color.secondaryLabel)
-                            .frame(width: 36, alignment: .leading)
-                            .padding([.leading], membershipValidation.valid ? 8 : 0)
-                        Picker("", selection: $membership.onChange { value in
-                            membershipValidation = validateMembership(value: membership)
-                            membershipChanged(to: value)
-                        }) {
-                            ForEach(MembershipCase.casesFor(hub: currentPage?.hub)) { level in
-                                Text(level.rawValue)
-                                    .tag(level)
-                                    .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
-                            }
-                        }
-                        .tint(Color.accentColor)
-                        .accentColor(Color.accentColor)
-                        .foregroundStyle(Color.accentColor, Color.label)
-                        .onAppear {
-                            membershipValidation = validateMembership(value: membership)
-                        }
-                        .focusable()
-                        .focused($focusedField, equals: .level)
-
-                        // Options
-                        Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
-                            Text("First feature on page")
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                        }
-                        .focusable()
-                        .focused($focusedField, equals: .firstFeature)
-                        .padding([.leading], 8)
-                        .help("First feature on page")
-
-                        if currentPage?.hub == "click" {
-                            Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                                Text("From community tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .communityTag)
-                            .padding([.leading], 8)
-                            .help("From community tag")
-
-                            Toggle(isOn: $fromHubTag.onChange(fromHubTagChanged)) {
-                                Text("From hub tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .hubTag)
-                            .padding([.leading], 8)
-                            .help("From hub tag")
-                        } else if currentPage?.hub == "snap" {
-                            Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
-                                Text("From RAW tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .rawTag)
-                            .padding([.leading], 8)
-                            .help("From RAW tag")
-
-                            Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
-                                Text("From community tag")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            .focusable()
-                            .focused($focusedField, equals: .communityTag)
-                            .padding([.leading], 8)
-                            .help("From community tag")
-                        }
-
-                        Spacer()
-                    }
-                }
-
-                // Scripts
-                Group {
-                    // Feature script output
-                    ScriptEditor(
-                        title: "Feature script:",
-                        script: $featureScript,
-                        minHeight: 72,
-                        maxHeight: .infinity,
-                        canCopy: canCopyScripts,
-                        hasPlaceholders: scriptHasPlaceholders(featureScript),
-                        copy: { force, withPlaceholders in
-                            placeholderSheetCase = .featureScript
-                            if copyScript(
-                                featureScript,
-                                featureScriptPlaceholders,
-                                [commentScriptPlaceholders, originalPostScriptPlaceholders],
-                                force: force,
-                                withPlaceholders: withPlaceholders
-                            ) {
-                                logger.verbose("Copied feature script to clipboard", context: "User")
-                                viewModel.showSuccessToast(
-                                    "Copied",
-                                    String {
-                                        "Copied the feature script\(withPlaceholders ? " with placeholders" : "") "
-                                        "to the clipboard"
-                                    }
-                                )
-                            }
-                        },
-                        focus: $focusedField,
-                        focusField: .featureScript
-                    )
-
-                    // Comment script output
-                    ScriptEditor(
-                        title: "Comment script:",
-                        script: $commentScript,
-                        minHeight: 36,
-                        maxHeight: 36 * accordionHeightRatio,
-                        canCopy: canCopyScripts,
-                        hasPlaceholders: scriptHasPlaceholders(commentScript),
-                        copy: { force, withPlaceholders in
-                            placeholderSheetCase = .commentScript
-                            if copyScript(
-                                commentScript,
-                                commentScriptPlaceholders,
-                                [featureScriptPlaceholders, originalPostScriptPlaceholders],
-                                force: force,
-                                withPlaceholders: withPlaceholders
-                            ) {
-                                logger.verbose("Copied comment script to clipboard", context: "User")
-                                viewModel.showSuccessToast(
-                                    "Copied",
-                                    String {
-                                        "Copied the comment script\(withPlaceholders ? " with placeholders" : "") "
-                                        "to the clipboard"
-                                    }
-                                )
-                            }
-                        },
-                        focus: $focusedField,
-                        focusField: .commentScript
-                    )
-
-                    // Original post script output
-                    ScriptEditor(
-                        title: "Original post script:",
-                        script: $originalPostScript,
-                        minHeight: 24,
-                        maxHeight: 24 * accordionHeightRatio,
-                        canCopy: canCopyScripts,
-                        hasPlaceholders: scriptHasPlaceholders(originalPostScript),
-                        copy: { force, withPlaceholders in
-                            placeholderSheetCase = .originalPostScript
-                            if copyScript(
-                                originalPostScript,
-                                originalPostScriptPlaceholders,
-                                [featureScriptPlaceholders, commentScriptPlaceholders],
-                                force: force,
-                                withPlaceholders: withPlaceholders
-                            ) {
-                                logger.verbose("Copied original post script to clipboard", context: "User")
-                                viewModel.showSuccessToast(
-                                    "Copied",
-                                    String {
-                                        "Copied the original script\(withPlaceholders ? " with placeholders" : "") "
-                                        "to the clipboard"
-                                    }
-                                )
-                            }
-                        },
-                        focus: $focusedField,
-                        focusField: .originalPostScript
-                    )
-                }
-
-                // New membership
-                Group {
-                    // New membership picker and script output
-                    NewMembershipEditor(
-                        newMembership: $newMembership,
-                        script: $newMembershipScript,
-                        currentPage: $currentPage,
-                        minHeight: 36,
-                        maxHeight: 36 * accordionHeightRatio,
-                        onChanged: { newValue in
-                            newMembershipValidation = validateNewMembership(value: newMembership)
-                            newMembershipChanged(to: newValue)
-                        },
-                        valid: newMembershipValidation.valid && userNameValidation.valid,
-                        canCopy: canCopyNewMembershipScript,
-                        copy: {
-                            copyToClipboard(newMembershipScript)
-                            logger.verbose("Copied new membership script to clipboard", context: "User")
+                // Feature script output
+                ScriptEditor(
+                    title: "Feature script:",
+                    script: $featureScript,
+                    minHeight: 72,
+                    maxHeight: .infinity,
+                    canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(featureScript),
+                    copy: { force, withPlaceholders in
+                        placeholderSheetCase = .featureScript
+                        if copyScript(
+                            featureScript,
+                            featureScriptPlaceholders,
+                            [commentScriptPlaceholders, originalPostScriptPlaceholders],
+                            force: force,
+                            withPlaceholders: withPlaceholders
+                        ) {
+                            logger.verbose("Copied feature script to clipboard", context: "User")
                             viewModel.showSuccessToast(
                                 "Copied",
-                                "Copied the new membership script to the clipboard"
+                                String {
+                                    "Copied the feature script\(withPlaceholders ? " with placeholders" : "") "
+                                    "to the clipboard"
+                                }
                             )
-                        },
-                        focus: $focusedField,
-                        focusField: .newMembershipScript
-                    )
-                }
+                        }
+                    },
+                    focus: $focusedField,
+                    focusField: .featureScript
+                )
+
+                // Comment script output
+                ScriptEditor(
+                    title: "Comment script:",
+                    script: $commentScript,
+                    minHeight: 36,
+                    maxHeight: 36 * accordionHeightRatio,
+                    canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(commentScript),
+                    copy: { force, withPlaceholders in
+                        placeholderSheetCase = .commentScript
+                        if copyScript(
+                            commentScript,
+                            commentScriptPlaceholders,
+                            [featureScriptPlaceholders, originalPostScriptPlaceholders],
+                            force: force,
+                            withPlaceholders: withPlaceholders
+                        ) {
+                            logger.verbose("Copied comment script to clipboard", context: "User")
+                            viewModel.showSuccessToast(
+                                "Copied",
+                                String {
+                                    "Copied the comment script\(withPlaceholders ? " with placeholders" : "") "
+                                    "to the clipboard"
+                                }
+                            )
+                        }
+                    },
+                    focus: $focusedField,
+                    focusField: .commentScript
+                )
+
+                // Original post script output
+                ScriptEditor(
+                    title: "Original post script:",
+                    script: $originalPostScript,
+                    minHeight: 24,
+                    maxHeight: 24 * accordionHeightRatio,
+                    canCopy: canCopyScripts,
+                    hasPlaceholders: scriptHasPlaceholders(originalPostScript),
+                    copy: { force, withPlaceholders in
+                        placeholderSheetCase = .originalPostScript
+                        if copyScript(
+                            originalPostScript,
+                            originalPostScriptPlaceholders,
+                            [featureScriptPlaceholders, commentScriptPlaceholders],
+                            force: force,
+                            withPlaceholders: withPlaceholders
+                        ) {
+                            logger.verbose("Copied original post script to clipboard", context: "User")
+                            viewModel.showSuccessToast(
+                                "Copied",
+                                String {
+                                    "Copied the original script\(withPlaceholders ? " with placeholders" : "") "
+                                    "to the clipboard"
+                                }
+                            )
+                        }
+                    },
+                    focus: $focusedField,
+                    focusField: .originalPostScript
+                )
+
+                // New membership picker and script output
+                NewMembershipEditor(
+                    newMembership: $newMembership,
+                    script: $newMembershipScript,
+                    currentPage: $currentPage,
+                    minHeight: 36,
+                    maxHeight: 36 * accordionHeightRatio,
+                    onChanged: { newValue in
+                        newMembershipValidation = validateNewMembership(value: newMembership)
+                        newMembershipChanged(to: newValue)
+                    },
+                    valid: newMembershipValidation.validation != .error && userNameValidation.validation != .error,
+                    canCopy: canCopyNewMembershipScript,
+                    copy: {
+                        copyToClipboard(newMembershipScript)
+                        logger.verbose("Copied new membership script to clipboard", context: "User")
+                        viewModel.showSuccessToast(
+                            "Copied",
+                            "Copied the new membership script to the clipboard"
+                        )
+                    },
+                    focus: $focusedField,
+                    focusField: .newMembershipScript
+                )
             }
             .foregroundStyle(Color.label, Color.secondaryLabel)
             .padding()
-            .alert(
-                alertTitle,
-                isPresented: $showingAlert,
-                actions: {
-                },
-                message: {
-                    Text(alertMessage)
-                })
             .sheet(isPresented: $showingPlaceholderSheet) {
                 PlaceholderSheet(
                     placeholders: placeholderSheetCase == .featureScript
@@ -550,10 +342,237 @@ struct ContentView: View {
             }
         }
     }
+    
+    fileprivate func PageAndStaffLevelView() -> some View {
+        HStack {
+            // Page picker
+            if pageValidation.validation != .valid {
+                Image(systemName: pageValidation.validation.icon)
+                    .foregroundStyle(pageValidation.validation.iconColor1, pageValidation.validation.iconColor2)
+                    .help(pageValidation.reason ?? "unknown error")
+                    .imageScale(.small)
+            }
+            Text("Page: ")
+                .foregroundStyle(pageValidation.validation.color, Color.secondaryLabel)
+                .frame(width: 36, alignment: .leading)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            Picker("", selection: $currentPage.onChange { value in
+                if currentPage == nil {
+                    pageValidation = (.error, "Page is required")
+                } else {
+                    pageValidation = (.valid, nil)
+                }
+                pageChanged(to: value)
+            }) {
+                ForEach(loadedPages) { page in
+                    Text(page.displayName)
+                        .tag(page)
+                        .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
+                }
+            }
+            .tint(Color.accentColor)
+            .accentColor(Color.accentColor)
+            .foregroundStyle(Color.accentColor, Color.label)
+            .focusable()
+            .focused($focusedField, equals: .page)
+            .onAppear {
+                if currentPage == nil {
+                    pageValidation = (.error, "Page must not be 'default' or a page name is required")
+                } else {
+                    pageValidation = (.valid, nil)
+                }
+            }
 
+            // Page staff level picker
+            Text("Page staff level: ")
+                .padding([.leading], 8)
+                .lineLimit(1)
+                .truncationMode(.tail)
+            Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
+                ForEach(StaffLevelCase.casesFor(hub: currentPage?.hub)) { staffLevelCase in
+                    Text(staffLevelCase.rawValue)
+                        .tag(staffLevelCase)
+                        .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
+                }
+            }
+            .tint(Color.accentColor)
+            .accentColor(Color.accentColor)
+            .foregroundStyle(Color.accentColor, Color.label)
+            .focusable()
+            .focused($focusedField, equals: .staffLevel)
+        }
+    }
+
+    fileprivate func ModeratorView() -> some View {
+        HStack {
+            // Your name editor
+            FieldEditor(
+                title: "You:",
+                titleWidth: [42, 60],
+                placeholder: "Enter your user name without '@'",
+                field: $yourName,
+                fieldChanged: yourNameChanged,
+                fieldValidation: $yourNameValidation,
+                validate: { value in
+                    if value.count == 0 {
+                        return (.error, "Required value")
+                    } else if value.first! == "@" {
+                        return (.error, "Don't include the '@' in user names")
+                    } else if value.contains(" ") {
+                        return (.error, "Spaces are not allowed")
+                    }
+                    return (.valid, nil)
+                },
+                focus: $focusedField,
+                focusField: .yourName
+            )
+            
+            // Your first name editor
+            FieldEditor(
+                title: "Your first name:",
+                placeholder: "Enter your first name (capitalized)",
+                field: $yourFirstName,
+                fieldChanged: yourFirstNameChanged,
+                fieldValidation: $yourFirstNameValidation,
+                validate: { value in
+                    if value.count == 0 {
+                        return (.error, "Required value")
+                    }
+                    return (.valid, nil)
+                },
+                focus: $focusedField,
+                focusField: .yourFirstName
+            ).padding([.leading], 8)
+        }
+    }
+    
+    fileprivate func UserAndOptionsView() -> some View {
+        HStack {
+            // User name editor
+            FieldEditor(
+                title: "User: ",
+                titleWidth: [42, 60],
+                placeholder: "Enter user name without '@'",
+                field: $userName,
+                fieldChanged: userNameChanged,
+                fieldValidation: $userNameValidation,
+                validate: validateUserName,
+                focus: $focusedField,
+                focusField: .userName
+            )
+            
+            Button(action: {
+                if let postLink = stringFromClipboard(), postLink.starts(with: "https://vero.co/") {
+                    let possibleUserAlias = String(postLink.dropFirst(16).split(separator: "/").first ?? "")
+                    // If the user doesn't have an alias, the link will have a single letter, often 'p'
+                    if possibleUserAlias.count > 1 {
+                        logger.verbose("Using the link text for the user alias", context: "System")
+                        userName = possibleUserAlias
+                        userNameChanged(to: userName)
+                        userNameValidation = validateUserName(value: userName)
+                    } else {
+                        viewModel.showToast(.warning, "No user name", "The VERO post link did not contain a user name", duration: 4, modal: false)
+                    }
+                } else {
+                    viewModel.showToast(.warning, "Not VERO link", "Clipboard did not contain VERO post link", duration: 4, modal: false)
+                }
+            }) {
+                Label("Paste from post link", systemImage: "link")
+                    .padding(.horizontal, 8)
+            }
+            
+            // User level picker
+            if membershipValidation.validation != .valid {
+                Image(systemName: membershipValidation.validation.icon)
+                    .foregroundStyle(membershipValidation.validation.iconColor1, membershipValidation.validation.iconColor2)
+                    .help(membershipValidation.reason ?? "unknown error")
+                    .imageScale(.small)
+                    .padding([.leading], 8)
+            }
+            Text("Level: ")
+                .foregroundStyle(membershipValidation.validation.color, Color.secondaryLabel)
+                .frame(width: 36, alignment: .leading)
+                .padding([.leading], membershipValidation.validation == .valid ? 8 : 0)
+            Picker("", selection: $membership.onChange { value in
+                membershipValidation = validateMembership(value: membership)
+                membershipChanged(to: value)
+            }) {
+                ForEach(MembershipCase.casesFor(hub: currentPage?.hub)) { level in
+                    Text(level.rawValue)
+                        .tag(level)
+                        .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
+                }
+            }
+            .tint(Color.accentColor)
+            .accentColor(Color.accentColor)
+            .foregroundStyle(Color.accentColor, Color.label)
+            .onAppear {
+                membershipValidation = validateMembership(value: membership)
+            }
+            .focusable()
+            .focused($focusedField, equals: .level)
+            
+            // Options
+            Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
+                Text("First feature on page")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            .focusable()
+            .focused($focusedField, equals: .firstFeature)
+            .padding([.leading], 8)
+            .help("First feature on page")
+            
+            if currentPage?.hub == "click" {
+                Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                    Text("From community tag")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+                .focusable()
+                .focused($focusedField, equals: .communityTag)
+                .padding([.leading], 8)
+                .help("From community tag")
+                
+                Toggle(isOn: $fromHubTag.onChange(fromHubTagChanged)) {
+                    Text("From hub tag")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+                .focusable()
+                .focused($focusedField, equals: .hubTag)
+                .padding([.leading], 8)
+                .help("From hub tag")
+            } else if currentPage?.hub == "snap" {
+                Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
+                    Text("From RAW tag")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+                .focusable()
+                .focused($focusedField, equals: .rawTag)
+                .padding([.leading], 8)
+                .help("From RAW tag")
+                
+                Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                    Text("From community tag")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+                .focusable()
+                .focused($focusedField, equals: .communityTag)
+                .padding([.leading], 8)
+                .help("From community tag")
+            }
+            
+            Spacer()
+        }
+    }
+    
     private func updateStaffLevelForPage() {
-        if !page.isEmpty {
-            if let rawPageStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel_" + page) {
+        if let currentPage {
+            if let rawPageStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel_" + currentPage.displayName) {
                 if let pageStaffLevelFromRaw = StaffLevelCase(rawValue: rawPageStaffLevel) {
                     pageStaffLevel = pageStaffLevelFromRaw
                     return
@@ -576,8 +595,8 @@ struct ContentView: View {
     }
 
     private func storeStaffLevelForPage() {
-        if !page.isEmpty {
-            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel_" + page)
+        if let currentPage {
+            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel_" + currentPage.displayName)
         } else {
             UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
         }
@@ -609,6 +628,14 @@ struct ContentView: View {
                 return "\($0.hub)_\($0.name)" < "\($1.hub)_\($1.name)"
             }))
 
+            let page = UserDefaults.standard.string(forKey: "Page") ?? ""
+            currentPage = loadedPages.first(where: { $0.displayName == page }) ?? loadedPages.first
+            if currentPage == nil {
+                pageValidation = (.error, "Page must not be 'default' or a page name is required")
+            } else {
+                pageValidation = (.valid, nil)
+            }
+
             logger.verbose("Loaded page catalog from server with \(loadedPages.count) pages", context: "System")
 
             updateStaffLevelForPage()
@@ -627,23 +654,37 @@ struct ContentView: View {
             logger.verbose("Loaded template catalog from server with \(templatesCatalog.pages.count) page templates", context: "System")
 
             do {
-                // Delay the start of the disallowed list download so the window can be ready faster
+                // Delay the start of the disallowed lists download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 1_000_000_000)
 
-                logger.verbose("Loading disallow list from server", context: "System")
+                logger.verbose("Loading disallow lists from server", context: "System")
 
-                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
-                disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
-                updateScripts()
-                updateNewMembershipScripts()
+                let disallowListsUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlists.json")!
+                disallowLists = try await URLSession.shared.decode([String: [String]].self, from: disallowListsUrl)
 
-                logger.verbose("Loaded disallow list from server with \(disallowList.count) entries", context: "System")
+                logger.verbose("Loaded disallow lists from server with \(disallowLists.count) entries", context: "System")
             } catch {
                 // do nothing, the disallow list is not critical
                 logger.error("Failed to load disallow list from server: \(error.localizedDescription)", context: "System")
                 debugPrint(error.localizedDescription)
             }
 
+            do {
+                logger.verbose("Loading caution lists from server", context: "System")
+
+                let cautionListsUrl = URL(string: "https://vero.andydragon.com/static/data/cautionlists.json")!
+                cautionLists = try await URLSession.shared.decode([String: [String]].self, from: cautionListsUrl)
+
+                logger.verbose("Loaded caution lists from server with \(cautionLists.count) entries", context: "System")
+            } catch {
+                // do nothing, the caution lists is not critical
+                logger.error("Failed to load caution lists from server: \(error.localizedDescription)", context: "System")
+                debugPrint(error.localizedDescription)
+            }
+
+            updateScripts()
+            updateNewMembershipScripts()
+            
 #if STANDALONE
             do {
                 // Delay the start of the disallowed list download so the window can be ready faster
@@ -704,14 +745,14 @@ struct ContentView: View {
         }
     }
 
-    private func validateMembership(value: MembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateMembership(value: MembershipCase) -> (validation: ValidationResult, reason: String?) {
         if value == MembershipCase.none {
-            return (false, "Required value")
+            return (.error, "Required value")
         }
         if !MembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (false, "Not a valid value")
+            return (.error, "Not a valid value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func userNameChanged(to value: String) {
@@ -723,15 +764,19 @@ struct ContentView: View {
         }
     }
 
-    private func validateUserName(value: String) -> (valid: Bool, reason: String?) {
+    private func validateUserName(value: String) -> (validation: ValidationResult, reason: String?) {
         if value.count == 0 {
-            return (false, "Required value")
+            return (.error, "Required value")
         } else if value.first! == "@" {
-            return (false, "Don't include the '@' in user names")
-        } else if (disallowList.first { disallow in disallow == value } != nil) {
-            return (false, "User is on the disallow list")
+            return (.error, "Don't include the '@' in user names")
+        } else if (disallowLists[currentPage?.hub ?? ""]?.first { disallow in disallow == value } != nil) {
+            return (.error, "User is on the disallow list")
+        } else if (cautionLists[currentPage?.hub ?? ""]?.first { caution in caution == value } != nil) {
+            return (.warning, "User is on the caution list")
+        } else if value.contains(" ") {
+            return (.error, "Spaces are not allowed")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func yourNameChanged(to value: String) {
@@ -739,7 +784,7 @@ struct ContentView: View {
             clearPlaceholders()
             UserDefaults.standard.set(yourName, forKey: "YourName")
             updateScripts()
-            updateNewMembershipScripts()
+        updateNewMembershipScripts()
             lastYourName = value
         }
     }
@@ -754,11 +799,17 @@ struct ContentView: View {
         }
     }
 
-    private func pageChanged(to value: String) {
+    private func pageChanged(to value: LoadedPage?) {
         if value != lastPage {
             clearPlaceholders()
-            UserDefaults.standard.set(page, forKey: "Page")
+            UserDefaults.standard.set(currentPage?.displayName, forKey: "Page")
             updateStaffLevelForPage()
+            userNameValidation = validateUserName(value: userName)
+            if !MembershipCase.caseValidFor(hub: currentPage?.hub, membership) {
+                membership = .none
+                membershipValidation = validateMembership(value: membership)
+                membershipChanged(to: membership)
+            }
             updateScripts()
             updateNewMembershipScripts()
             lastPage = value
@@ -801,11 +852,11 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    private func validateNewMembership(value: NewMembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateNewMembership(value: NewMembershipCase) -> (validation: ValidationResult, reason: String?) {
         if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (false, "Not a valid value")
+            return (.error, "Not a valid value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func copyScript(
@@ -930,86 +981,55 @@ struct ContentView: View {
     }
 
     private func updateScripts() -> Void {
-        var currentPageName = page
-        var scriptPageName = currentPageName
-        var scriptPageHash = currentPageName
-        var scriptPageTitle = currentPageName
-        let currentHubName = currentPage?.hub
-        var membershipString = membership.rawValue
-        if currentPageName != "" {
-            let pageSource = loadedPages.first(where: { needle in needle.id == page })
-            if pageSource != nil {
-                currentPageName = pageSource?.name ?? page
-                scriptPageName = currentPageName
-                scriptPageHash = currentPageName
-                scriptPageTitle = currentPageName
-                if pageSource?.title != nil {
-                    scriptPageTitle = (pageSource?.title)!
-                }
-                if pageSource?.pageName != nil {
-                    scriptPageName = (pageSource?.pageName)!
-                }
-                if pageSource?.hashTag != nil {
-                    scriptPageHash = (pageSource?.hashTag)!
-                }
-            }
-            currentPage = pageSource
-            membershipString = membership.scriptMembershipStringForHub(hub: currentPage?.hub)
-        } else {
-            currentPage = nil
-        }
-        // There was a hub change, re-validate the membership and new membership
-        if currentPage?.hub != currentHubName {
-            membership = MembershipCase.none
-            membershipString = membership.scriptMembershipStringForHub(hub: currentPage?.hub)
-            lastMembership = membership
-            membershipValidation = validateMembership(value: membership)
-            newMembership = NewMembershipCase.none
-            newMembershipValidation = validateNewMembership(value: newMembership)
-            newMembershipChanged(to: newMembership)
-        }
         if !canCopyScripts {
             var validationErrors = ""
-            if !userNameValidation.valid {
+            if userNameValidation.validation != .valid {
                 validationErrors += "User: " + userNameValidation.reason! + "\n"
             }
-            if !membershipValidation.valid {
+            if membershipValidation.validation != .valid {
                 validationErrors += "Level: " + membershipValidation.reason! + "\n"
             }
-            if !yourNameValidation.valid {
+            if yourNameValidation.validation != .valid {
                 validationErrors += "You: " + yourNameValidation.reason! + "\n"
             }
-            if !yourFirstNameValidation.valid {
+            if yourFirstNameValidation.validation != .valid {
                 validationErrors += "Your first name: " + yourFirstNameValidation.reason! + "\n"
             }
-            if !pageValidation.valid {
+            if pageValidation.validation != .valid {
                 validationErrors += "Page: " + pageValidation.reason! + "\n"
             }
             featureScript = validationErrors
             originalPostScript = ""
             commentScript = ""
-        } else {
+        } else if let currentPage {
+            let currentPageName = currentPage.id
+            let currentPageDisplayName = currentPage.name
+            let scriptPageName = currentPage.pageName ?? currentPageDisplayName
+            let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
+            let scriptPageTitle = currentPage.title ?? currentPageDisplayName
+            let membershipString = membership.rawValue
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
-                from: page,
+                from: currentPage.id,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag,
                 hubTag: fromHubTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
-                from: page,
+                from: currentPage.id,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag,
                 hubTag: fromHubTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
-                from: page,
+                from: currentPage.id,
                 firstFeature: firstForPage,
                 rawTag: fromRawTag,
                 communityTag: fromCommunityTag,
                 hubTag: fromHubTag) ?? ""
+            
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
@@ -1140,41 +1160,21 @@ struct ContentView: View {
         if !canCopyNewMembershipScript {
             var validationErrors = ""
             if newMembership != NewMembershipCase.none {
-                if !userNameValidation.valid {
+                if userNameValidation.validation != .valid {
                     validationErrors += "User: " + userNameValidation.reason! + "\n"
                 }
-                if !newMembershipValidation.valid {
+                if newMembershipValidation.validation != .valid {
                     validationErrors += "New level: " + newMembershipValidation.reason! + "\n"
                 }
             }
             newMembershipScript = validationErrors
-        } else {
-            var currentPageName = page
-            var scriptPageName = currentPageName
-            var scriptPageHash = currentPageName
-            var scriptPageTitle = currentPageName
-            if currentPageName != "" {
-                let pageSource = loadedPages.first(where: { needle in needle.id == page })
-                if pageSource != nil {
-                    currentPageName = pageSource?.name ?? page
-                    scriptPageName = currentPageName
-                    scriptPageHash = currentPageName
-                    scriptPageTitle = currentPageName
-                    if pageSource?.title != nil {
-                        scriptPageTitle = (pageSource?.title)!
-                    }
-                    if pageSource?.pageName != nil {
-                        scriptPageName = (pageSource?.pageName)!
-                    }
-                    if pageSource?.hashTag != nil {
-                        scriptPageHash = (pageSource?.hashTag)!
-                    }
-                }
-                currentPage = pageSource
-            } else {
-                currentPage = nil
-            }
-            let templateName = NewMembershipCase.scriptFor(hub: currentPage?.hub, newMembership)
+        } else if canCopyNewMembershipScript, let currentPage {
+            let currentPageName = currentPage.id
+            let currentPageDisplayName = currentPage.name
+            let scriptPageName = currentPage.pageName ?? currentPageDisplayName
+            let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
+            let scriptPageTitle = currentPage.title ?? currentPageDisplayName
+            let templateName = NewMembershipCase.scriptFor(hub: currentPage.hub, newMembership)
             let template = templatesCatalog.specialTemplates.first(where: { template in
                 template.name == templateName
             })
@@ -1191,6 +1191,8 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
                 .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
                 .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+        } else {
+            newMembershipScript = ""
         }
     }
 }

@@ -21,8 +21,8 @@ struct ScriptEditor: View {
             Button(action: {
                 copy(true, false)
             }) {
-                Text("Copy")
-                    .padding(.horizontal, 20)
+                Label("Copy", systemImage: "list.clipboard")
+                    .padding(.horizontal, 4)
             }
             .buttonStyle(.bordered)
 

@@ -13,12 +13,12 @@ struct FieldEditor: View {
     var placeholder: String
     @Binding var field: String
     var fieldChanged: (_ to: String) -> Void
-    @Binding var fieldValidation: (valid: Bool, reason: String?)
-    var validate: (String) -> (valid: Bool, reason: String?) = { value in
+    @Binding var fieldValidation: (validation: ValidationResult, reason: String?)
+    var validate: (String) -> (validation: ValidationResult, reason: String?) = { value in
         if value.count == 0 {
-            return (false, "Required value")
+            return (.error, "Required value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
     var focus: FocusState<FocusedField?>.Binding
     var focusField: FocusedField
@@ -26,9 +26,9 @@ struct FieldEditor: View {
     var body: some View {
         HStack {
             // Title validator
-            if !fieldValidation.valid {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(Color.accentColor, Color.red)
+            if fieldValidation.validation != .valid {
+                Image(systemName: fieldValidation.validation.icon)
+                    .foregroundStyle(fieldValidation.validation.iconColor1, fieldValidation.validation.iconColor2)
                     .help(fieldValidation.reason ?? "")
                     .imageScale(.small)
             }
@@ -37,16 +37,12 @@ struct FieldEditor: View {
             if title.count != 0 {
                 if titleWidth.isEmpty {
                     Text(title)
-                        .foregroundStyle(fieldValidation.valid ?
-                                         Color.label : Color.red,
-                                         Color.secondaryLabel)
+                        .foregroundStyle(fieldValidation.validation.color, Color.secondaryLabel)
                         .lineLimit(1)
                         .truncationMode(.tail)
                 } else {
                     Text(title)
-                        .foregroundStyle(fieldValidation.valid ?
-                                         Color.label : Color.red,
-                                         Color.secondaryLabel)
+                        .foregroundStyle(fieldValidation.validation.color, Color.secondaryLabel)
                         .frame(width: titleWidth[0], alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)

@@ -7,6 +7,46 @@
 
 import SwiftUI
 
+enum ValidationResult: String {
+    case valid = "Valid"
+    case warning = "Warning"
+    case error = "Error"
+}
+
+extension ValidationResult {
+    var color: Color {
+        switch self {
+        case .error: return Color.red
+        case .warning: return Color.yellow
+        case .valid: return Color(UIColor.label)
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .error: return "exclamationmark.triangle.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .valid: return ""
+        }
+    }
+
+    var iconColor1: Color {
+        switch self {
+        case .error: return .white
+        case .warning: return .black
+        case .valid: return .clear
+        }
+    }
+
+    var iconColor2: Color {
+        switch self {
+        case .error: return .red
+        case .warning: return .yellow
+        case .valid: return .clear
+        }
+    }
+}
+
 enum MembershipCase: String, CaseIterable, Identifiable, Codable {
     case none = "None"
 

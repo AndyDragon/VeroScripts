@@ -33,21 +33,22 @@ struct ContentView: View {
     @State private var loadedPages = [LoadedPage]()
     @State private var waitingForTemplates = true
     @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
-    @State private var disallowList = [String]()
-    
+    @State private var disallowLists = [String:[String]]()
+    @State private var cautionLists = [String:[String]]()
+
     @State private var currentPage: LoadedPage? = nil
-    @State private var pageValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var pageValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var pageStaffLevel = StaffLevelCase.mod
     
     @State private var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
-    @State private var yourNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var yourNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
-    @State private var yourFirstNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var yourFirstNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     
     @State private var userName = ""
-    @State private var userNameValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var userNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var membership = MembershipCase.none
-    @State private var membershipValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var membershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var firstForPage = false
     @State private var fromCommunityTag = false
     @State private var fromHubTag = false
@@ -60,7 +61,7 @@ struct ContentView: View {
     @State private var originalPostScript = ""
     
     @State private var newMembership = NewMembershipCase.none
-    @State private var newMembershipValidation: (valid: Bool, reason: String?) = (true, nil)
+    @State private var newMembershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var newMembershipScript = ""
     
     @State private var placeholderSheetCase = PlaceholderSheetCase.featureScript
@@ -73,16 +74,16 @@ struct ContentView: View {
     @State private var scriptWithPlaceholders = ""
     
     private var canCopyScripts: Bool {
-        return membershipValidation.valid
-        && userNameValidation.valid
-        && yourNameValidation.valid
-        && yourFirstNameValidation.valid
-        && pageValidation.valid
+        return membershipValidation.validation != .error
+        && userNameValidation.validation != .error
+        && yourNameValidation.validation != .error
+        && yourFirstNameValidation.validation != .error
+        && pageValidation.validation != .error
     }
     private var canCopyNewMembershipScript: Bool {
         return newMembership != NewMembershipCase.none
-        && newMembershipValidation.valid
-        && userNameValidation.valid
+        && newMembershipValidation.validation != .error
+        && userNameValidation.validation != .error
     }
     private let logger = SwiftyBeaver.self
     
@@ -440,26 +441,23 @@ struct ContentView: View {
     fileprivate func PageAndStaffView() -> some View {
         VStack(alignment: .leading) {
             HStack {
-                // Page picker
-                if !pageValidation.valid {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(Color.accentColor, Color.red)
+                if pageValidation.validation != .valid {
+                    Image(systemName: pageValidation.validation.icon)
+                        .foregroundStyle(pageValidation.validation.iconColor1, pageValidation.validation.iconColor2)
                         .help(pageValidation.reason ?? "unknown error")
                         .imageScale(.small)
                 }
-                Text("Feature page: ")
-                    .foregroundStyle(
-                        pageValidation.valid ? Color(UIColor.label) : Color.red,
-                        Color(UIColor.secondaryLabel))
+                Text("Page: ")
+                    .foregroundStyle(pageValidation.validation.color, Color(UIColor.secondaryLabel))
                 Spacer()
             }
             .frame(maxWidth: .infinity)
             
             Picker("Page:", selection: $currentPage.onChange { value in
                 if currentPage == nil {
-                    pageValidation = (false, "Page is required")
+                    pageValidation = (.error, "Page is required")
                 } else {
-                    pageValidation = (true, nil)
+                    pageValidation = (.valid, nil)
                 }
                 currentPageChanged(to: value)
             }) {
@@ -471,9 +469,9 @@ struct ContentView: View {
             }
             .onAppear {
                 if currentPage == nil {
-                    pageValidation = (false, "Page is required")
+                    pageValidation = (.error, "Page is required")
                 } else {
-                    pageValidation = (true, nil)
+                    pageValidation = (.valid, nil)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -503,13 +501,13 @@ struct ContentView: View {
                 fieldValidation: $yourNameValidation,
                 validate: { value in
                     if value.count == 0 {
-                        return (false, "Required value")
+                        return (.error, "Required value")
                     } else if value.first! == "@" {
-                        return (false, "Don't include the '@' in user names")
+                        return (.error, "Don't include the '@' in user names")
                     } else if value.contains(" ") {
-                        return (false, "Spaces are not allowed")
+                        return (.error, "Spaces are not allowed")
                     }
-                    return (true, nil)
+                    return (.valid, nil)
                 }
             )
             .frame(maxWidth: .infinity)
@@ -523,9 +521,9 @@ struct ContentView: View {
                 fieldValidation: $yourFirstNameValidation,
                 validate: { value in
                     if value.count == 0 {
-                        return (false, "Required value")
+                        return (.error, "Required value")
                     }
-                    return (true, nil)
+                    return (.valid, nil)
                 }
             )
             .frame(maxWidth: .infinity)
@@ -562,6 +560,7 @@ struct ContentView: View {
                 }
             }) {
                 Label("Paste from post link", systemImage: "link")
+                    .padding(.horizontal, 4)
             }
             .buttonStyle(.bordered)
             
@@ -569,21 +568,26 @@ struct ContentView: View {
 
             // User level picker
             HStack {
-                if !membershipValidation.valid {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(Color.accentColor, Color.red)
+                if membershipValidation.validation != .valid {
+                    Image(systemName: membershipValidation.validation.icon)
+                        .foregroundStyle(membershipValidation.validation.iconColor1, membershipValidation.validation.iconColor2)
                         .help(membershipValidation.reason ?? "unknown error")
                         .imageScale(.small)
+                        .padding([.leading], 8)
                 }
                 Text("Level: ")
-                    .foregroundStyle(
-                        membershipValidation.valid ? Color(UIColor.label) : Color.red,
-                        Color(UIColor.secondaryLabel))
+                    .foregroundStyle(membershipValidation.validation.color, Color(UIColor.secondaryLabel))
                 
                 Spacer()
             }
             .frame(maxWidth: .infinity)
             
+            if membershipValidation.validation != .valid {
+                Text(membershipValidation.reason ?? "")
+                    .font(.footnote)
+                    .foregroundStyle(membershipValidation.validation.color)
+            }
+
             Picker("", selection: $membership.onChange { value in
                 membershipValidation = validateMembership(value: membership)
                 membershipChanged(to: value)
@@ -741,7 +745,7 @@ struct ContentView: View {
                         newMembershipValidation = validateNewMembership(value: newMembership)
                         newMembershipChanged(to: newValue)
                     },
-                    valid: newMembershipValidation.valid && userNameValidation.valid,
+                    valid: newMembershipValidation.validation != .error && userNameValidation.validation != .error,
                     canCopy: canCopyNewMembershipScript,
                     copy: {
                         copyToClipboard(newMembershipScript)
@@ -816,6 +820,11 @@ struct ContentView: View {
 
             let page = UserDefaults.standard.string(forKey: "Page") ?? ""
             currentPage = loadedPages.first(where: { $0.displayName == page }) ?? loadedPages.first
+            if currentPage == nil {
+                pageValidation = (.error, "Page must not be 'default' or a page name is required")
+            } else {
+                pageValidation = (.valid, nil)
+            }
 
             logger.verbose("Loaded page catalog from server with \(loadedPages.count) pages", context: "System")
 
@@ -838,19 +847,33 @@ struct ContentView: View {
                 // Delay the start of the disallowed list download so the window can be ready faster
                 try await Task.sleep(nanoseconds: 1_000_000_000)
 
-                logger.verbose("Loading disallow list from server", context: "System")
+                logger.verbose("Loading disallow lists from server", context: "System")
 
-                let disallowListUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlist.json")!
-                disallowList = try await URLSession.shared.decode([String].self, from: disallowListUrl)
-                updateScripts()
-                updateNewMembershipScripts()
+                let disallowListsUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlists.json")!
+                disallowLists = try await URLSession.shared.decode([String: [String]].self, from: disallowListsUrl)
 
-                logger.verbose("Loaded disallow list from server with \(disallowList.count) entries", context: "System")
+                logger.verbose("Loaded disallow lists from server with \(disallowLists.count) entries", context: "System")
             } catch {
-                // do nothing, the disallow list is not critical
-                logger.error("Failed to load disallow list from server: \(error.localizedDescription)", context: "System")
+                // do nothing, the disallow lists is not critical
+                logger.error("Failed to load disallow lists from server: \(error.localizedDescription)", context: "System")
                 debugPrint(error.localizedDescription)
             }
+
+            do {
+                logger.verbose("Loading caution lists from server", context: "System")
+
+                let cautionListsUrl = URL(string: "https://vero.andydragon.com/static/data/cautionlists.json")!
+                cautionLists = try await URLSession.shared.decode([String: [String]].self, from: cautionListsUrl)
+
+                logger.verbose("Loaded caution lists from server with \(cautionLists.count) entries", context: "System")
+            } catch {
+                // do nothing, the caution lists is not critical
+                logger.error("Failed to load caution lists from server: \(error.localizedDescription)", context: "System")
+                debugPrint(error.localizedDescription)
+            }
+
+            updateScripts()
+            updateNewMembershipScripts()
         } catch {
             logger.error("Failed to load page catalog or template catalog from server: \(error.localizedDescription)", context: "System")
             viewModel.dismissAllNonBlockingToasts(includeProgress: true)
@@ -897,14 +920,14 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    private func validateMembership(value: MembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateMembership(value: MembershipCase) -> (validation: ValidationResult, reason: String?) {
         if value == MembershipCase.none {
-            return (false, "Required value")
+            return (.error, "Required value")
         }
         if !MembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (false, "Not a valid value")
+            return (.error, "Not a valid value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func userNameChanged(to value: String) {
@@ -913,17 +936,19 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    private func validateUserName(value: String) -> (valid: Bool, reason: String?) {
+    private func validateUserName(value: String) -> (validation: ValidationResult, reason: String?) {
         if value.count == 0 {
-            return (false, "Required value")
+            return (.error, "Required value")
         } else if value.first! == "@" {
-            return (false, "Don't include the '@' in user names")
-        } else if (disallowList.first { disallow in disallow == value } != nil) {
-            return (false, "User is on the disallow list")
+            return (.error, "Don't include the '@' in user names")
+        } else if (disallowLists[currentPage?.hub ?? ""]?.first { disallow in disallow == value } != nil) {
+            return (.error, "User is on the disallow list")
+        } else if (cautionLists[currentPage?.hub ?? ""]?.first { caution in caution == value } != nil) {
+            return (.warning, "User is on the caution list")
         } else if value.contains(" ") {
-            return (false, "Spaces are not allowed")
+            return (.error, "Spaces are not allowed")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func yourNameChanged(to value: String) {
@@ -944,13 +969,14 @@ struct ContentView: View {
         clearPlaceholders()
         UserDefaults.standard.set(currentPage?.displayName, forKey: "Page")
         updateStaffLevelForPage()
-        updateScripts()
-        updateNewMembershipScripts()
+        userNameValidation = validateUserName(value: userName)
         if !MembershipCase.caseValidFor(hub: currentPage?.hub, membership) {
             membership = .none
             membershipValidation = validateMembership(value: membership)
             membershipChanged(to: membership)
         }
+        updateScripts()
+        updateNewMembershipScripts()
     }
 
     private func pageStaffLevelChanged(to value: StaffLevelCase) {
@@ -984,11 +1010,11 @@ struct ContentView: View {
         updateNewMembershipScripts()
     }
 
-    private func validateNewMembership(value: NewMembershipCase) -> (valid: Bool, reason: String?) {
+    private func validateNewMembership(value: NewMembershipCase) -> (validation: ValidationResult, reason: String?) {
         if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (false, "Not a valid value")
+            return (.error, "Not a valid value")
         }
-        return (true, nil)
+        return (.valid, nil)
     }
 
     private func copyScript(
