@@ -73,7 +73,7 @@ export const links: Record<Platform, Links | undefined> = {
         actions: [
             {
                 action: "install from app store",
-                target: "",
+                target: "_blank",
                 suffix: "",
             }
         ]
@@ -84,7 +84,7 @@ export const links: Record<Platform, Links | undefined> = {
         actions: [
             {
                 action: "install from app store",
-                target: "",
+                target: "_blank",
                 suffix: "",
             }
         ]
@@ -110,7 +110,7 @@ export const links: Record<Platform, Links | undefined> = {
         actions: [
             {
                 action: "install from app store",
-                target: "",
+                target: "_blank",
                 suffix: "",
             }
         ]
