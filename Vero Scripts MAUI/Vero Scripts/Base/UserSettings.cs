@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 
 namespace VeroScripts.Base;
