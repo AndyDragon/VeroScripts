@@ -25,6 +25,7 @@
     </ContentPage.Resources>
 
     <Grid
+        x:Name="MainGrid"
         Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

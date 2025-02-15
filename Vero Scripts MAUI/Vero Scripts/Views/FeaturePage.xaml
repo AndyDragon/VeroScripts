@@ -24,6 +24,7 @@
     </ContentPage.Resources>
 
     <ScrollView
+        x:Name="MainScrollView"
         Orientation="Vertical">
         <Grid
             Margin="20,0,20,20"
@@ -225,10 +226,10 @@
                 <Label 
                     Grid.Row="1"
                     Grid.ColumnSpan="3"
-                    Text="{Binding UserNameValidation.Message}"
+                    Text="{Binding MembershipValidation.Message}"
                     TextColor="{Binding MembershipValidation, Converter={StaticResource ValidationResultColorConverter}}"
                     FontSize="11"
-                    IsVisible="{Binding UserNameValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
+                    IsVisible="{Binding MembershipValidation, Converter={StaticResource ValidationResultVisibilityConverter}}" />
             </Grid>
             
             <Border 
@@ -288,12 +289,6 @@
                     VerticalOptions="Center"
                     Text="From hub tag" />
             </Grid> 
-            <!-- -->
-            <!-- <Button -->
-            <!--     Grid.Row="15" -->
-            <!--     Text="Feature script" -->
-            <!--     Command="{Binding FeatureScriptCommand}" -->
-            <!--     IsVisible="{Binding HasSelectedPage}" /> -->
         </Grid>
     </ScrollView>
     

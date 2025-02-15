@@ -182,7 +182,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error occurred loading page catalog (will retry): {0}", ex.Message);
+            Console.WriteLine("IsError occurred loading page catalog (will retry): {0}", ex.Message);
             await Toast.Make($"Failed to load the page catalog: {ex.Message}", ToastDuration.Long).Show();
             Application.Current!.Quit();
         }
@@ -206,7 +206,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error occurred loading the template catalog (will retry): {0}", ex.Message);
+            Console.WriteLine("IsError occurred loading the template catalog (will retry): {0}", ex.Message);
             await Toast.Make($"Failed to load the page templates: {ex.Message}", ToastDuration.Long).Show();
             Application.Current!.Quit();
         }
@@ -221,18 +221,25 @@ public class FeatureViewModel : NotifyPropertyChanged
             {
                 NoCache = true
             };
-            var templatesUri = new Uri("https://vero.andydragon.com/static/data/disallowlists.json");
-            var content = await _httpClient.GetStringAsync(templatesUri);
-            if (!string.IsNullOrEmpty(content))
+            var disallowListsUri = new Uri("https://vero.andydragon.com/static/data/disallowlists.json");
+            var disallowListsContent = await _httpClient.GetStringAsync(disallowListsUri);
+            if (!string.IsNullOrEmpty(disallowListsContent))
             {
-                Validation.DisallowList =
-                    JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(content) ?? [];
+                Validation.DisallowLists =
+                    JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(disallowListsContent) ?? [];
+            }
+            var cautionListsUri = new Uri("https://vero.andydragon.com/static/data/cautionlists.json");
+            var cautionListsContent = await _httpClient.GetStringAsync(cautionListsUri);
+            if (!string.IsNullOrEmpty(cautionListsContent))
+            {
+                Validation.CautionLists =
+                    JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(cautionListsContent) ?? [];
             }
         }
         catch (Exception ex)
         {
             // Do nothing, not vital
-            Console.WriteLine("Error occurred loading the disallow lists (ignoring): {0}", ex.Message);
+            Console.WriteLine("IsError occurred loading the disallow or caution lists (ignoring): {0}", ex.Message);
         }
     }
 
@@ -278,6 +285,7 @@ public class FeatureViewModel : NotifyPropertyChanged
                 {
                     StaffLevel = StaffLevels[0];
                 }
+                UserNameValidation = Validation.ValidateUser(SelectedPage!.HubName, UserName);
             }
         }
     }
@@ -894,15 +902,15 @@ public class FeatureViewModel : NotifyPropertyChanged
     #region Script management
 
     public bool CanCopyScripts =>
-        UserNameValidation.Valid &&
-        MembershipValidation.Valid &&
-        YourAliasValidation.Valid &&
-        YourFirstNameValidation.Valid &&
-        PageValidation.Valid;
+        !UserNameValidation.IsError &&
+        !MembershipValidation.IsError &&
+        !YourAliasValidation.IsError &&
+        !YourFirstNameValidation.IsError &&
+        !PageValidation.IsError;
 
     public bool CanCopyNewMembershipScript =>
         NewMembership != "None" &&
-        UserNameValidation.Valid;
+        !UserNameValidation.IsError;
 
     private void UpdateScripts()
     {
@@ -948,7 +956,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
             void CheckValidation(string prefix, ValidationResult result)
             {
-                if (!result.Valid)
+                if (!result.IsValid)
                 {
                     validationErrors += prefix + ": " + (result.Message ?? "unknown") + "\n";
                 }
@@ -1088,7 +1096,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
             void CheckValidation(string prefix, ValidationResult result)
             {
-                if (!result.Valid)
+                if (!result.IsValid)
                 {
                     validationErrors += prefix + ": " + (result.Message ?? "unknown") + "\n";
                 }
@@ -1197,7 +1205,7 @@ public class FeatureViewModel : NotifyPropertyChanged
         else if (CheckForPlaceholders(script, force))
         {
             var editor = new PlaceholderEditor(this, script);
-            Application.Current?.Windows[0].Navigation.PushAsync(editor);
+            Application.Current?.Windows[0].Page?.Navigation.PushAsync(editor);
         }
         else
         {

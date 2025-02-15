@@ -37,8 +37,8 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <Configurations>Release;Debug</Configurations>
-        <ReleaseVersion>1.0.2</ReleaseVersion>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <ReleaseVersion>1.0.3</ReleaseVersion>
+        <AssemblyVersion>1.0.3</AssemblyVersion>
     </PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -80,6 +80,12 @@
       <None Update="Platforms\Android\Resources\drawable\maui_splash.xml">
         <SubType>Designer</SubType>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Mono.Android">
+        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.Android.Ref.35\35.0.39\ref\net9.0\Mono.Android.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

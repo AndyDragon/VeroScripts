@@ -20,6 +20,7 @@
     </ContentPage.Resources>
 
     <Grid
+        x:Name="MainGrid"
         Margin="20"
         RowDefinitions="Auto, Auto, Auto, *">
 

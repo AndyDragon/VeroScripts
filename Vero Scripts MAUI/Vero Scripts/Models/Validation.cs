@@ -2,19 +2,23 @@ namespace VeroScripts.Models;
 
 public static class Validation
 {
-    public static Dictionary<string, List<string>> DisallowList { get; set; } = [];
+    public static Dictionary<string, List<string>> DisallowLists { get; set; } = [];
+    public static Dictionary<string, List<string>> CautionLists { get; set; } = [];
 
     #region Field validation
 
     public static ValidationResult ValidateUser(string hubName, string userName, ValidationLevel failLevel = ValidationLevel.Error)
     {
         var userNameValidationResult = ValidateUserName(userName);
-        return !userNameValidationResult.Valid
+        return !userNameValidationResult.IsValid
             ? userNameValidationResult
-            : DisallowList.TryGetValue(hubName, out var value) &&
-              value.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null
+            : DisallowLists.TryGetValue(hubName, out var disallowList) &&
+              disallowList.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null
                 ? new ValidationResult(failLevel, "User is on the disallow list")
-                : new ValidationResult();
+                : CautionLists.TryGetValue(hubName, out var cautionList) &&
+                  cautionList.FirstOrDefault(caution => string.Equals(caution, userName, StringComparison.OrdinalIgnoreCase)) != null
+                    ? new ValidationResult(ValidationLevel.Warning, "User is on the caution list")
+                    : new ValidationResult();
     }
 
     public static ValidationResult ValidateValueNotEmpty(string value, ValidationLevel failLevel = ValidationLevel.Error)
@@ -44,20 +48,20 @@ public static class Validation
             ? new ValidationResult(failLevel, "Required value")
             : userName.StartsWith('@')
                 ? new ValidationResult(failLevel, "Don't include the '@' in user names")
-                : userName.Length <= 1
-                    ? new ValidationResult(failLevel, "User name should be more than 1 character long")
-                    : ValidateValueNotEmptyAndContainsNoNewlines(userName, failLevel);
+                : userName.Contains(' ')
+                    ? new ValidationResult(failLevel, "Value cannot contain spaces") 
+                    : userName.Length <= 1
+                        ? new ValidationResult(failLevel, "User name should be more than 1 character long")
+                        : ValidateValueNotEmptyAndContainsNoNewlines(userName, failLevel);
     }
 
     private static ValidationResult ValidateValueNotEmptyAndContainsNoNewlines(string value, ValidationLevel failLevel = ValidationLevel.Error)
     {
         return string.IsNullOrEmpty(value)
             ? new ValidationResult(failLevel, "Required value")
-            : value.Contains('\n')
+            : value.Contains('\n') || value.Contains('\r')
                 ? new ValidationResult(failLevel, "Value cannot contain newline")
-                : value.Contains('\r')
-                    ? new ValidationResult(failLevel, "Value cannot contain newline")
-                    : new ValidationResult();
+                : new ValidationResult();
     }
 
     internal static ValidationResult ValidateUserProfileUrl(string userProfileUrl, ValidationLevel failLevel = ValidationLevel.Error)
