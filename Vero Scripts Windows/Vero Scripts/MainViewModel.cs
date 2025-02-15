@@ -29,68 +29,77 @@ namespace VeroScripts
         public static ValidationResult ValidateUser(string hubName, string userName)
         {
             var userNameValidationResult = ValidateUserName(userName);
-            if (!userNameValidationResult.Valid)
+            if (!userNameValidationResult.IsValid)
             {
                 return userNameValidationResult;
             }
-            if (DisallowList.TryGetValue(hubName, out List<string>? value) &&
-                value.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
+            if (DisallowLists.TryGetValue(hubName, out List<string>? disallowList) &&
+                disallowList.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
             {
-                return new ValidationResult(false, "User is on the disallow list");
+                return new ValidationResult(ValidationResultType.Error, "User is on the disallow list");
             }
-            return new ValidationResult(true);
+            if (CautionLists.TryGetValue(hubName, out List<string>? cautionList) &&
+                cautionList.FirstOrDefault(caution => string.Equals(caution, userName, StringComparison.OrdinalIgnoreCase)) != null)
+            {
+                return new ValidationResult(ValidationResultType.Warning, "User is on the caution list");
+            }
+            return new ValidationResult(ValidationResultType.Valid);
         }
 
         public static ValidationResult ValidateValueNotEmpty(string value)
         {
             if (string.IsNullOrEmpty(value))
             {
-                return new ValidationResult(false, "Required value");
+                return new ValidationResult(ValidationResultType.Error, "Required value");
             }
-            return new ValidationResult(true);
+            return new ValidationResult(ValidationResultType.Valid);
         }
 
         public static ValidationResult ValidateValueNotDefault(string value, string defaultValue)
         {
             if (string.IsNullOrEmpty(value) || string.Equals(value, defaultValue, StringComparison.OrdinalIgnoreCase))
             {
-                return new ValidationResult(false, "Required value");
+                return new ValidationResult(ValidationResultType.Error, "Required value");
             }
-            return new ValidationResult(true);
+            return new ValidationResult(ValidationResultType.Valid);
         }
 
         public static ValidationResult ValidateUserName(string userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
-                return new ValidationResult(false, "Required value");
+                return new ValidationResult(ValidationResultType.Error, "Required value");
             }
             if (userName.StartsWith('@'))
             {
-                return new ValidationResult(false, "Don't include the '@' in user names");
+                return new ValidationResult(ValidationResultType.Error, "Don't include the '@' in user names");
+            }
+            if (userName.Contains('\n') || userName.Contains('\r'))
+            {
+                return new ValidationResult(ValidationResultType.Error, "Value cannot contain newline");
+            }
+            if (userName.Contains(' '))
+            {
+                return new ValidationResult(ValidationResultType.Error, "Value cannot contain spaces");
             }
             if (userName.Length <= 1)
             {
-                return new ValidationResult(false, "User name should be more than 1 character long");
+                return new ValidationResult(ValidationResultType.Error, "User name should be more than 1 character long");
             }
-            return new ValidationResult(true);
+            return new ValidationResult(ValidationResultType.Valid);
         }
 
         internal static ValidationResult ValidateValueNotEmptyAndContainsNoNewlines(string value)
         {
             if (string.IsNullOrEmpty(value))
             {
-                return new ValidationResult(false, "Required value");
+                return new ValidationResult(ValidationResultType.Error, "Required value");
             }
-            if (value.Contains('\n'))
+            if (value.Contains('\n') || value.Contains('\r'))
             {
-                return new ValidationResult(false, "Value cannot contain newline");
+                return new ValidationResult(ValidationResultType.Error, "Value cannot contain newline");
             }
-            if (value.Contains('\r'))
-            {
-                return new ValidationResult(false, "Value cannot contain newline");
-            }
-            return new ValidationResult(true);
+            return new ValidationResult(ValidationResultType.Valid);
         }
 
         #endregion
@@ -217,7 +226,7 @@ namespace VeroScripts
                         expirationTime: TimeSpan.FromSeconds(3));
                 }
                 _ = LoadTemplates();
-                _ = LoadDisallowList();
+                _ = LoadDisallowAndCautionLists();
             }
             catch (Exception ex)
             {
@@ -259,7 +268,7 @@ namespace VeroScripts
             }
         }
 
-        private async Task LoadDisallowList()
+        private async Task LoadDisallowAndCautionLists()
         {
             try
             {
@@ -268,15 +277,22 @@ namespace VeroScripts
                 {
                     NoCache = true
                 };
-                var templatesUri = new Uri("https://vero.andydragon.com/static/data/disallowlists.json");
-                var content = await httpClient.GetStringAsync(templatesUri);
-                if (!string.IsNullOrEmpty(content))
+                var disallowedListsUri = new Uri("https://vero.andydragon.com/static/data/disallowlists.json");
+                var disallowListsContent = await httpClient.GetStringAsync(disallowedListsUri);
+                if (!string.IsNullOrEmpty(disallowListsContent))
                 {
-                    disallowList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(content) ?? [];
-                    OnPropertyChanged(nameof(UserNameValidation));
-                    UpdateScripts();
-                    UpdateNewMembershipScripts();
+                    disallowLists = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(disallowListsContent) ?? [];
+
+                    var cautionListsUri = new Uri("https://vero.andydragon.com/static/data/cautionlists.json");
+                    var cautionListsContent = await httpClient.GetStringAsync(cautionListsUri);
+                    if (!string.IsNullOrEmpty(cautionListsContent))
+                    {
+                        cautionLists = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(cautionListsContent) ?? [];
+                    }
                 }
+                UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
+                UpdateScripts();
+                UpdateNewMembershipScripts();
             }
             catch (Exception ex)
             {
@@ -290,6 +306,43 @@ namespace VeroScripts
         #region Commands
 
         public ICommand ClearUserCommand { get; }
+
+        public Command PastePostLinkCommand => new(() => 
+        {
+            if (Clipboard.ContainsText())
+            {
+                var postLink = Clipboard.GetText().Trim();
+                if (postLink.StartsWith("https://vero.co/"))
+                {
+                    var possibleUserAlias = postLink[16..].Split('/').FirstOrDefault() ?? "";
+                    if (possibleUserAlias.Length > 1)
+                    {
+                        UserName = possibleUserAlias;
+                        ShowToast(
+                            "Found user name", 
+                            "Parsed the user name from the post link", 
+                            NotificationType.Success,
+                            expirationTime: TimeSpan.FromSeconds(3));
+                    }
+                    else
+                    {
+                        ShowToast(
+                            "User name not in VERO link", 
+                            "Could not parse the user name from the VERO link, user might not have user name, use their name without spaces", 
+                            NotificationType.Error,
+                            expirationTime: TimeSpan.FromSeconds(12));
+                    }
+                }
+                else
+                {
+                    ShowToast(
+                        "Clipboard did not contain VERO link", 
+                        "Could not parse the user name from the clipboard, the clipboard doesn't contain a VERO link", 
+                        NotificationType.Error,
+                        expirationTime: TimeSpan.FromSeconds(12));
+                }
+            }
+        }, () => Clipboard.ContainsText());
 
         public ICommand CopyFeatureScriptCommand { get; }
 
@@ -313,11 +366,18 @@ namespace VeroScripts
 
         public TemplatesCatalog TemplatesCatalog { get; private set; }
 
-        private static Dictionary<string, List<string>> disallowList = [];
-        public static Dictionary<string, List<string>> DisallowList
+        private static Dictionary<string, List<string>> disallowLists = [];
+        public static Dictionary<string, List<string>> DisallowLists
         {
-            get => disallowList;
-            set => disallowList = value;
+            get => disallowLists;
+            set => disallowLists = value;
+        }
+
+        private static Dictionary<string, List<string>> cautionLists = [];
+        public static Dictionary<string, List<string>> CautionLists
+        {
+            get => cautionLists;
+            set => cautionLists = value;
         }
 
         private Theme? theme = ThemeManager.Current.DetectTheme();
@@ -407,6 +467,8 @@ namespace VeroScripts
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
                     OnPropertyChanged(nameof(CanCopyNewMembershipScript));
+                    UpdateScripts();
+                    UpdateNewMembershipScripts();
                 }
             }
         }
@@ -474,6 +536,7 @@ namespace VeroScripts
                 if (Set(ref membershipValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
+                    UpdateScripts();
                 }
             }
         }
@@ -510,6 +573,7 @@ namespace VeroScripts
                 if (Set(ref yourNameValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
+                    UpdateScripts();
                 }
             }
         }
@@ -546,6 +610,7 @@ namespace VeroScripts
                 if (Set(ref yourFirstNameValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
+                    UpdateScripts();
                 }
             }
         }
@@ -580,6 +645,7 @@ namespace VeroScripts
                         {
                             StaffLevel = StaffLevels[0];
                         }
+                        UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
                     }
                 }
             }
@@ -634,6 +700,7 @@ namespace VeroScripts
                 if (Set(ref pageValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
+                    UpdateScripts();
                 }
             }
         }
@@ -1023,15 +1090,15 @@ namespace VeroScripts
         #region Script management
 
         public bool CanCopyScripts =>
-            UserNameValidation.Valid &&
-            MembershipValidation.Valid &&
-            YourNameValidation.Valid &&
-            YourFirstNameValidation.Valid &&
-            PageValidation.Valid;
+            !UserNameValidation.IsError &&
+            !MembershipValidation.IsError &&
+            !YourNameValidation.IsError &&
+            !YourFirstNameValidation.IsError &&
+            !PageValidation.IsError;
 
         public bool CanCopyNewMembershipScript =>
             NewMembership != "None" &&
-            UserNameValidation.Valid;
+            !UserNameValidation.IsError;
 
         public MainWindow? MainWindow { get; internal set; }
 
@@ -1074,7 +1141,7 @@ namespace VeroScripts
                 var validationErrors = "";
                 void CheckValidation(string prefix, ValidationResult result)
                 {
-                    if (!result.Valid)
+                    if (!result.IsValid)
                     {
                         validationErrors += prefix + ": " + (result.Error ?? "unknown") + "\n";
                     }
@@ -1212,7 +1279,7 @@ namespace VeroScripts
                 var validationErrors = "";
                 void CheckValidation(string prefix, ValidationResult result)
                 {
-                    if (!result.Valid)
+                    if (!result.IsValid)
                     {
                         validationErrors += prefix + ": " + (result.Error ?? "unknown") + "\n";
                     }

@@ -26,9 +26,10 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <local:ValidationResultBrushConverter x:Key="validationResultBrushConverter"></local:ValidationResultBrushConverter>
         <local:ValidationResultColorConverter x:Key="validationResultColorConverter"></local:ValidationResultColorConverter>
-        <local:ValidationBooleanColorConverter x:Key="validationBooleanColorConverter"></local:ValidationBooleanColorConverter>
         <local:ValidationResultVisibilityConverter x:Key="validationResultVisibilityConverter"></local:ValidationResultVisibilityConverter>
+        <local:ValidationBooleanColorConverter x:Key="validationBooleanColorConverter"></local:ValidationBooleanColorConverter>
         <local:ValidationBooleanVisibilityConverter x:Key="validationBooleanVisibilityConverter"></local:ValidationBooleanVisibilityConverter>
     </Window.Resources>
 
@@ -93,13 +94,13 @@
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{DynamicResource MahApps.Brushes.Control.Validation}"
+                            Foreground="{Binding PageValidation, Converter={StaticResource validationResultBrushConverter}}"
                             Visibility="{Binding PageValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock 
                             Text="Page:" 
                             FontWeight="Bold" 
                             VerticalAlignment="Center"
-                            Foreground="{Binding PageValidation, Converter={StaticResource validationResultColorConverter}}" />
+                            Foreground="{Binding PageValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
                 <ComboBox Grid.Column="1" ItemsSource="{Binding LoadedPages}" SelectedItem="{Binding SelectedPage, Mode=TwoWay}">
@@ -131,13 +132,13 @@
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{DynamicResource MahApps.Brushes.Control.Validation}"
+                            Foreground="{Binding YourNameValidation, Converter={StaticResource validationResultBrushConverter}}"
                             Visibility="{Binding YourNameValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock 
                             Text="You:" 
                             FontWeight="Bold" 
                             VerticalAlignment="Center"
-                            Foreground="{Binding YourNameValidation, Converter={StaticResource validationResultColorConverter}}" />
+                            Foreground="{Binding YourNameValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
                 <TextBox Text="{Binding YourName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Height="20" />
@@ -147,13 +148,13 @@
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{DynamicResource MahApps.Brushes.Control.Validation}"
+                            Foreground="{Binding YourFirstNameValidation, Converter={StaticResource validationResultBrushConverter}}"
                             Visibility="{Binding YourFirstNameValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock 
                             Text="Your first name:" 
                             FontWeight="Bold" 
                             VerticalAlignment="Center"
-                            Foreground="{Binding YourFirstNameValidation, Converter={StaticResource validationResultColorConverter}}" />
+                            Foreground="{Binding YourFirstNameValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
                 <TextBox Text="{Binding YourFirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Height="20" />
@@ -167,6 +168,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -178,34 +180,44 @@
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{DynamicResource MahApps.Brushes.Control.Validation}"
+                            Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultBrushConverter}}"
                             Visibility="{Binding UserNameValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock 
                             Text="User:" 
                             FontWeight="Bold" 
                             VerticalAlignment="Center"
-                            Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultColorConverter}}" />
+                            Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
                 <TextBox Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" VerticalAlignment="Center" Height="20" />
-                <Label Grid.Column="2" VerticalAlignment="Center" FontSize="11" Margin="10, 0, 4, 0">
+                <Button
+                    Grid.Column="2"
+                    Padding="8,0"
+                    Margin="5,0,0,0"
+                    Height="20"
+                    MinWidth="20"
+                    MaxHeight="20"
+                    VerticalAlignment="Center"
+                    Content="Paste from post link"
+                    Command="{Binding PastePostLinkCommand}" />
+                <Label Grid.Column="3" VerticalAlignment="Center" FontSize="11" Margin="10, 0, 4, 0">
                     <StackPanel Orientation="Horizontal" ToolTip="{Binding MembershipValidation.Error}">
                         <iconPacks:PackIconModern 
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{DynamicResource MahApps.Brushes.Control.Validation}"
+                            Foreground="{Binding MembershipValidation, Converter={StaticResource validationResultBrushConverter}}"
                             Visibility="{Binding MembershipValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock 
                             Text="Level:" 
                             FontWeight="Bold" 
                             VerticalAlignment="Center"
-                            Foreground="{Binding MembershipValidation, Converter={StaticResource validationResultColorConverter}}" />
+                            Foreground="{Binding MembershipValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
-                <ComboBox ItemsSource="{Binding HubMemberships}" SelectedItem="{Binding Membership, Mode=TwoWay}" Grid.Column="3" VerticalAlignment="Center"  />
+                <ComboBox ItemsSource="{Binding HubMemberships}" SelectedItem="{Binding Membership, Mode=TwoWay}" Grid.Column="4" VerticalAlignment="Center" />
                 <CheckBox 
-                    Grid.Column="4" 
+                    Grid.Column="5" 
                     IsChecked="{Binding FirstForPage}" 
                     Content="First feature on page" 
                     FontWeight="Bold" 
@@ -213,7 +225,7 @@
                     Margin="16,0,0,0" 
                     VerticalAlignment="Center" />
                 <CheckBox 
-                    Grid.Column="5" 
+                    Grid.Column="6" 
                     IsChecked="{Binding RawTag}" 
                     Content="From RAW tag" 
                     FontWeight="Bold" 
@@ -222,7 +234,7 @@
                     VerticalAlignment="Center"
                     Visibility="{Binding SnapHubVisibility}" />
                 <CheckBox 
-                    Grid.Column="6" 
+                    Grid.Column="7" 
                     IsChecked="{Binding CommunityTag}" 
                     Content="From community tag" 
                     FontWeight="Bold" 
