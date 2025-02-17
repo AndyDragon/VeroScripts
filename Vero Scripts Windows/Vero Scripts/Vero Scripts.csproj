@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
     <RootNamespace>VeroScripts</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -17,6 +17,7 @@
     <Company>AndyDragon Software</Company>
     <Authors>Andrew Forget</Authors>
     <Version>1.0.39</Version>
+    <Platforms>AnyCPU;x64;x86;ARM32;ARM64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
