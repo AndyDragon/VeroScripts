@@ -3,6 +3,12 @@ Vero Scripts Windows/Vero Scripts/bin/
 Vero Scripts Windows/Vero Scripts/obj/
 Vero Scripts Windows/Vero Scripts/*.csproj.user
 Vero Scripts Windows/Vero Scripts/Properties/PublishProfiles/*.user
+Vero Scripts Windows/MSIX Packager/AppPackages/
+Vero Scripts Windows/MSIX Packager/bin/
+Vero Scripts Windows/MSIX Packager/obj/
+Vero Scripts Windows/MSIX Packager/MSIX Packager.assets.cache
+Vero Scripts Windows/MSIX Packager/MSIX Packager.wapproj.user
+Vero Scripts Windows/MSIX Packager/BundleArtifacts/
 Vero Scripts Editor Windows/.vs/
 Vero Scripts Editor Windows/Vero Scripts Editor/bin/
 Vero Scripts Editor Windows/Vero Scripts Editor/obj/
@@ -12,6 +18,25 @@ Vero Scripts Editor Windows/Vero Scripts Editor/Properties/PublishProfiles/*.use
 Vero Scripts MAUI/.idea/
 Vero Scripts MAUI/Vero Scripts/bin/
 Vero Scripts MAUI/Vero Scripts/obj/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Windows Store app package directories and files
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
 
 *.xcbkptlist
 **/xcuserdata/
