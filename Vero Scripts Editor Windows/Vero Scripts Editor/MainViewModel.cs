@@ -300,8 +300,12 @@ namespace VeroScriptsEditor
         public string Script
         {
             get => script;
-            set => Set(ref script, value);
+            set => Set(ref script, value, [nameof(ScriptPlaceholderVisibility), nameof(ScriptLength)]);
         }
+
+        public int ScriptLength => Script.Length;
+
+        public Visibility ScriptPlaceholderVisibility => ScriptHasPlaceholder() ? Visibility.Visible : Visibility.Collapsed;
 
         #endregion
 
@@ -332,6 +336,22 @@ namespace VeroScriptsEditor
                     if (!StaffLevels.Contains(StaffLevel))
                     {
                         StaffLevel = StaffLevels[0];
+                    }
+                    UserName = "reallylongartistalias";
+                    YourName = "reallylongmoderatoralias";
+                    YourFirstName = "MyReallyLongFirstName";
+                    StaffLevel = "Co-Admin";
+                    if (SelectedPage?.HubName == "snap")
+                    {
+                        Membership = "Hall of Fame Member";
+                    }
+                    else if (SelectedPage?.HubName == "click")
+                    {
+                        Membership = "Platinum Member";
+                    }
+                    else
+                    {
+                        Membership = "Artist";
                     }
                     UpdateScript();
                     CopyReportCommand.OnCanExecuteChanged();
@@ -440,9 +460,9 @@ namespace VeroScriptsEditor
                     {
                         return SelectedPage.HubName switch
                         {
-                            "click" => clickTemplates.Where(clickTemplate => !templatePage.Templates.Any(template => template.Name == clickTemplate)).ToArray(),
-                            "snap" => snapTemplates.Where(snapTemplate => !templatePage.Templates.Any(template => template.Name == snapTemplate)).ToArray(),
-                            _ => otherTemplates.Where(otherTemplate => !templatePage.Templates.Any(template => template.Name == otherTemplate)).ToArray(),
+                            "click" => [.. clickTemplates.Where(clickTemplate => !templatePage.Templates.Any(template => template.Name == clickTemplate))],
+                            "snap" => [.. snapTemplates.Where(snapTemplate => !templatePage.Templates.Any(template => template.Name == snapTemplate))],
+                            _ => [.. otherTemplates.Where(otherTemplate => !templatePage.Templates.Any(template => template.Name == otherTemplate))],
                         };
                     }
                 }

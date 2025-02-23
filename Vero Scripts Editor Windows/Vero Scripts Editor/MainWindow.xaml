@@ -29,7 +29,9 @@
     <Window.Resources>
         <local:NullVisibilityConverter x:Key="nullVisibilityConverter" />
         <local:ArrayNotEmptyToVisibilityConverter x:Key="arrayNotEmptyToVisibilityConverter" />
-        
+        <local:ScriptLengthToVisibility x:Key="scriptLengthToVisibility" />
+        <local:ScriptLengthToColor x:Key="scriptLengthToColor" />
+
         <ObjectDataProvider x:Key="SyncModePreferenceEnumValues"
                                 MethodName="GetValues"
                                 ObjectType="{x:Type controlzEx:ThemeSyncMode}">
@@ -470,8 +472,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Label Content="Script:" Grid.Column="0" VerticalAlignment="Center" FontWeight="Bold" FontSize="11" />
                     <Button 
@@ -483,6 +485,34 @@
                         Margin="8,0,0,0" 
                         Padding="12,2" 
                         Command="{Binding CopyScriptCommand}" />
+                    <StackPanel
+                        Grid.Column="3"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            Text="Length: "
+                            VerticalAlignment="Center" 
+                            Visibility="{Binding ScriptLength, Converter={StaticResource scriptLengthToVisibility}}"
+                            Foreground="{Binding ScriptLength, Converter={StaticResource scriptLengthToColor}}" />
+                        <TextBlock
+                            Text="{Binding ScriptLength}"
+                            VerticalAlignment="Center" 
+                            Visibility="{Binding ScriptLength, Converter={StaticResource scriptLengthToVisibility}}"
+                            Foreground="{Binding ScriptLength, Converter={StaticResource scriptLengthToColor}}" />
+                        <TextBlock
+                            Text=" of 1000"
+                            VerticalAlignment="Center" 
+                            Visibility="{Binding ScriptLength, Converter={StaticResource scriptLengthToVisibility}}"
+                            Foreground="{Binding ScriptLength, Converter={StaticResource scriptLengthToColor}}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Visibility="{Binding ScriptPlaceholderVisibility}">
+                            <TextBlock
+                                Text=" **"
+                                VerticalAlignment="Center" 
+                                Visibility="{Binding ScriptLength, Converter={StaticResource scriptLengthToVisibility}}"
+                                Foreground="{Binding ScriptLength, Converter={StaticResource scriptLengthToColor}}" />
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
                 <!-- Script viewer -->
                 <Border

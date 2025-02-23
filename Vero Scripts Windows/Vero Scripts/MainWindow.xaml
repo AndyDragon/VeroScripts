@@ -349,6 +349,7 @@
                     Command="{Binding CopyCommentScriptWithPlaceholdersCommand}" />
                 <StackPanel
                     Grid.Column="4"
+                    Orientation="Horizontal"
                     Visibility="{Binding CanCopyScripts, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock
                         Text="Length: "
@@ -420,6 +421,7 @@
                     Command="{Binding CopyOriginalPostScriptWithPlaceholdersCommand}" />
                 <StackPanel
                     Grid.Column="4"
+                    Orientation="Horizontal"
                     Visibility="{Binding CanCopyScripts, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock
                         Text="Length: "
