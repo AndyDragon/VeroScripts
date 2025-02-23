@@ -203,7 +203,6 @@ struct TemplateEditorView: View {
 
             ScriptEditor(
                 title: "Sample script:",
-                isFeature: selectedTemplate.name == "feature",
                 script: $script,
                 minHeight: 200,
                 maxHeight: 640,
