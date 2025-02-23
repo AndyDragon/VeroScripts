@@ -26,6 +26,17 @@ public class ScriptViewModel(FeatureViewModel viewModel, Script script) : Notify
     public string ScriptText
     {
         get => ViewModel.GetScriptText(Script);
-        set => ViewModel.SetScriptText(Script, value);
+        set
+        {
+            if (ViewModel.SetScriptText(Script, value))
+            {
+                OnPropertyChanged(nameof(ScriptLength));
+                OnPropertyChanged(nameof(ScriptHasPlaceholders));
+            }
+        }
     }
+    
+    public int ScriptLength => ViewModel.GetScriptLength(Script);
+    
+    public bool ScriptHasPlaceholders => ViewModel.GetScriptHasPlaceholders(Script);
 }

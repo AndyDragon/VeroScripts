@@ -642,10 +642,13 @@ public class FeatureViewModel : NotifyPropertyChanged
             {
                 Scripts[Script.Feature] = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(FeatureScriptLength));
                 OnPropertyChanged(nameof(FeatureScriptPlaceholderVisibility));
             }
         }
     }
+    
+    public int FeatureScriptLength => Scripts[Script.Feature].Length;
 
     public Visibility FeatureScriptPlaceholderVisibility =>
         ScriptHasPlaceholder(Script.Feature) ? Visibility.Visible : Visibility.Collapsed;
@@ -663,10 +666,13 @@ public class FeatureViewModel : NotifyPropertyChanged
             {
                 Scripts[Script.Comment] = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CommentScriptLength));
                 OnPropertyChanged(nameof(CommentScriptPlaceholderVisibility));
             }
         }
     }
+    
+    public int CommentScriptLength => Scripts[Script.Comment].Length;
 
     public Visibility CommentScriptPlaceholderVisibility =>
         ScriptHasPlaceholder(Script.Comment) ? Visibility.Visible : Visibility.Collapsed;
@@ -684,10 +690,13 @@ public class FeatureViewModel : NotifyPropertyChanged
             {
                 Scripts[Script.OriginalPost] = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(OriginalPostScriptLength));
                 OnPropertyChanged(nameof(OriginalPostScriptPlaceholderVisibility));
             }
         }
     }
+    
+    public int OriginalPostScriptLength => Scripts[Script.OriginalPost].Length;
 
     public Visibility OriginalPostScriptPlaceholderVisibility =>
         ScriptHasPlaceholder(Script.OriginalPost) ? Visibility.Visible : Visibility.Collapsed;
@@ -881,20 +890,11 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
     }
 
-    private string ProcessPlaceholders(Script script)
+    public string ProcessPlaceholders(Script script)
     {
         var result = Scripts[script];
-        foreach (var placeholder in PlaceholdersMap[script])
-        {
-            result = result.Replace("[[" + placeholder.Name + "]]", placeholder.Value.Trim());
-        }
-
-        foreach (var longPlaceholder in LongPlaceholdersMap[script])
-        {
-            result = result.Replace("[{" + longPlaceholder.Name + "}]", longPlaceholder.Value.Trim());
-        }
-
-        return result;
+        result = PlaceholdersMap[script].Aggregate(result, (current, placeholder) => current.Replace("[[" + placeholder.Name + "]]", placeholder.Value.Trim()));
+        return LongPlaceholdersMap[script].Aggregate(result, (current, longPlaceholder) => current.Replace("[{" + longPlaceholder.Name + "}]", longPlaceholder.Value.Trim()));
     }
 
     #endregion
@@ -1248,11 +1248,27 @@ public class FeatureViewModel : NotifyPropertyChanged
         return Scripts[script];
     }
     
-    public void SetScriptText(Script script, string scriptText)
+    public bool SetScriptText(Script script, string scriptText)
     {
-        Scripts[script] = scriptText;
+        if (scriptText != Scripts[script])
+        {
+            Scripts[script] = scriptText;
+            return true;
+        }
+
+        return false;
     }
     
+    public int GetScriptLength(Script script)
+    {
+        return Scripts[script].Length;
+    }
+
+    public bool GetScriptHasPlaceholders(Script script)
+    {
+        return ScriptHasPlaceholder(script);
+    }
+
     #endregion
 
     private static readonly Regex PlaceholderRegex = new(@"\[\[([^\]]*)\]\]");

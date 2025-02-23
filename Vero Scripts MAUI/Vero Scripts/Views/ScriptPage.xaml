@@ -1,4 +1,4 @@
-<ContentPage 
+<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:localConverters="clr-namespace:VeroScripts.Converters"
@@ -22,6 +22,8 @@
 
     <ContentPage.Resources>
         <localConverters:ValidationBooleanColorConverter x:Key="ValidationBooleanColorConverter" />
+        <localConverters:ScriptLengthToVisible x:Key="ScriptLengthToVisible" />
+        <localConverters:ScriptLengthToColor x:Key="ScriptLengthToColor" />
     </ContentPage.Resources>
 
     <Grid
@@ -29,9 +31,10 @@
         Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <!-- Script header -->
         <Button
             Grid.Row="0"
@@ -44,10 +47,35 @@
             MaximumHeightRequest="32"
             Command="{Binding ViewModel.CopyScriptCommand}"
             CommandParameter="{Binding Script}" />
-        
+
+        <HorizontalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="End"
+            IsVisible="{Binding ViewModel.CanCopyScripts}">
+            <Label
+                Text="Length: "
+                IsVisible="{Binding ScriptLength, Converter={StaticResource ScriptLengthToVisible}}"
+                TextColor="{Binding ScriptLength, Converter={StaticResource ScriptLengthToColor}}" />
+            <Label
+                Text="{Binding ScriptLength}"
+                IsVisible="{Binding ScriptLength, Converter={StaticResource ScriptLengthToVisible}}"
+                TextColor="{Binding ScriptLength, Converter={StaticResource ScriptLengthToColor}}" />
+            <Label
+                Text=" of 1000"
+                IsVisible="{Binding ScriptLength, Converter={StaticResource ScriptLengthToVisible}}"
+                TextColor="{Binding ScriptLength, Converter={StaticResource ScriptLengthToColor}}" />
+            <HorizontalStackLayout
+                IsVisible="{Binding ScriptHasPlaceholders}">
+                <Label
+                    Text=" **"
+                    IsVisible="{Binding ScriptLength, Converter={StaticResource ScriptLengthToVisible}}"
+                    TextColor="{Binding ScriptLength, Converter={StaticResource ScriptLengthToColor}}" />
+            </HorizontalStackLayout>
+        </HorizontalStackLayout>
+
         <!-- Feature script -->
         <Editor
-            Grid.Row="1"
+            Grid.Row="2"
             Text="{Binding ScriptText, Mode=TwoWay}"
             Margin="0,0,0,8"
             TextColor="{Binding ViewModel.CanCopyScripts, Converter={StaticResource ValidationBooleanColorConverter}}" />
