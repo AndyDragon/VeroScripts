@@ -11,6 +11,7 @@ import SystemColors
 
 struct ScriptEditor: View {
     var title: String
+    var isFeature: Bool
     @Binding var script: String
     var minHeight: CGFloat
     var maxHeight: CGFloat
@@ -18,6 +19,16 @@ struct ScriptEditor: View {
     var focusedField: FocusState<FocusField?>.Binding
     var editorFocusField: FocusField
     var buttonFocusField: FocusField
+
+    private func color() -> Color {
+        if script.count > 963 {
+            return .red
+        }
+        if script.count > 950 {
+            return .orange
+        }
+        return .green
+    }
 
     var body: some View {
         // Header
@@ -32,6 +43,11 @@ struct ScriptEditor: View {
             })
 
             Spacer()
+
+            if isFeature {
+                Text("Length: \(script.count) characters out of 963")
+                    .foregroundStyle(color())
+            }
         }
         .frame(alignment: .leading)
         .padding([.top], 4)

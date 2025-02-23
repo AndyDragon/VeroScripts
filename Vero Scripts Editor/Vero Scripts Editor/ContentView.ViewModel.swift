@@ -42,11 +42,11 @@ extension ContentView {
         // MARK: Feature sample state
         var tagSource: TagSourceCase = .commonPageTag
         var firstFeature: Bool = false
-        var userLevel: MembershipCase = .commonArtist
-        var userAlias = "alphabeta"
-        var yourName = "omegazeta"
-        var yourFirstName = "Omega"
-        var pageStaffLevel: StaffLevelCase = .mod
+        var userLevel: MembershipCase = .snapHallOfFameMember
+        var userAlias = "reallylongartistalias"
+        var yourName = "reallylongmoderatoralias"
+        var yourFirstName = "MyReallyLongFirstName"
+        var pageStaffLevel: StaffLevelCase = .coadmin
 
 #if STANDALONE
         // MARK: Version check

@@ -509,8 +509,8 @@ struct ContentView: View {
                 viewModel.selectedPage = newValue
             }
             selectedTemplate = nil
-            viewModel.userLevel = .commonArtist
-            viewModel.pageStaffLevel = .mod
+            viewModel.userLevel = viewModel.selectedPage?.hub == "snap" ? .snapHallOfFameMember : viewModel.selectedPage?.hub == "click" ? .clickBronzeMember : .commonArtist
+            viewModel.pageStaffLevel = .coadmin
             UserDefaults.standard.set(viewModel.selectedPage?.pageId ?? "", forKey: "Page")
         }
     }
