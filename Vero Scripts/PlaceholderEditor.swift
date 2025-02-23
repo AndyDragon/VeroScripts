@@ -20,6 +20,7 @@ struct PlaceholderView: View {
     let element: [String: PlaceholderValue].Element
     var editorName = ""
     var editorLongForm = false
+    var valueChanged: () -> Void = {}
     @State var editorValue: String
 
     var body: some View {
@@ -27,43 +28,43 @@ struct PlaceholderView: View {
             Text(editorName.capitalized)
                 .frame(minWidth: 200)
                 .padding([.top], editorLongForm ? 4 : 0)
-            
+
             if editorLongForm {
                 if #available(macOS 14.0, *) {
                     TextEditor(text: $editorValue.onChange(editorValueChanged))
-                    .font(.body)
-                    .frame(height: 48)
-                    .frame(minWidth: 320)
-                    .foregroundStyle(Color.label, Color.secondaryLabel)
-                    .scrollContentBackground(.hidden)
-                    .padding(4)
-                    .background(Color.controlBackground.opacity(0.5))
-                    .border(Color.gray.opacity(0.25))
-                    .cornerRadius(4)
-                    .textEditorStyle(.plain)
+                        .font(.body)
+                        .frame(height: 48)
+                        .frame(minWidth: 320)
+                        .foregroundStyle(Color.label, Color.secondaryLabel)
+                        .scrollContentBackground(.hidden)
+                        .padding(4)
+                        .background(Color.controlBackground.opacity(0.5))
+                        .border(Color.gray.opacity(0.25))
+                        .cornerRadius(4)
+                        .textEditorStyle(.plain)
                 } else {
                     TextEditor(text: $editorValue.onChange(editorValueChanged))
-                    .font(.body)
-                    .frame(height: 48)
-                    .frame(minWidth: 320)
-                    .foregroundStyle(Color.label, Color.secondaryLabel)
-                    .scrollContentBackground(.hidden)
-                    .padding(4)
-                    .background(Color.controlBackground.opacity(0.5))
-                    .border(Color.gray.opacity(0.25))
-                    .cornerRadius(4)
+                        .font(.body)
+                        .frame(height: 48)
+                        .frame(minWidth: 320)
+                        .foregroundStyle(Color.label, Color.secondaryLabel)
+                        .scrollContentBackground(.hidden)
+                        .padding(4)
+                        .background(Color.controlBackground.opacity(0.5))
+                        .border(Color.gray.opacity(0.25))
+                        .cornerRadius(4)
                 }
             } else {
                 TextField("", text: $editorValue.onChange(editorValueChanged))
-                .lineLimit(1)
-                .font(.body)
-                .frame(minWidth: 320)
-                .foregroundStyle(Color.label, Color.secondaryLabel)
-                .textFieldStyle(.plain)
-                .padding(4)
-                .background(Color.controlBackground.opacity(0.5))
-                .border(Color.gray.opacity(0.25))
-                .cornerRadius(4)
+                    .lineLimit(1)
+                    .font(.body)
+                    .frame(minWidth: 320)
+                    .foregroundStyle(Color.label, Color.secondaryLabel)
+                    .textFieldStyle(.plain)
+                    .padding(4)
+                    .background(Color.controlBackground.opacity(0.5))
+                    .border(Color.gray.opacity(0.25))
+                    .cornerRadius(4)
             }
             Spacer()
                 .background(Color.yellow)
@@ -72,17 +73,19 @@ struct PlaceholderView: View {
         .listRowSeparator(.hidden)
     }
 
-    init(_ element: [String: PlaceholderValue].Element, isLongForm: Bool) {
+    init(_ element: [String: PlaceholderValue].Element, isLongForm: Bool, valueChanged: @escaping () -> Void) {
         self.element = element
         let start = element.key.index(element.key.startIndex, offsetBy: 2)
         let end = element.key.index(element.key.endIndex, offsetBy: -3)
-        editorName = String(element.key[start...end]);
+        editorName = String(element.key[start ... end])
         editorValue = element.value.value
         editorLongForm = isLongForm
+        self.valueChanged = valueChanged
     }
 
     func editorValueChanged(to: String) {
         element.value.value = editorValue
+        valueChanged()
     }
 }
 
@@ -93,25 +96,60 @@ struct PlaceholderSheet: View {
     @Binding var isPresenting: Bool
     var transferPlaceholders: () -> Void
     var toastCopyToClipboard: (_ copySuffix: String) -> Void
-    
+
+    @State private var scriptLength = 0
+
+    private func color() -> Color {
+        if scriptLength > 1000 {
+            return .red
+        }
+        if scriptLength >= 990 {
+            return .orange
+        }
+        return .green
+    }
+
+    private func updateCharacterCount() {
+        var scriptWithPlaceholders = scriptWithPlaceholdersInPlace
+        placeholders.placeholderDict.forEach({ placeholder in
+            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                of: placeholder.key,
+                with: placeholder.value.value)
+        })
+        placeholders.longPlaceholderDict.forEach({ placeholder in
+            scriptWithPlaceholders = scriptWithPlaceholders.replacingOccurrences(
+                of: placeholder.key,
+                with: placeholder.value.value)
+        })
+        scriptLength = scriptWithPlaceholders.count
+    }
+
     var body: some View {
         ZStack {
             Color.backgroundColor.edgesIgnoringSafeArea(.all)
-            
+
             VStack {
                 Text("There are manual placeholders that need to be filled out:")
                 Text("(leave any fields blank to remove placeholder)")
+                if scriptLength >= 975 {
+                    Text("Length: \(scriptLength) characters out of 1000")
+                        .foregroundStyle(color())
+                }
 
-                List() {
+                List {
                     ForEach(placeholders.placeholderDict.sorted(by: { entry1, entry2 in
                         entry1.key < entry2.key
                     }), id: \.key) { entry in
-                        PlaceholderView(entry, isLongForm: false)
+                        PlaceholderView(entry, isLongForm: false) {
+                            updateCharacterCount()
+                        }
                     }
                     ForEach(placeholders.longPlaceholderDict.sorted(by: { entry1, entry2 in
                         entry1.key < entry2.key
                     }), id: \.key) { entry in
-                        PlaceholderView(entry, isLongForm: true)
+                        PlaceholderView(entry, isLongForm: true) {
+                            updateCharacterCount()
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -155,6 +193,9 @@ struct PlaceholderSheet: View {
             .foregroundStyle(Color.label, Color.secondaryLabel)
             .frame(minWidth: 800, maxWidth: .infinity, minHeight: 600, maxHeight: .infinity)
             .padding()
+        }
+        .onAppear {
+            updateCharacterCount()
         }
     }
 }

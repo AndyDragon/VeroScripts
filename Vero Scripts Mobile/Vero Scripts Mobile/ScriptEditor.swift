@@ -13,6 +13,16 @@ struct ScriptEditor: View {
     var hasPlaceholders: Bool
     var copy: (Bool, Bool) -> Void
 
+    private func color() -> Color {
+        if script.count > 1000 {
+            return .red
+        }
+        if script.count >= 990 {
+            return .orange
+        }
+        return .green
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             // Header
@@ -25,6 +35,11 @@ struct ScriptEditor: View {
                     .padding(.horizontal, 4)
             }
             .buttonStyle(.bordered)
+
+            if script.count >= 975 {
+                Text("Length: \(script.count) characters out of 1000\(hasPlaceholders ? " **" : "")")
+                    .foregroundStyle(color())
+            }
 
             // Editor
             TextEditor(text: $script)
