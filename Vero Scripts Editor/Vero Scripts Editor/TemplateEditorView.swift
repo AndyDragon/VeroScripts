@@ -257,13 +257,16 @@ struct TemplateEditorView: View {
         let scriptPageName = viewModel.selectedPage?.pageName ?? currentPageDisplayName
         let scriptPageHash = viewModel.selectedPage?.hashTag ?? currentPageDisplayName
         let scriptPageTitle = viewModel.selectedPage?.title ?? currentPageDisplayName
-        let userLevelTitle = viewModel.userLevel.scriptMembershipStringForHub(hub: viewModel.selectedPage?.hub)
+        let membership = viewModel.userLevel.rawValue
+        let membershipString = (viewModel.selectedPage?.hub == "snap" && membership.hasPrefix("Snap "))
+            ? String(membership.dropFirst(5))
+            : membership
         script = selectedTemplate.template
             .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
             .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageDisplayName)
             .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
             .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-            .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: userLevelTitle)
+            .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
             .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userAlias)
             .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
             .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)

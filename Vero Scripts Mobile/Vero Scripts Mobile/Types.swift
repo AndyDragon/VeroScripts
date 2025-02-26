@@ -51,20 +51,22 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
     case none = "None"
 
     case commonArtist = "Artist"
-    case commonMember = "Member"
-    case commonPlatinumMember = "Platinum Member"
 
     // snap
-    case snapVipMember = "VIP Member"
-    case snapVipGoldMember = "VIP Gold Member"
-    case snapEliteMember = "Elite Member"
-    case snapHallOfFameMember = "Hall of Fame Member"
-    case snapDiamondMember = "Diamond Member"
+    case snapMember = "Snap Member"
+    case snapVipMember = "Snap VIP Member"
+    case snapVipGoldMember = "Snap VIP Gold Member"
+    case snapPlatinumMember = "Snap Platinum Member"
+    case snapEliteMember = "Snap Elite Member"
+    case snapHallOfFameMember = "Snap Hall of Fame Member"
+    case snapDiamondMember = "Snap Diamond Member"
 
     // click
-    case clickBronzeMember = "Bronze Member"
-    case clickSilverMember = "Silver Member"
-    case clickGoldMember = "Gold Member"
+    case clickMember = "Click Member"
+    case clickBronzeMember = "Click Bronze Member"
+    case clickSilverMember = "Click Silver Member"
+    case clickGoldMember = "Click Gold Member"
+    case clickPlatinumMember = "Click Platinum Member"
 
     var id: Self { self }
 
@@ -72,16 +74,18 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
         return [
             .none,
             .commonArtist,
-            .commonMember,
+            .snapMember,
             .snapVipMember,
+            .snapPlatinumMember,
+            .snapEliteMember,
+            .snapHallOfFameMember,
+            .snapDiamondMember,
+            .clickMember,
             .snapVipGoldMember,
             .clickBronzeMember,
             .clickSilverMember,
             .clickGoldMember,
-            .commonPlatinumMember,
-            .snapEliteMember,
-            .snapHallOfFameMember,
-            .snapDiamondMember,
+            .clickPlatinumMember,
         ]
     }
 
@@ -90,10 +94,10 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
             return [
                 .none,
                 .commonArtist,
-                .commonMember,
+                .snapMember,
                 .snapVipMember,
                 .snapVipGoldMember,
-                .commonPlatinumMember,
+                .snapPlatinumMember,
                 .snapEliteMember,
                 .snapHallOfFameMember,
                 .snapDiamondMember,
@@ -103,11 +107,11 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
             return [
                 .none,
                 .commonArtist,
-                .commonMember,
+                .clickMember,
                 .clickBronzeMember,
                 .clickSilverMember,
                 .clickGoldMember,
-                .commonPlatinumMember,
+                .clickPlatinumMember,
             ]
         }
         return [
@@ -118,12 +122,6 @@ enum MembershipCase: String, CaseIterable, Identifiable, Codable {
 
     static func caseValidFor(hub: String?, _ value: MembershipCase) -> Bool {
         return casesFor(hub: hub).contains(value)
-    }
-
-    func scriptMembershipStringForHub(hub: String?) -> String {
-        (hub == "snap" && self != .commonArtist && self != .none) ? "Snap \(rawValue)"
-            : (hub == "click" && self != .commonArtist && self != .none) ? "Click \(rawValue)"
-            : rawValue
     }
 }
 

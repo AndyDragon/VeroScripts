@@ -43,6 +43,12 @@ struct VeroScriptsApp: App {
             ContentView(appState)
 #else
             ContentView()
+#if SCREENSHOT
+                .frame(width: 1280, height: 748)
+                .frame(minWidth: 1280, maxWidth: 1280, minHeight: 748, maxHeight: 748)
+#else
+                .frame(minWidth: 1024, minHeight: 600)
+#endif
 #endif
         }
         .commands {

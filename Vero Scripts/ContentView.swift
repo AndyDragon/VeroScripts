@@ -30,7 +30,6 @@ struct ContentView: View {
     @State private var disallowLists = [String:[String]]()
     @State private var cautionLists = [String:[String]]()
 
-//    @State private var page = UserDefaults.standard.string(forKey: "Page") ?? ""
     @State private var currentPage: LoadedPage? = nil
     @State private var pageValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var pageStaffLevel = StaffLevelCase.mod
@@ -316,7 +315,6 @@ struct ContentView: View {
                 }
             }
         }
-        .frame(minWidth: 1024, minHeight: 600)
         .background(Color.backgroundColor)
         .advancedToastView(toasts: $viewModel.toastViews)
 #if STANDALONE
@@ -1007,7 +1005,9 @@ struct ContentView: View {
             let scriptPageName = currentPage.pageName ?? currentPageDisplayName
             let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
             let scriptPageTitle = currentPage.title ?? currentPageDisplayName
-            let membershipString = membership.rawValue
+            let membershipString = (currentPage.hub == "snap" && membership.rawValue.hasPrefix("Snap "))
+                ? String(membership.rawValue.dropFirst(5))
+                : membership.rawValue
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
                 from: currentPage.id,

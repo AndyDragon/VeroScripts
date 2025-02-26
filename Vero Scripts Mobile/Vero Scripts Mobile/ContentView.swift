@@ -1145,7 +1145,9 @@ struct ContentView: View {
             let scriptPageName = currentPage.pageName ?? currentPageDisplayName
             let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
             let scriptPageTitle = currentPage.title ?? currentPageDisplayName
-            let membershipString = membership.rawValue
+            let membershipString = (currentPage.hub == "snap" && membership.rawValue.hasPrefix("Snap "))
+                ? String(membership.rawValue.dropFirst(5))
+                : membership.rawValue
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
                 from: currentPage.id,

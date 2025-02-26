@@ -29,7 +29,7 @@ struct VeroScriptsEditorApp: App {
         logger.addDestination(loggerConsole)
         logger.addDestination(loggerFile)
     }
-    
+
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
 #if STANDALONE
@@ -46,6 +46,12 @@ struct VeroScriptsEditorApp: App {
 #else
             ContentView()
                 .environmentObject(commandModel)
+#if SCREENSHOT
+                .frame(width: 1280, height: 748)
+                .frame(minWidth: 1280, maxWidth: 1280, minHeight: 748, maxHeight: 748)
+#else
+                .frame(minWidth: 1280, minHeight: 800)
+#endif
 #endif
         }
         .commands {
@@ -109,7 +115,7 @@ struct VeroScriptsEditorApp: App {
                 .keyboardShortcut("r", modifiers: [.command])
             }
         }
-        
+
         // About view window with id "about"
         Window("About \(Bundle.main.displayName ?? "Vero Scripts Editor")", id: "about") {
             AboutView(packages: [
