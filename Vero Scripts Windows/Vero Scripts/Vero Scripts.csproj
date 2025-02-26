@@ -16,7 +16,7 @@
     <Copyright>Copyright (c) 2024-2025 AndyDragon Software, all rights reserved</Copyright>
     <Company>AndyDragon Software</Company>
     <Authors>Andrew Forget</Authors>
-    <Version>1.1.40</Version>
+    <Version>1.1.41</Version>
     <Platforms>AnyCPU;x64;x86;ARM32;ARM64</Platforms>
   </PropertyGroup>
 

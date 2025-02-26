@@ -14,6 +14,12 @@ Vero Scripts Editor Windows/Vero Scripts Editor/bin/
 Vero Scripts Editor Windows/Vero Scripts Editor/obj/
 Vero Scripts Editor Windows/Vero Scripts Editor/*.csproj.user
 Vero Scripts Editor Windows/Vero Scripts Editor/Properties/PublishProfiles/*.user
+Vero Scripts Editor Windows/MSIX Packager/AppPackages/
+Vero Scripts Editor Windows/MSIX Packager/bin/
+Vero Scripts Editor Windows/MSIX Packager/obj/
+Vero Scripts Editor Windows/MSIX Packager/MSIX Packager.assets.cache
+Vero Scripts Editor Windows/MSIX Packager/MSIX Packager.wapproj.user
+Vero Scripts Editor Windows/MSIX Packager/BundleArtifacts/
 
 Vero Scripts MAUI/.idea/
 Vero Scripts MAUI/Vero Scripts/bin/

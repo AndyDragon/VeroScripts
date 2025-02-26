@@ -58,6 +58,7 @@ namespace VeroScriptsEditor
             InsertManualPlaceholderCommand = new CommandWithParameter(InsertManualPlaceholder, CanInsertManualPlaceholder);
             CopyScriptCommand = new Command(CopyScript);
             SetThemeCommand = new CommandWithParameter(SetTheme);
+			LaunchAboutCommand = new Command(LaunchAbout);
         }
 
         public TextEditor? TemplateTextEditor { get; internal set; }
@@ -971,6 +972,18 @@ namespace VeroScriptsEditor
             }
         }
 
+        public ICommand LaunchAboutCommand { get; }
+        private void LaunchAbout()
+        {
+            var panel = new AboutDialog
+            {
+                DataContext = new AboutViewModel(),
+                Owner = Application.Current.MainWindow,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+            panel.ShowDialog();
+        }
+
         #endregion
 
         #region Placeholder management
@@ -1077,12 +1090,13 @@ namespace VeroScriptsEditor
                 var scriptPageName = SelectedPage.PageName ?? currentPageDisplayName;
                 var scriptPageHash = SelectedPage.HashTag ?? currentPageDisplayName;
                 var scriptPageTitle = SelectedPage.Title ?? currentPageDisplayName;
+                var membershipString = (SelectedPage?.HubName == "snap" && Membership.StartsWith("Snap ")) ? Membership[5..] : Membership;
                 Script = SelectedTemplate.Template
                     .Replace("%%PAGENAME%%", scriptPageName)
                     .Replace("%%FULLPAGENAME%%", currentPageDisplayName)
                     .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
-                    .Replace("%%MEMBERLEVEL%%", Membership)
+                    .Replace("%%MEMBERLEVEL%%", membershipString)
                     .Replace("%%USERNAME%%", UserName)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
