@@ -1,6 +1,10 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MahApps.Metro.Controls;
@@ -29,14 +33,19 @@ namespace VeroScriptsEditor
                         vm.UpdateScript();
                     }
                 };
-                using var stream = File.OpenRead("ScriptTemplate.xshd");
-                using var reader = new System.Xml.XmlTextReader(stream);
-                var syntax = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                HighlightingManager.Instance.RegisterHighlighting(
-                    "ScriptTemplate",
-                    [],
-                    syntax);
-                textEditor.SyntaxHighlighting = syntax;
+                var assembly = Assembly.GetExecutingAssembly();
+                using var stream = assembly.GetManifestResourceStream("VeroScriptsEditor.ScriptTemplate.xshd");
+                if (stream != null)
+                {
+                    using var reader = new System.Xml.XmlTextReader(stream);
+                    var syntax = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                    HighlightingManager.Instance.RegisterHighlighting(
+                        "ScriptTemplate",
+                        [],
+                        syntax);
+                    textEditor.SyntaxHighlighting = syntax;
+                    textEditor.TextArea.TextView.LinkTextForegroundBrush = Brushes.LightBlue;
+                }
             }
         }
 

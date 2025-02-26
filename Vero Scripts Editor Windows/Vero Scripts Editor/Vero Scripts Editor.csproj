@@ -16,12 +16,19 @@
     <Copyright>Copyright (c) 2024-2025 AndyDragon Software, all rights reserved</Copyright>
     <Company>AndyDragon Software</Company>
     <Authors>Andrew Forget</Authors>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Platforms>AnyCPU;ARM64;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Resources\App_Image.png" />
+    <None Remove="ScriptTemplate.xshd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ScriptTemplate.xshd">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -51,9 +58,6 @@
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Update="ScriptTemplate.xshd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

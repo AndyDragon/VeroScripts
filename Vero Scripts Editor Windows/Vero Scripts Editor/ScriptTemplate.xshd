@@ -6,7 +6,7 @@
 	<Color name="StaticPlaceholder" foreground="#FF60FF" fontWeight="bold" />
 	<Color name="ShortManualPlaceholder" foreground="#60FFFF" fontWeight="bold" />
   <Color name="LongManualPlaceholder" foreground="#60FF60" fontWeight="bold" />
-  <Color name="HashTag" foreground="#D0E0FF" />
+  <Color name="HashTag" foreground="#C0E0FF" />
 
   <RuleSet name="Placeholders">
     <Rule color="StaticPlaceholder">
@@ -21,10 +21,12 @@
     <Rule color="LongManualPlaceholder">
       \[{[^}]+}\]
     </Rule>
+    <Rule color="HashTag">
+      (\@|\#)[^(\s|%|\[)]*
+    </Rule>
   </RuleSet>
 
   <RuleSet>
-    <!--<Span color="HashTag" begin="(\@|\#)" end="[^\s]*" ruleSet="Placeholders" />-->
     <Import ruleSet="Placeholders"/>
   </RuleSet>
 

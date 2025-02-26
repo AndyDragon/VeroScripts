@@ -10,7 +10,7 @@
   <Identity
     Name="21445AndyDragonSoftware.187510EDEFE4"
     Publisher="CN=0ECE0AF0-01C0-42E1-B15B-68D2DD6AA771"
-    Version="1.0.5.0" />
+    Version="1.0.6.0" />
 
   <Properties>
     <DisplayName>Vero Scripts Editor</DisplayName>
