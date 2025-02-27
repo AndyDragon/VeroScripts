@@ -10,10 +10,10 @@ export const applicationDetails = (
         changes to the script templates do not require a new version of the application, the app just needs to be restarted.
     </>
 );
-export const showMacScreenshot = true
+export const showMacScreenshot = true;
 export const macScreenshotWidth = 1200;
 export const macScreenshotHeight = 820;
-export const showWindowsScreenshot = true
+export const showWindowsScreenshot = true;
 export const windowsScreenshotWidth = 1200;
 export const windowsScreenshotHeight = 800;
 

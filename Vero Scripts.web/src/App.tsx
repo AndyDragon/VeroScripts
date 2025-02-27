@@ -375,13 +375,17 @@ function App() {
       const scriptPageTitle = page?.title || scriptPageName
       const scriptPageHash = page?.hashTag || scriptPageName
       const staffLevelString = staffLevelOptions.find((option) => option.key === selectedStaffLevel)?.text || defaultStaffLevelOptions[0].text;
+      let membership = levelOptions.find((option) => option.key === selectedLevel)?.text || "";
+      if (hubPart === "snap" && membership.startsWith("Snap ")) {
+        membership = membership.substring(5);
+      }
       return (
         template
           .replaceAll("%%PAGENAME%%", scriptPageName)
           .replaceAll("%%FULLPAGENAME%%", pagePart)
           .replaceAll("%%PAGETITLE%%", scriptPageTitle)
           .replaceAll("%%PAGEHASH%%", scriptPageHash)
-          .replaceAll("%%MEMBERLEVEL%%", levelOptions.find((option) => option.key === selectedLevel)?.text || "")
+          .replaceAll("%%MEMBERLEVEL%%", membership)
           .replaceAll("%%USERNAME%%", userName)
           .replaceAll("%%YOURNAME%%", yourName)
           .replaceAll("%%YOURFIRSTNAME%%", firstName)

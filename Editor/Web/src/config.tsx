@@ -5,8 +5,10 @@ export const applicationDetails = (
         This tool is used to edit the script templates for the Vero Scripts tool.
     </>
 );
+export const showMacScreenshot = true;
 export const macScreenshotWidth = 1320;
 export const macScreenshotHeight = 800;
+export const showWindowsScreenshot = false;
 export const windowsScreenshotWidth = 1200;
 export const windowsScreenshotHeight = 800;
 
@@ -14,27 +16,45 @@ export const deploymentWebLocation = "/app/veroscriptseditor";
 
 export const versionLocation = "veroscriptseditor/version.json";
 
-export const showMacInfo = true;
-export const macDmgLocation = "veroscriptseditor/macos/Vero%20Scripts%20Editor%20";
+export const enum PlatformLocation {
+    DoNotShow,
+    AppPortal,
+    AppStore,
+}
+
+export const showMacInfo: PlatformLocation = PlatformLocation.AppStore;
+export const macAppStoreLocation = "https://apps.apple.com/us/app/vero-scripts/id6475614720";
 export const macReleaseNotesLocation = "releaseNotes-mac.json";
 
-export const showWindowsInfo = true;
+export const showIosInfo: PlatformLocation = PlatformLocation.DoNotShow;
+export const iosAppStoreLocation = "TODO";
+export const iosReleaseNotesLocation = "releaseNotes-ios.json";
+
+export const showWindowsInfo: PlatformLocation = PlatformLocation.AppPortal;
 export const windowsInstallerLocation = "veroscriptseditor/windows";
 export const windowsReleaseNotesLocation = "releaseNotes-windows.json";
 
+export const showAndroidInfo: PlatformLocation = PlatformLocation.DoNotShow;
+export const androidInstallerLocation = "TODO";
+export const androidReleaseNotesLocation = "releaseNotes-android.json";
+
+export const supportEmail = "andydragon@live.com";
+
 export const hasTutorial = false;
 
-export type Platform = "macOS" | "windows";
+export type Platform = "macOS" | "windows" | "iOS" | "android";
 
 export const platformString: Record<Platform, string> = {
     macOS: "macOS",
-    windows: "Windows"
+    windows: "Windows",
+    iOS: "iPhone / iPad",
+    android: "Android",
 }
 
 export interface Links {
+    readonly useAppStore?: true;
     readonly location: (version: string, flavorSuffix: string) => string;
     readonly actions: {
-        readonly name: string;
         readonly action: string;
         readonly target: string;
         readonly suffix: string;
@@ -43,12 +63,23 @@ export interface Links {
 
 export const links: Record<Platform, Links | undefined> = {
     macOS: {
-        location: (version, suffix) => `${macDmgLocation}${suffix}v${version}.dmg`,
+        useAppStore: true,
+        location: (_version, _suffix) => macAppStoreLocation,
         actions: [
             {
-                name: "default",
-                action: "download",
-                target: "",
+                action: "install from Apple app store",
+                target: "_blank",
+                suffix: "",
+            }
+        ]
+    },
+    iOS: {
+        useAppStore: true,
+        location: (_version, _suffix) => iosAppStoreLocation,
+        actions: [
+            {
+                action: "install from Apple app store",
+                target: "_blank",
                 suffix: "",
             }
         ]
@@ -57,14 +88,23 @@ export const links: Record<Platform, Links | undefined> = {
         location: (_version, suffix) => `${windowsInstallerLocation}${suffix}`,
         actions: [
             {
-                name: "current",
                 action: "install",
                 target: "",
                 suffix: "/setup.exe",
             },
             {
-                name: "current",
                 action: "read more about",
+                target: "_blank",
+                suffix: "",
+            }
+        ]
+    },
+    android: {
+        useAppStore: true,
+        location: (_version, _suffix) => androidInstallerLocation,
+        actions: [
+            {
+                action: "install from Google Play store",
                 target: "_blank",
                 suffix: "",
             }
