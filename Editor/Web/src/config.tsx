@@ -30,8 +30,8 @@ export const showIosInfo: PlatformLocation = PlatformLocation.DoNotShow;
 export const iosAppStoreLocation = "TODO";
 export const iosReleaseNotesLocation = "releaseNotes-ios.json";
 
-export const showWindowsInfo: PlatformLocation = PlatformLocation.AppPortal;
-export const windowsInstallerLocation = "veroscriptseditor/windows";
+export const showWindowsInfo: PlatformLocation = PlatformLocation.AppStore;
+export const windowsAppStoreLocation = "https://apps.microsoft.com/detail/9P0HQZCHCJWQ";
 export const windowsReleaseNotesLocation = "releaseNotes-windows.json";
 
 export const showAndroidInfo: PlatformLocation = PlatformLocation.DoNotShow;
@@ -85,15 +85,11 @@ export const links: Record<Platform, Links | undefined> = {
         ]
     },
     windows: {
-        location: (_version, suffix) => `${windowsInstallerLocation}${suffix}`,
+        useAppStore: true,
+        location: (_version, _suffix) => windowsAppStoreLocation,
         actions: [
             {
-                action: "install",
-                target: "",
-                suffix: "/setup.exe",
-            },
-            {
-                action: "read more about",
+                action: "install from Microsoft store",
                 target: "_blank",
                 suffix: "",
             }
