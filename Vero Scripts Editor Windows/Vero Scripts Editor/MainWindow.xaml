@@ -251,7 +251,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
                     <TextBlock
-                        Text="Welcome to Vero Scripts Editor"
+                        Text="Welcome to Feature Script Template Editor"
                         HorizontalAlignment="Center"
                         FontSize="32"
                         Foreground="{DynamicResource MahApps.Brushes.Text}" />

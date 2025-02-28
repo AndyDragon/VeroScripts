@@ -8,7 +8,7 @@
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:AboutViewModel}"
-    Title="About VERO Scripts Editor" Height="334" Width="640"
+    Title="About Feature Script Template Editor" Height="334" Width="640"
     GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
     ResizeMode="NoResize">
 

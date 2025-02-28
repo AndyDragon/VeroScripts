@@ -9,7 +9,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <PackageId>VeroScriptsEditor</PackageId>
-    <Title>Vero Scripts Editor</Title>
+    <Title>Feature Script Template Editor</Title>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>

@@ -8,12 +8,12 @@
   IgnorableNamespaces="uap rescap uap18">
 
   <Identity
-    Name="21445AndyDragonSoftware.187510EDEFE4"
+    Name="21445AndyDragonSoftware.FeatureScriptTemplateEdito"
     Publisher="CN=0ECE0AF0-01C0-42E1-B15B-68D2DD6AA771"
     Version="1.0.6.0" />
 
   <Properties>
-    <DisplayName>Vero Scripts Editor</DisplayName>
+    <DisplayName>Feature Script Template Editor</DisplayName>
     <PublisherDisplayName>AndyDragon Software</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
@@ -32,8 +32,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$" uap18:RuntimeBehavior="packagedClassicApp">
       <uap:VisualElements
-        DisplayName="Vero Scripts Editor"
-        Description="Vero Scripts template editor for editing script templates for Vero Scripts app."
+        DisplayName="Feature Script Template Editor"
+        Description="Feature script template editor for editing script templates for featuring apps."
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">

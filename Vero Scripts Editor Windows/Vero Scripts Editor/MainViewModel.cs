@@ -259,7 +259,7 @@ namespace VeroScriptsEditor
             get => Catalog?.IsDirty ?? false;
         }
 
-        public string Title => $"Vero Scripts Editor{(IsDirty ? " - some templates edited" : string.Empty)}";
+        public string Title => $"Feature Script Template Editor{(IsDirty ? " - some templates edited" : string.Empty)}";
 
         public enum DirtyActionResult
         {
