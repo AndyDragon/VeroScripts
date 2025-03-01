@@ -5,7 +5,6 @@ namespace VeroScripts;
 public static class KeyboardHelper
 {
     public static event EventHandler<bool>? KeyboardVisibilityChanged;
-    private static bool _isKeyboardVisible;
 
     public static void Initialize(Activity? activity)
     {
@@ -20,20 +19,24 @@ public static class KeyboardHelper
                 var keypadHeight = screenHeight - rect.Bottom;
 
                 var isVisible = keypadHeight > screenHeight * 0.15; // 15% threshold for keyboard visibility
-                if (_isKeyboardVisible != isVisible)
+                if (IsKeyboardVisible != isVisible)
                 {
-                    _isKeyboardVisible = isVisible;
+                    IsKeyboardVisible = isVisible;
                     KeyboardVisibilityChanged?.Invoke(null, isVisible);
                 }
             };
         }
     }
     
-    public static bool IsKeyboardVisible => _isKeyboardVisible;
+    public static bool IsKeyboardVisible { get; private set; }
 
     public static double ConvertPixelsToDp(float pixelValue)
     {
-        var metrics = Platform.CurrentActivity.Resources.DisplayMetrics;
+        var metrics = Platform.CurrentActivity?.Resources?.DisplayMetrics;
+        if (metrics is null)
+        {
+            return pixelValue;
+        }
         return pixelValue / ((float)metrics.DensityDpi / 160f);
     }
 }
