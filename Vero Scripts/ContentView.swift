@@ -225,10 +225,8 @@ struct ContentView: View {
                             logger.verbose("Tapped clear user", context: "User")
                             viewModel.userName = ""
                             userNameChanged(to: viewModel.userName)
-                            viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
                             viewModel.membership = MembershipCase.none
                             membershipChanged(to: viewModel.membership)
-                            viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
                             viewModel.firstForPage = false
                             firstForPageChanged(to: viewModel.firstForPage)
                             viewModel.fromCommunityTag = false
@@ -359,11 +357,6 @@ struct ContentView: View {
                 .lineLimit(1)
                 .truncationMode(.tail)
             Picker("", selection: $viewModel.currentPage.onChange { value in
-                if viewModel.currentPage == nil {
-                    viewModel.pageValidation = .error("Page is required")
-                } else {
-                    viewModel.pageValidation = .valid
-                }
                 pageChanged(to: value)
             }) {
                 ForEach(viewModel.loadedPages) { page in
@@ -415,16 +408,7 @@ struct ContentView: View {
                 field: $viewModel.yourName,
                 fieldChanged: yourNameChanged,
                 fieldValidation: $viewModel.yourNameValidation,
-                validate: { value in
-                    if value.count == 0 {
-                        return .error("Required value")
-                    } else if value.first! == "@" {
-                        return .error("Don't include the '@' in user names")
-                    } else if value.contains(" ") {
-                        return .error("Spaces are not allowed")
-                    }
-                    return .valid
-                },
+                validate: viewModel.validateYourName,
                 focus: $focusedField,
                 focusField: .yourName
             )
@@ -436,12 +420,6 @@ struct ContentView: View {
                 field: $viewModel.yourFirstName,
                 fieldChanged: yourFirstNameChanged,
                 fieldValidation: $viewModel.yourFirstNameValidation,
-                validate: { value in
-                    if value.count == 0 {
-                        return .error("Required value")
-                    }
-                    return .valid
-                },
                 focus: $focusedField,
                 focusField: .yourFirstName
             ).padding([.leading], 8)
@@ -472,7 +450,6 @@ struct ContentView: View {
                         logger.verbose("Using the link text for the user alias", context: "System")
                         viewModel.userName = possibleUserAlias
                         userNameChanged(to: viewModel.userName)
-                        viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
                     } else {
                         viewModel.showToast(.warning, "No user name", "The VERO post link did not contain a user name", duration: 4, modal: false)
                     }
@@ -493,7 +470,6 @@ struct ContentView: View {
                 .frame(width: 36, alignment: .leading)
                 .padding([.leading], viewModel.membershipValidation.isValid ? 8 : 0)
             Picker("", selection: $viewModel.membership.onChange { value in
-                viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
                 membershipChanged(to: value)
             }) {
                 ForEach(MembershipCase.casesFor(hub: viewModel.currentPage?.hub)) { level in
@@ -735,6 +711,7 @@ struct ContentView: View {
     }
 
     private func membershipChanged(to value: MembershipCase) {
+        viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
         if value != lastMembership {
             clearPlaceholders()
             updateScripts()
@@ -744,6 +721,7 @@ struct ContentView: View {
     }
 
     private func userNameChanged(to value: String) {
+        viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
         if value != lastUserName {
             clearPlaceholders()
             updateScripts()
@@ -753,11 +731,12 @@ struct ContentView: View {
     }
 
     private func yourNameChanged(to value: String) {
+        viewModel.yourNameValidation = viewModel.validateUserName(value: viewModel.userName)
         if value != lastYourName {
             clearPlaceholders()
             UserDefaults.standard.set(viewModel.yourName, forKey: "YourName")
             updateScripts()
-        updateNewMembershipScripts()
+            updateNewMembershipScripts()
             lastYourName = value
         }
     }
@@ -773,6 +752,11 @@ struct ContentView: View {
     }
 
     private func pageChanged(to value: LoadedPage?) {
+        if viewModel.currentPage == nil {
+            viewModel.pageValidation = .error("Page is required")
+        } else {
+            viewModel.pageValidation = .valid
+        }
         if value != lastPage {
             clearPlaceholders()
             UserDefaults.standard.set(viewModel.currentPage?.displayName, forKey: "Page")
@@ -780,7 +764,6 @@ struct ContentView: View {
             viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
             if !MembershipCase.caseValidFor(hub: viewModel.currentPage?.hub, viewModel.membership) {
                 viewModel.membership = .none
-                viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
                 membershipChanged(to: viewModel.membership)
             }
             updateScripts()

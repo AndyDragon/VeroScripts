@@ -87,6 +87,17 @@ extension ContentView {
             return .valid
         }
 
+        func validateYourName(value: String) -> ValidationResult {
+            if value.count == 0 {
+                return .error("Required value")
+            } else if value.first! == "@" {
+                return .error("Don't include the '@' in user names")
+            } else if value.contains(" ") {
+                return .error("Spaces are not allowed")
+            }
+            return .valid
+        }
+
         func validateNewMembership(value: NewMembershipCase) -> ValidationResult {
             if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
                 return .error("Not a valid value")
