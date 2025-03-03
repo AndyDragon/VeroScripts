@@ -24,36 +24,9 @@ struct ContentView: View {
 
     @State private var viewModel = ViewModel()
 
-    @State private var loadedPages = [LoadedPage]()
-    @State private var waitingForTemplates = true
-    @State private var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
-    @State private var disallowLists = [String:[String]]()
-    @State private var cautionLists = [String:[String]]()
-
-    @State private var currentPage: LoadedPage? = nil
-    @State private var pageValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
-    @State private var pageStaffLevel = StaffLevelCase.mod
-
-    @State private var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
-    @State private var yourNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
-    @State private var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
-    @State private var yourFirstNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
-
-    @State private var userName = ""
-    @State private var userNameValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
-    @State private var membership = MembershipCase.none
-    @State private var membershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
-    @State private var firstForPage = false
-    @State private var fromCommunityTag = false
-    @State private var fromHubTag = false
-    @State private var fromRawTag = false
-
     @State private var featureScript = ""
     @State private var commentScript = ""
     @State private var originalPostScript = ""
-
-    @State private var newMembership = NewMembershipCase.none
-    @State private var newMembershipValidation: (validation: ValidationResult, reason: String?) = (.valid, nil)
     @State private var newMembershipScript = ""
 
     @State private var placeholderSheetCase = PlaceholderSheetCase.featureScript
@@ -75,16 +48,16 @@ struct ContentView: View {
     @FocusState private var focusedField: FocusedField?
 
     private var canCopyScripts: Bool {
-        return membershipValidation.validation != .error
-        && userNameValidation.validation != .error
-        && yourNameValidation.validation != .error
-        && yourFirstNameValidation.validation != .error
-        && pageValidation.validation != .error
+        return !viewModel.membershipValidation.isError
+        && !viewModel.userNameValidation.isError
+        && !viewModel.yourNameValidation.isError
+        && !viewModel.yourFirstNameValidation.isError
+        && !viewModel.pageValidation.isError
     }
     private var canCopyNewMembershipScript: Bool {
-        return newMembership != NewMembershipCase.none
-        && newMembershipValidation.validation != .error
-        && userNameValidation.validation != .error
+        return viewModel.newMembership != NewMembershipCase.none
+        && !viewModel.newMembershipValidation.isError
+        && !viewModel.userNameValidation.isError
     }
     private let accordionHeightRatio = 3.5
     private let logger = SwiftyBeaver.self
@@ -100,219 +73,252 @@ struct ContentView: View {
         ZStack {
             Color.backgroundColor.edgesIgnoringSafeArea(.all)
 
-            VStack {
-                // Page and staff level
-                PageAndStaffLevelView()
+            if viewModel.visibleView == .ScriptView {
+                VStack {
+                    // Page and staff level
+                    PageAndStaffLevelView()
 
-                // You and your first name
-                ModeratorView()
+                    // You and your first name
+                    ModeratorView()
 
-                // User, membership and options
-                UserAndOptionsView()
+                    // User, membership and options
+                    UserAndOptionsView()
 
-                // Feature script output
-                ScriptEditor(
-                    title: "Feature script:",
-                    script: $featureScript,
-                    minHeight: 72,
-                    maxHeight: .infinity,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(featureScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .featureScript
-                        if copyScript(
-                            featureScript,
-                            featureScriptPlaceholders,
-                            [commentScriptPlaceholders, originalPostScriptPlaceholders],
-                            force: force,
-                            withPlaceholders: withPlaceholders
-                        ) {
-                            logger.verbose("Copied feature script to clipboard", context: "User")
-                            viewModel.showSuccessToast(
-                                "Copied",
-                                String {
-                                    "Copied the feature script\(withPlaceholders ? " with placeholders" : "") "
-                                    "to the clipboard"
-                                }
-                            )
-                        }
-                    },
-                    focus: $focusedField,
-                    focusField: .featureScript
-                )
-
-                // Comment script output
-                ScriptEditor(
-                    title: "Comment script:",
-                    script: $commentScript,
-                    minHeight: 36,
-                    maxHeight: 36 * accordionHeightRatio,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(commentScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .commentScript
-                        if copyScript(
-                            commentScript,
-                            commentScriptPlaceholders,
-                            [featureScriptPlaceholders, originalPostScriptPlaceholders],
-                            force: force,
-                            withPlaceholders: withPlaceholders
-                        ) {
-                            logger.verbose("Copied comment script to clipboard", context: "User")
-                            viewModel.showSuccessToast(
-                                "Copied",
-                                String {
-                                    "Copied the comment script\(withPlaceholders ? " with placeholders" : "") "
-                                    "to the clipboard"
-                                }
-                            )
-                        }
-                    },
-                    focus: $focusedField,
-                    focusField: .commentScript
-                )
-
-                // Original post script output
-                ScriptEditor(
-                    title: "Original post script:",
-                    script: $originalPostScript,
-                    minHeight: 24,
-                    maxHeight: 24 * accordionHeightRatio,
-                    canCopy: canCopyScripts,
-                    hasPlaceholders: scriptHasPlaceholders(originalPostScript),
-                    copy: { force, withPlaceholders in
-                        placeholderSheetCase = .originalPostScript
-                        if copyScript(
-                            originalPostScript,
-                            originalPostScriptPlaceholders,
-                            [featureScriptPlaceholders, commentScriptPlaceholders],
-                            force: force,
-                            withPlaceholders: withPlaceholders
-                        ) {
-                            logger.verbose("Copied original post script to clipboard", context: "User")
-                            viewModel.showSuccessToast(
-                                "Copied",
-                                String {
-                                    "Copied the original script\(withPlaceholders ? " with placeholders" : "") "
-                                    "to the clipboard"
-                                }
-                            )
-                        }
-                    },
-                    focus: $focusedField,
-                    focusField: .originalPostScript
-                )
-
-                // New membership picker and script output
-                NewMembershipEditor(
-                    newMembership: $newMembership,
-                    script: $newMembershipScript,
-                    currentPage: $currentPage,
-                    minHeight: 36,
-                    maxHeight: 36 * accordionHeightRatio,
-                    onChanged: { newValue in
-                        newMembershipValidation = validateNewMembership(value: newMembership)
-                        newMembershipChanged(to: newValue)
-                    },
-                    valid: newMembershipValidation.validation != .error && userNameValidation.validation != .error,
-                    canCopy: canCopyNewMembershipScript,
-                    copy: {
-                        copyToClipboard(newMembershipScript)
-                        logger.verbose("Copied new membership script to clipboard", context: "User")
-                        viewModel.showSuccessToast(
-                            "Copied",
-                            "Copied the new membership script to the clipboard"
-                        )
-                    },
-                    focus: $focusedField,
-                    focusField: .newMembershipScript
-                )
-            }
-            .foregroundStyle(Color.label, Color.secondaryLabel)
-            .padding()
-            .sheet(isPresented: $showingPlaceholderSheet) {
-                PlaceholderSheet(
-                    placeholders: placeholderSheetCase == .featureScript
-                    ? featureScriptPlaceholders
-                    : placeholderSheetCase == .commentScript
-                    ? commentScriptPlaceholders
-                    : originalPostScriptPlaceholders,
-                    scriptWithPlaceholders: $scriptWithPlaceholders,
-                    scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
-                    isPresenting: $showingPlaceholderSheet,
-                    transferPlaceholders: {
-                        switch placeholderSheetCase {
-                        case .featureScript:
-                            transferPlaceholderValues(
+                    // Feature script output
+                    ScriptEditor(
+                        title: "Feature script:",
+                        script: $featureScript,
+                        minHeight: 72,
+                        maxHeight: .infinity,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(featureScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .featureScript
+                            if copyScript(
+                                featureScript,
                                 featureScriptPlaceholders,
-                                [commentScriptPlaceholders, originalPostScriptPlaceholders])
-                            break
-                        case .commentScript:
-                            transferPlaceholderValues(
+                                [commentScriptPlaceholders, originalPostScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders
+                            ) {
+                                logger.verbose("Copied feature script to clipboard", context: "User")
+                                viewModel.showSuccessToast(
+                                    "Copied",
+                                    String {
+                                        "Copied the feature script\(withPlaceholders ? " with placeholders" : "") "
+                                        "to the clipboard"
+                                    }
+                                )
+                            }
+                        },
+                        focus: $focusedField,
+                        focusField: .featureScript
+                    )
+
+                    // Comment script output
+                    ScriptEditor(
+                        title: "Comment script:",
+                        script: $commentScript,
+                        minHeight: 36,
+                        maxHeight: 36 * accordionHeightRatio,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(commentScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .commentScript
+                            if copyScript(
+                                commentScript,
                                 commentScriptPlaceholders,
-                                [featureScriptPlaceholders, originalPostScriptPlaceholders])
-                            break
-                        case .originalPostScript:
-                            transferPlaceholderValues(
+                                [featureScriptPlaceholders, originalPostScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders
+                            ) {
+                                logger.verbose("Copied comment script to clipboard", context: "User")
+                                viewModel.showSuccessToast(
+                                    "Copied",
+                                    String {
+                                        "Copied the comment script\(withPlaceholders ? " with placeholders" : "") "
+                                        "to the clipboard"
+                                    }
+                                )
+                            }
+                        },
+                        focus: $focusedField,
+                        focusField: .commentScript
+                    )
+
+                    // Original post script output
+                    ScriptEditor(
+                        title: "Original post script:",
+                        script: $originalPostScript,
+                        minHeight: 24,
+                        maxHeight: 24 * accordionHeightRatio,
+                        canCopy: canCopyScripts,
+                        hasPlaceholders: scriptHasPlaceholders(originalPostScript),
+                        copy: { force, withPlaceholders in
+                            placeholderSheetCase = .originalPostScript
+                            if copyScript(
+                                originalPostScript,
                                 originalPostScriptPlaceholders,
-                                [featureScriptPlaceholders, commentScriptPlaceholders])
-                            break
-                        }
-                    },
-                    toastCopyToClipboard: { copiedSuffix in
-                        var scriptName: String
-                        switch placeholderSheetCase {
-                        case .featureScript:
-                            scriptName = "feature"
-                            break
-                        case .commentScript:
-                            scriptName = "comment"
-                            break
-                        case .originalPostScript:
-                            scriptName = "original post"
-                            break
-                        }
-                        let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
-                        logger.verbose("Copied \(scriptName) script to clipboard", context: "User")
-                        viewModel.showSuccessToast("Copied", "Copied the \(scriptName) script\(suffix) to the clipboard")
-                    }
-                )
-            }
-            .toolbar {
-                ToolbarItem {
-                    Button(action: {
-                        logger.verbose("Tapped clear user", context: "User")
-                        userName = ""
-                        userNameChanged(to: userName)
-                        userNameValidation = validateUserName(value: userName)
-                        membership = MembershipCase.none
-                        membershipChanged(to: membership)
-                        membershipValidation = validateMembership(value: membership)
-                        firstForPage = false
-                        firstForPageChanged(to: firstForPage)
-                        fromCommunityTag = false
-                        fromCommunityTagChanged(to: fromCommunityTag)
-                        fromHubTag = false
-                        fromHubTagChanged(to: fromHubTag)
-                        fromRawTag = false
-                        fromRawTagChanged(to: fromRawTag)
-                        newMembership = NewMembershipCase.none
-                        newMembershipChanged(to: newMembership)
-                        focusedField = .userName
-                        logger.verbose("Cleared user", context: "System")
-                    }) {
-                        HStack {
-                            Image(systemName: "xmark")
-                                .foregroundStyle(Color.red, Color.secondaryLabel)
-                            Text("Clear user")
-                                .font(.system(.body, design: .rounded).bold())
-                                .foregroundStyle(Color.red, Color.secondaryLabel)
-                        }
-                        .padding(4)
-                        .buttonStyle(.plain)
-                    }
-                    .disabled(viewModel.hasModalToasts)
+                                [featureScriptPlaceholders, commentScriptPlaceholders],
+                                force: force,
+                                withPlaceholders: withPlaceholders
+                            ) {
+                                logger.verbose("Copied original post script to clipboard", context: "User")
+                                viewModel.showSuccessToast(
+                                    "Copied",
+                                    String {
+                                        "Copied the original script\(withPlaceholders ? " with placeholders" : "") "
+                                        "to the clipboard"
+                                    }
+                                )
+                            }
+                        },
+                        focus: $focusedField,
+                        focusField: .originalPostScript
+                    )
+
+                    // New membership picker and script output
+                    NewMembershipEditor(
+                        newMembership: $viewModel.newMembership,
+                        script: $newMembershipScript,
+                        currentPage: $viewModel.currentPage,
+                        minHeight: 36,
+                        maxHeight: 36 * accordionHeightRatio,
+                        onChanged: { newValue in
+                            viewModel.newMembershipValidation = viewModel.validateNewMembership(value: viewModel.newMembership)
+                            newMembershipChanged(to: newValue)
+                        },
+                        valid: !viewModel.newMembershipValidation.isError && !viewModel.userNameValidation.isError,
+                        canCopy: canCopyNewMembershipScript,
+                        copy: {
+                            copyToClipboard(newMembershipScript)
+                            logger.verbose("Copied new membership script to clipboard", context: "User")
+                            viewModel.showSuccessToast(
+                                "Copied",
+                                "Copied the new membership script to the clipboard"
+                            )
+                        },
+                        focus: $focusedField,
+                        focusField: .newMembershipScript
+                    )
                 }
+                .toolbar {
+                    ToolbarItem {
+                        Button(action: {
+                            viewModel.visibleView = .PostDownloadView
+                        }) {
+                            HStack {
+                                Image(systemName: "photo.badge.checkmark")
+                                    .foregroundStyle(viewModel.postLink != nil ? Color.accentColor : Color.secondaryLabel, Color.secondaryLabel)
+                                Text("Load photos")
+                                    .font(.system(.body, design: .rounded).bold())
+                                    .foregroundStyle(viewModel.postLink != nil ? Color.accentColor : Color.secondaryLabel, Color.secondaryLabel)
+                            }
+                            .padding(4)
+                            .padding(.trailing, 4)
+                            .buttonStyle(.plain)
+                        }
+                        .disabled(viewModel.postLink == nil)
+                    }
+                    ToolbarItem {
+                        Button(action: {
+                            logger.verbose("Tapped clear user", context: "User")
+                            viewModel.userName = ""
+                            userNameChanged(to: viewModel.userName)
+                            viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
+                            viewModel.membership = MembershipCase.none
+                            membershipChanged(to: viewModel.membership)
+                            viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
+                            viewModel.firstForPage = false
+                            firstForPageChanged(to: viewModel.firstForPage)
+                            viewModel.fromCommunityTag = false
+                            fromCommunityTagChanged(to: viewModel.fromCommunityTag)
+                            viewModel.fromHubTag = false
+                            fromHubTagChanged(to: viewModel.fromHubTag)
+                            viewModel.fromRawTag = false
+                            fromRawTagChanged(to: viewModel.fromRawTag)
+                            viewModel.newMembership = NewMembershipCase.none
+                            newMembershipChanged(to: viewModel.newMembership)
+                            focusedField = .userName
+                            logger.verbose("Cleared user", context: "System")
+                        }) {
+                            HStack {
+                                Image(systemName: "xmark")
+                                    .foregroundStyle(Color.red, Color.secondaryLabel)
+                                Text("Clear user")
+                                    .font(.system(.body, design: .rounded).bold())
+                                    .foregroundStyle(Color.red, Color.secondaryLabel)
+                            }
+                            .padding(4)
+                            .buttonStyle(.plain)
+                        }
+                        .disabled(viewModel.hasModalToasts)
+                    }
+                }
+                .foregroundStyle(Color.label, Color.secondaryLabel)
+                .padding()
+                .sheet(isPresented: $showingPlaceholderSheet) {
+                    PlaceholderSheet(
+                        placeholders: placeholderSheetCase == .featureScript
+                        ? featureScriptPlaceholders
+                        : placeholderSheetCase == .commentScript
+                        ? commentScriptPlaceholders
+                        : originalPostScriptPlaceholders,
+                        scriptWithPlaceholders: $scriptWithPlaceholders,
+                        scriptWithPlaceholdersInPlace: $scriptWithPlaceholdersInPlace,
+                        isPresenting: $showingPlaceholderSheet,
+                        transferPlaceholders: {
+                            switch placeholderSheetCase {
+                            case .featureScript:
+                                transferPlaceholderValues(
+                                    featureScriptPlaceholders,
+                                    [commentScriptPlaceholders, originalPostScriptPlaceholders])
+                                break
+                            case .commentScript:
+                                transferPlaceholderValues(
+                                    commentScriptPlaceholders,
+                                    [featureScriptPlaceholders, originalPostScriptPlaceholders])
+                                break
+                            case .originalPostScript:
+                                transferPlaceholderValues(
+                                    originalPostScriptPlaceholders,
+                                    [featureScriptPlaceholders, commentScriptPlaceholders])
+                                break
+                            }
+                        },
+                        toastCopyToClipboard: { copiedSuffix in
+                            var scriptName: String
+                            switch placeholderSheetCase {
+                            case .featureScript:
+                                scriptName = "feature"
+                                break
+                            case .commentScript:
+                                scriptName = "comment"
+                                break
+                            case .originalPostScript:
+                                scriptName = "original post"
+                                break
+                            }
+                            let suffix = copiedSuffix.isEmpty ? "" : " \(copiedSuffix)"
+                            logger.verbose("Copied \(scriptName) script to clipboard", context: "User")
+                            viewModel.showSuccessToast("Copied", "Copied the \(scriptName) script\(suffix) to the clipboard")
+                        }
+                    )
+                }
+            } else if viewModel.visibleView == .PostDownloadView {
+                PostDownloaderView(
+                    viewModel,
+                    {
+                        print("Should be updating scripts...")
+                        clearPlaceholders()
+                        updateScripts()
+                        updateNewMembershipScripts()
+                    },
+                    $focusedField)
+            } else if viewModel.visibleView == .ImageValidationView {
+                ImageValidationView(
+                    viewModel,
+                    $focusedField)
             }
         }
         .background(Color.backgroundColor)
@@ -325,7 +331,7 @@ struct ContentView: View {
 #endif
         .task {
             // Hack for page staff level to handle changes (otherwise they are not persisted)
-            lastPageStaffLevel = pageStaffLevel
+            lastPageStaffLevel = viewModel.pageStaffLevel
 
             let loadingPagesToast = viewModel.showToast(
                 .progress,
@@ -344,26 +350,23 @@ struct ContentView: View {
     fileprivate func PageAndStaffLevelView() -> some View {
         HStack {
             // Page picker
-            if pageValidation.validation != .valid {
-                Image(systemName: pageValidation.validation.icon)
-                    .foregroundStyle(pageValidation.validation.iconColor1, pageValidation.validation.iconColor2)
-                    .help(pageValidation.reason ?? "unknown error")
-                    .imageScale(.small)
+            if !viewModel.pageValidation.isValid {
+                viewModel.pageValidation.getImage()
             }
             Text("Page: ")
-                .foregroundStyle(pageValidation.validation.color, Color.secondaryLabel)
+                .foregroundStyle(viewModel.pageValidation.getColor(), Color.secondaryLabel)
                 .frame(width: 36, alignment: .leading)
                 .lineLimit(1)
                 .truncationMode(.tail)
-            Picker("", selection: $currentPage.onChange { value in
-                if currentPage == nil {
-                    pageValidation = (.error, "Page is required")
+            Picker("", selection: $viewModel.currentPage.onChange { value in
+                if viewModel.currentPage == nil {
+                    viewModel.pageValidation = .error("Page is required")
                 } else {
-                    pageValidation = (.valid, nil)
+                    viewModel.pageValidation = .valid
                 }
                 pageChanged(to: value)
             }) {
-                ForEach(loadedPages) { page in
+                ForEach(viewModel.loadedPages) { page in
                     Text(page.displayName)
                         .tag(page)
                         .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
@@ -375,10 +378,10 @@ struct ContentView: View {
             .focusable()
             .focused($focusedField, equals: .page)
             .onAppear {
-                if currentPage == nil {
-                    pageValidation = (.error, "Page must not be 'default' or a page name is required")
+                if viewModel.currentPage == nil {
+                    viewModel.pageValidation = .error("Page must not be 'default' or a page name is required")
                 } else {
-                    pageValidation = (.valid, nil)
+                    viewModel.pageValidation = .valid
                 }
             }
 
@@ -387,8 +390,8 @@ struct ContentView: View {
                 .padding([.leading], 8)
                 .lineLimit(1)
                 .truncationMode(.tail)
-            Picker("", selection: $pageStaffLevel.onChange(pageStaffLevelChanged)) {
-                ForEach(StaffLevelCase.casesFor(hub: currentPage?.hub)) { staffLevelCase in
+            Picker("", selection: $viewModel.pageStaffLevel.onChange(pageStaffLevelChanged)) {
+                ForEach(StaffLevelCase.casesFor(hub: viewModel.currentPage?.hub)) { staffLevelCase in
                     Text(staffLevelCase.rawValue)
                         .tag(staffLevelCase)
                         .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
@@ -409,18 +412,18 @@ struct ContentView: View {
                 title: "You:",
                 titleWidth: [42, 60],
                 placeholder: "Enter your user name without '@'",
-                field: $yourName,
+                field: $viewModel.yourName,
                 fieldChanged: yourNameChanged,
-                fieldValidation: $yourNameValidation,
+                fieldValidation: $viewModel.yourNameValidation,
                 validate: { value in
                     if value.count == 0 {
-                        return (.error, "Required value")
+                        return .error("Required value")
                     } else if value.first! == "@" {
-                        return (.error, "Don't include the '@' in user names")
+                        return .error("Don't include the '@' in user names")
                     } else if value.contains(" ") {
-                        return (.error, "Spaces are not allowed")
+                        return .error("Spaces are not allowed")
                     }
-                    return (.valid, nil)
+                    return .valid
                 },
                 focus: $focusedField,
                 focusField: .yourName
@@ -430,14 +433,14 @@ struct ContentView: View {
             FieldEditor(
                 title: "Your first name:",
                 placeholder: "Enter your first name (capitalized)",
-                field: $yourFirstName,
+                field: $viewModel.yourFirstName,
                 fieldChanged: yourFirstNameChanged,
-                fieldValidation: $yourFirstNameValidation,
+                fieldValidation: $viewModel.yourFirstNameValidation,
                 validate: { value in
                     if value.count == 0 {
-                        return (.error, "Required value")
+                        return .error("Required value")
                     }
-                    return (.valid, nil)
+                    return .valid
                 },
                 focus: $focusedField,
                 focusField: .yourFirstName
@@ -452,23 +455,24 @@ struct ContentView: View {
                 title: "User: ",
                 titleWidth: [42, 60],
                 placeholder: "Enter user name without '@'",
-                field: $userName,
+                field: $viewModel.userName,
                 fieldChanged: userNameChanged,
-                fieldValidation: $userNameValidation,
-                validate: validateUserName,
+                fieldValidation: $viewModel.userNameValidation,
+                validate: viewModel.validateUserName,
                 focus: $focusedField,
                 focusField: .userName
             )
             
             Button(action: {
                 if let postLink = stringFromClipboard(), postLink.starts(with: "https://vero.co/") {
+                    viewModel.postLink = postLink
                     let possibleUserAlias = String(postLink.dropFirst(16).split(separator: "/").first ?? "")
                     // If the user doesn't have an alias, the link will have a single letter, often 'p'
                     if possibleUserAlias.count > 1 {
                         logger.verbose("Using the link text for the user alias", context: "System")
-                        userName = possibleUserAlias
-                        userNameChanged(to: userName)
-                        userNameValidation = validateUserName(value: userName)
+                        viewModel.userName = possibleUserAlias
+                        userNameChanged(to: viewModel.userName)
+                        viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
                     } else {
                         viewModel.showToast(.warning, "No user name", "The VERO post link did not contain a user name", duration: 4, modal: false)
                     }
@@ -481,22 +485,18 @@ struct ContentView: View {
             }
             
             // User level picker
-            if membershipValidation.validation != .valid {
-                Image(systemName: membershipValidation.validation.icon)
-                    .foregroundStyle(membershipValidation.validation.iconColor1, membershipValidation.validation.iconColor2)
-                    .help(membershipValidation.reason ?? "unknown error")
-                    .imageScale(.small)
-                    .padding([.leading], 8)
+            if !viewModel.membershipValidation.isValid {
+                viewModel.membershipValidation.getImage()
             }
             Text("Level: ")
-                .foregroundStyle(membershipValidation.validation.color, Color.secondaryLabel)
+                .foregroundStyle(viewModel.membershipValidation.getColor(), Color.secondaryLabel)
                 .frame(width: 36, alignment: .leading)
-                .padding([.leading], membershipValidation.validation == .valid ? 8 : 0)
-            Picker("", selection: $membership.onChange { value in
-                membershipValidation = validateMembership(value: membership)
+                .padding([.leading], viewModel.membershipValidation.isValid ? 8 : 0)
+            Picker("", selection: $viewModel.membership.onChange { value in
+                viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
                 membershipChanged(to: value)
             }) {
-                ForEach(MembershipCase.casesFor(hub: currentPage?.hub)) { level in
+                ForEach(MembershipCase.casesFor(hub: viewModel.currentPage?.hub)) { level in
                     Text(level.rawValue)
                         .tag(level)
                         .foregroundStyle(Color.secondaryLabel, Color.secondaryLabel)
@@ -506,13 +506,13 @@ struct ContentView: View {
             .accentColor(Color.accentColor)
             .foregroundStyle(Color.accentColor, Color.label)
             .onAppear {
-                membershipValidation = validateMembership(value: membership)
+                viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
             }
             .focusable()
             .focused($focusedField, equals: .level)
             
             // Options
-            Toggle(isOn: $firstForPage.onChange(firstForPageChanged)) {
+            Toggle(isOn: $viewModel.firstForPage.onChange(firstForPageChanged)) {
                 Text("First feature on page")
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -522,8 +522,8 @@ struct ContentView: View {
             .padding([.leading], 8)
             .help("First feature on page")
             
-            if currentPage?.hub == "click" {
-                Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+            if viewModel.currentPage?.hub == "click" {
+                Toggle(isOn: $viewModel.fromCommunityTag.onChange(fromCommunityTagChanged)) {
                     Text("From community tag")
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -533,7 +533,7 @@ struct ContentView: View {
                 .padding([.leading], 8)
                 .help("From community tag")
                 
-                Toggle(isOn: $fromHubTag.onChange(fromHubTagChanged)) {
+                Toggle(isOn: $viewModel.fromHubTag.onChange(fromHubTagChanged)) {
                     Text("From hub tag")
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -542,8 +542,8 @@ struct ContentView: View {
                 .focused($focusedField, equals: .hubTag)
                 .padding([.leading], 8)
                 .help("From hub tag")
-            } else if currentPage?.hub == "snap" {
-                Toggle(isOn: $fromRawTag.onChange(fromRawTagChanged)) {
+            } else if viewModel.currentPage?.hub == "snap" {
+                Toggle(isOn: $viewModel.fromRawTag.onChange(fromRawTagChanged)) {
                     Text("From RAW tag")
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -553,7 +553,7 @@ struct ContentView: View {
                 .padding([.leading], 8)
                 .help("From RAW tag")
                 
-                Toggle(isOn: $fromCommunityTag.onChange(fromCommunityTagChanged)) {
+                Toggle(isOn: $viewModel.fromCommunityTag.onChange(fromCommunityTagChanged)) {
                     Text("From community tag")
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -569,34 +569,34 @@ struct ContentView: View {
     }
     
     private func updateStaffLevelForPage() {
-        if let currentPage {
+        if let currentPage = viewModel.currentPage {
             if let rawPageStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel_" + currentPage.displayName) {
                 if let pageStaffLevelFromRaw = StaffLevelCase(rawValue: rawPageStaffLevel) {
-                    pageStaffLevel = pageStaffLevelFromRaw
+                    viewModel.pageStaffLevel = pageStaffLevelFromRaw
                     return
                 }
-                pageStaffLevel = StaffLevelCase.mod
+                viewModel.pageStaffLevel = StaffLevelCase.mod
                 return
             }
         }
 
         if let rawPagelessStaffLevel = UserDefaults.standard.string(forKey: "StaffLevel") {
             if let pageStaffLevelFromRaw = StaffLevelCase(rawValue: rawPagelessStaffLevel) {
-                pageStaffLevel = pageStaffLevelFromRaw
+                viewModel.pageStaffLevel = pageStaffLevelFromRaw
                 storeStaffLevelForPage()
                 return
             }
         }
 
-        pageStaffLevel = StaffLevelCase.mod
+        viewModel.pageStaffLevel = StaffLevelCase.mod
         storeStaffLevelForPage()
     }
 
     private func storeStaffLevelForPage() {
-        if let currentPage {
-            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel_" + currentPage.displayName)
+        if let currentPage = viewModel.currentPage {
+            UserDefaults.standard.set(viewModel.pageStaffLevel.rawValue, forKey: "StaffLevel_" + currentPage.displayName)
         } else {
-            UserDefaults.standard.set(pageStaffLevel.rawValue, forKey: "StaffLevel")
+            UserDefaults.standard.set(viewModel.pageStaffLevel.rawValue, forKey: "StaffLevel")
         }
     }
 
@@ -612,8 +612,8 @@ struct ContentView: View {
                     pages.append(LoadedPage.from(hub: hubPair.key, page: hubPage))
                 }
             }
-            loadedPages.removeAll()
-            loadedPages.append(contentsOf: pages.sorted(by: {
+            viewModel.loadedPages.removeAll()
+            viewModel.loadedPages.append(contentsOf: pages.sorted(by: {
                 if $0.hub == "other" && $1.hub == "other" {
                     return $0.name < $1.name
                 }
@@ -627,14 +627,14 @@ struct ContentView: View {
             }))
 
             let page = UserDefaults.standard.string(forKey: "Page") ?? ""
-            currentPage = loadedPages.first(where: { $0.displayName == page }) ?? loadedPages.first
-            if currentPage == nil {
-                pageValidation = (.error, "Page must not be 'default' or a page name is required")
+            viewModel.currentPage = viewModel.loadedPages.first(where: { $0.displayName == page }) ?? viewModel.loadedPages.first
+            if viewModel.currentPage == nil {
+                viewModel.pageValidation = .error("Page must not be 'default' or a page name is required")
             } else {
-                pageValidation = (.valid, nil)
+                viewModel.pageValidation = .valid
             }
 
-            logger.verbose("Loaded page catalog from server with \(loadedPages.count) pages", context: "System")
+            logger.verbose("Loaded page catalog from server with \(viewModel.loadedPages.count) pages", context: "System")
 
             updateStaffLevelForPage()
 
@@ -644,12 +644,12 @@ struct ContentView: View {
             logger.verbose("Loading template catalog from server", context: "System")
 
             let templatesUrl = URL(string: "https://vero.andydragon.com/static/data/templates.json")!
-            templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
-            waitingForTemplates = false
+            viewModel.templatesCatalog = try await URLSession.shared.decode(TemplateCatalog.self, from: templatesUrl)
+            viewModel.waitingForTemplates = false
             updateScripts()
             updateNewMembershipScripts()
 
-            logger.verbose("Loaded template catalog from server with \(templatesCatalog.pages.count) page templates", context: "System")
+            logger.verbose("Loaded template catalog from server with \(viewModel.templatesCatalog.pages.count) page templates", context: "System")
 
             do {
                 // Delay the start of the disallowed lists download so the window can be ready faster
@@ -658,9 +658,9 @@ struct ContentView: View {
                 logger.verbose("Loading disallow lists from server", context: "System")
 
                 let disallowListsUrl = URL(string: "https://vero.andydragon.com/static/data/disallowlists.json")!
-                disallowLists = try await URLSession.shared.decode([String: [String]].self, from: disallowListsUrl)
+                viewModel.disallowLists = try await URLSession.shared.decode([String: [String]].self, from: disallowListsUrl)
 
-                logger.verbose("Loaded disallow lists from server with \(disallowLists.count) entries", context: "System")
+                logger.verbose("Loaded disallow lists from server with \(viewModel.disallowLists.count) entries", context: "System")
             } catch {
                 // do nothing, the disallow list is not critical
                 logger.error("Failed to load disallow list from server: \(error.localizedDescription)", context: "System")
@@ -671,9 +671,9 @@ struct ContentView: View {
                 logger.verbose("Loading caution lists from server", context: "System")
 
                 let cautionListsUrl = URL(string: "https://vero.andydragon.com/static/data/cautionlists.json")!
-                cautionLists = try await URLSession.shared.decode([String: [String]].self, from: cautionListsUrl)
+                viewModel.cautionLists = try await URLSession.shared.decode([String: [String]].self, from: cautionListsUrl)
 
-                logger.verbose("Loaded caution lists from server with \(cautionLists.count) entries", context: "System")
+                logger.verbose("Loaded caution lists from server with \(viewModel.cautionLists.count) entries", context: "System")
             } catch {
                 // do nothing, the caution lists is not critical
                 logger.error("Failed to load caution lists from server: \(error.localizedDescription)", context: "System")
@@ -743,16 +743,6 @@ struct ContentView: View {
         }
     }
 
-    private func validateMembership(value: MembershipCase) -> (validation: ValidationResult, reason: String?) {
-        if value == MembershipCase.none {
-            return (.error, "Required value")
-        }
-        if !MembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (.error, "Not a valid value")
-        }
-        return (.valid, nil)
-    }
-
     private func userNameChanged(to value: String) {
         if value != lastUserName {
             clearPlaceholders()
@@ -762,25 +752,10 @@ struct ContentView: View {
         }
     }
 
-    private func validateUserName(value: String) -> (validation: ValidationResult, reason: String?) {
-        if value.count == 0 {
-            return (.error, "Required value")
-        } else if value.first! == "@" {
-            return (.error, "Don't include the '@' in user names")
-        } else if (disallowLists[currentPage?.hub ?? ""]?.first { disallow in disallow == value } != nil) {
-            return (.error, "User is on the disallow list")
-        } else if (cautionLists[currentPage?.hub ?? ""]?.first { caution in caution == value } != nil) {
-            return (.warning, "User is on the caution list")
-        } else if value.contains(" ") {
-            return (.error, "Spaces are not allowed")
-        }
-        return (.valid, nil)
-    }
-
     private func yourNameChanged(to value: String) {
         if value != lastYourName {
             clearPlaceholders()
-            UserDefaults.standard.set(yourName, forKey: "YourName")
+            UserDefaults.standard.set(viewModel.yourName, forKey: "YourName")
             updateScripts()
         updateNewMembershipScripts()
             lastYourName = value
@@ -790,7 +765,7 @@ struct ContentView: View {
     private func yourFirstNameChanged(to value: String) {
         if value != lastYourFirstName {
             clearPlaceholders()
-            UserDefaults.standard.set(yourFirstName, forKey: "YourFirstName")
+            UserDefaults.standard.set(viewModel.yourFirstName, forKey: "YourFirstName")
             updateScripts()
             updateNewMembershipScripts()
             lastYourFirstName = value
@@ -800,13 +775,13 @@ struct ContentView: View {
     private func pageChanged(to value: LoadedPage?) {
         if value != lastPage {
             clearPlaceholders()
-            UserDefaults.standard.set(currentPage?.displayName, forKey: "Page")
+            UserDefaults.standard.set(viewModel.currentPage?.displayName, forKey: "Page")
             updateStaffLevelForPage()
-            userNameValidation = validateUserName(value: userName)
-            if !MembershipCase.caseValidFor(hub: currentPage?.hub, membership) {
-                membership = .none
-                membershipValidation = validateMembership(value: membership)
-                membershipChanged(to: membership)
+            viewModel.userNameValidation = viewModel.validateUserName(value: viewModel.userName)
+            if !MembershipCase.caseValidFor(hub: viewModel.currentPage?.hub, viewModel.membership) {
+                viewModel.membership = .none
+                viewModel.membershipValidation = viewModel.validateMembership(value: viewModel.membership)
+                membershipChanged(to: viewModel.membership)
             }
             updateScripts()
             updateNewMembershipScripts()
@@ -848,13 +823,6 @@ struct ContentView: View {
 
     private func newMembershipChanged(to value: NewMembershipCase) {
         updateNewMembershipScripts()
-    }
-
-    private func validateNewMembership(value: NewMembershipCase) -> (validation: ValidationResult, reason: String?) {
-        if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
-            return (.error, "Not a valid value")
-        }
-        return (.valid, nil)
     }
 
     private func copyScript(
@@ -981,85 +949,85 @@ struct ContentView: View {
     private func updateScripts() -> Void {
         if !canCopyScripts {
             var validationErrors = ""
-            if userNameValidation.validation != .valid {
-                validationErrors += "User: " + userNameValidation.reason! + "\n"
+            if !viewModel.userNameValidation.isValid {
+                validationErrors += "User: " + viewModel.userNameValidation.unwrappedMessage + "\n"
             }
-            if membershipValidation.validation != .valid {
-                validationErrors += "Level: " + membershipValidation.reason! + "\n"
+            if !viewModel.membershipValidation.isValid {
+                validationErrors += "Level: " + viewModel.membershipValidation.unwrappedMessage + "\n"
             }
-            if yourNameValidation.validation != .valid {
-                validationErrors += "You: " + yourNameValidation.reason! + "\n"
+            if !viewModel.yourNameValidation.isValid {
+                validationErrors += "You: " + viewModel.yourNameValidation.unwrappedMessage + "\n"
             }
-            if yourFirstNameValidation.validation != .valid {
-                validationErrors += "Your first name: " + yourFirstNameValidation.reason! + "\n"
+            if !viewModel.yourFirstNameValidation.isValid {
+                validationErrors += "Your first name: " + viewModel.yourFirstNameValidation.unwrappedMessage + "\n"
             }
-            if pageValidation.validation != .valid {
-                validationErrors += "Page: " + pageValidation.reason! + "\n"
+            if !viewModel.pageValidation.isValid {
+                validationErrors += "Page: " + viewModel.pageValidation.unwrappedMessage + "\n"
             }
             featureScript = validationErrors
             originalPostScript = ""
             commentScript = ""
-        } else if let currentPage {
+        } else if let currentPage = viewModel.currentPage {
             let currentPageName = currentPage.id
             let currentPageDisplayName = currentPage.name
             let scriptPageName = currentPage.pageName ?? currentPageDisplayName
             let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
             let scriptPageTitle = currentPage.title ?? currentPageDisplayName
-            let membershipString = (currentPage.hub == "snap" && membership.rawValue.hasPrefix("Snap "))
-                ? String(membership.rawValue.dropFirst(5))
-                : membership.rawValue
+            let membershipString = (currentPage.hub == "snap" && viewModel.membership.rawValue.hasPrefix("Snap "))
+            ? String(viewModel.membership.rawValue.dropFirst(5))
+            : viewModel.membership.rawValue
             let featureScriptTemplate = getTemplateFromCatalog(
                 "feature",
                 from: currentPage.id,
-                firstFeature: firstForPage,
-                rawTag: fromRawTag,
-                communityTag: fromCommunityTag,
-                hubTag: fromHubTag) ?? ""
+                firstFeature: viewModel.firstForPage,
+                rawTag: viewModel.fromRawTag,
+                communityTag: viewModel.fromCommunityTag,
+                hubTag: viewModel.fromHubTag) ?? ""
             let commentScriptTemplate = getTemplateFromCatalog(
                 "comment",
                 from: currentPage.id,
-                firstFeature: firstForPage,
-                rawTag: fromRawTag,
-                communityTag: fromCommunityTag,
-                hubTag: fromHubTag) ?? ""
+                firstFeature: viewModel.firstForPage,
+                rawTag: viewModel.fromRawTag,
+                communityTag: viewModel.fromCommunityTag,
+                hubTag: viewModel.fromHubTag) ?? ""
             let originalPostScriptTemplate = getTemplateFromCatalog(
                 "original post",
                 from: currentPage.id,
-                firstFeature: firstForPage,
-                rawTag: fromRawTag,
-                communityTag: fromCommunityTag,
-                hubTag: fromHubTag) ?? ""
-            
+                firstFeature: viewModel.firstForPage,
+                rawTag: viewModel.fromRawTag,
+                communityTag: viewModel.fromCommunityTag,
+                hubTag: viewModel.fromHubTag) ?? ""
+
             featureScript = featureScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
-                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: viewModel.pageStaffLevel.rawValue)
             originalPostScript = originalPostScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
-                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: viewModel.pageStaffLevel.rawValue)
             commentScript = commentScriptTemplate
                 .replacingOccurrences(of: "%%PAGENAME%%", with: scriptPageName)
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
                 .replacingOccurrences(of: "%%MEMBERLEVEL%%", with: membershipString)
-                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: viewModel.pageStaffLevel.rawValue)
         }
     }
 
@@ -1072,10 +1040,10 @@ struct ContentView: View {
         hubTag: Bool
     ) -> String! {
         var template: Template!
-        if waitingForTemplates {
+        if viewModel.waitingForTemplates {
             return "";
         }
-        let templatePage = templatesCatalog.pages.first(where: { page in
+        let templatePage = viewModel.templatesCatalog.pages.first(where: { page in
             page.id == pageId
         });
 
@@ -1153,29 +1121,29 @@ struct ContentView: View {
     }
 
     private func updateNewMembershipScripts() -> Void {
-        if waitingForTemplates {
+        if viewModel.waitingForTemplates {
             newMembershipScript = ""
             return
         }
         if !canCopyNewMembershipScript {
             var validationErrors = ""
-            if newMembership != NewMembershipCase.none {
-                if userNameValidation.validation != .valid {
-                    validationErrors += "User: " + userNameValidation.reason! + "\n"
+            if viewModel.newMembership != NewMembershipCase.none {
+                if !viewModel.userNameValidation.isValid {
+                    validationErrors += "User: " + viewModel.userNameValidation.unwrappedMessage + "\n"
                 }
-                if newMembershipValidation.validation != .valid {
-                    validationErrors += "New level: " + newMembershipValidation.reason! + "\n"
+                if !viewModel.newMembershipValidation.isValid {
+                    validationErrors += "New level: " + viewModel.newMembershipValidation.unwrappedMessage + "\n"
                 }
             }
             newMembershipScript = validationErrors
-        } else if canCopyNewMembershipScript, let currentPage {
+        } else if canCopyNewMembershipScript, let currentPage = viewModel.currentPage {
             let currentPageName = currentPage.id
             let currentPageDisplayName = currentPage.name
             let scriptPageName = currentPage.pageName ?? currentPageDisplayName
             let scriptPageHash = currentPage.hashTag ?? currentPageDisplayName
             let scriptPageTitle = currentPage.title ?? currentPageDisplayName
-            let templateName = NewMembershipCase.scriptFor(hub: currentPage.hub, newMembership)
-            let template = templatesCatalog.specialTemplates.first(where: { template in
+            let templateName = NewMembershipCase.scriptFor(hub: currentPage.hub, viewModel.newMembership)
+            let template = viewModel.templatesCatalog.specialTemplates.first(where: { template in
                 template.name == templateName
             })
             if template == nil {
@@ -1187,10 +1155,10 @@ struct ContentView: View {
                 .replacingOccurrences(of: "%%FULLPAGENAME%%", with: currentPageName)
                 .replacingOccurrences(of: "%%PAGETITLE%%", with: scriptPageTitle)
                 .replacingOccurrences(of: "%%PAGEHASH%%", with: scriptPageHash)
-                .replacingOccurrences(of: "%%USERNAME%%", with: userName)
-                .replacingOccurrences(of: "%%YOURNAME%%", with: yourName)
-                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: yourFirstName)
-                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: pageStaffLevel.rawValue)
+                .replacingOccurrences(of: "%%USERNAME%%", with: viewModel.userName)
+                .replacingOccurrences(of: "%%YOURNAME%%", with: viewModel.yourName)
+                .replacingOccurrences(of: "%%YOURFIRSTNAME%%", with: viewModel.yourFirstName)
+                .replacingOccurrences(of: "%%STAFFLEVEL%%", with: viewModel.pageStaffLevel.rawValue)
         } else {
             newMembershipScript = ""
         }

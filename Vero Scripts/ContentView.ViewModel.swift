@@ -21,9 +21,88 @@ extension View {
 #endif
 
 extension ContentView {
+    enum VisibleView {
+        case ScriptView
+        case PostDownloadView
+        case ImageValidationView
+    }
+
     @Observable
     class ViewModel {
         private let logger = SwiftyBeaver.self
+
+        var imageValidationImageUrl: URL?
+        var visibleView = VisibleView.ScriptView
+        var postLink: String?
+
+        var loadedPages = [LoadedPage]()
+        var waitingForTemplates = true
+        var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
+        var disallowLists = [String:[String]]()
+        var cautionLists = [String:[String]]()
+
+        var currentPage: LoadedPage? = nil
+        var pageValidation: ValidationResult = .valid
+        var pageStaffLevel = StaffLevelCase.mod
+
+        var yourName = UserDefaults.standard.string(forKey: "YourName") ?? ""
+        var yourNameValidation: ValidationResult = .valid
+        var yourFirstName = UserDefaults.standard.string(forKey: "YourFirstName") ?? ""
+        var yourFirstNameValidation: ValidationResult = .valid
+
+        var userName = ""
+        var userNameValidation: ValidationResult = .valid
+        var membership = MembershipCase.none
+        var membershipValidation: ValidationResult = .valid
+        var firstForPage = false
+        var fromCommunityTag = false
+        var fromHubTag = false
+        var fromRawTag = false
+
+        var newMembership = NewMembershipCase.none
+        var newMembershipValidation: ValidationResult = .valid
+
+        func validateMembership(value: MembershipCase) -> ValidationResult {
+            if value == MembershipCase.none {
+                return .error("Required value")
+            }
+            if !MembershipCase.caseValidFor(hub: currentPage?.hub, value) {
+                return .error("Not a valid value")
+            }
+            return .valid
+        }
+
+        func validateUserName(value: String) -> ValidationResult {
+            if value.count == 0 {
+                return .error("Required value")
+            } else if value.first! == "@" {
+                return .error("Don't include the '@' in user names")
+            } else if (disallowLists[currentPage?.hub ?? ""]?.first { disallow in disallow == value } != nil) {
+                return .error("User is on the disallow list")
+            } else if (cautionLists[currentPage?.hub ?? ""]?.first { caution in caution == value } != nil) {
+                return .warning("User is on the caution list")
+            } else if value.contains(" ") {
+                return .error("Spaces are not allowed")
+            }
+            return .valid
+        }
+
+        func validateNewMembership(value: NewMembershipCase) -> ValidationResult {
+            if !NewMembershipCase.caseValidFor(hub: currentPage?.hub, value) {
+                return .error("Not a valid value")
+            }
+            return .valid
+        }
+
+        func validatePostLink(value: String) -> ValidationResult {
+            if value.isEmpty {
+                return .error("Required value")
+            }
+            if value.contains(where: \.isNewline) {
+                return .error("Cannot contain newline characters")
+            }
+            return .valid
+        }
 
 #if STANDALONE
         // MARK: Version check

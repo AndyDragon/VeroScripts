@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum FocusedField: Hashable {
-    case userName,
+    case userName, // Content view
          level,
          yourName,
          yourFirstName,
@@ -22,47 +22,12 @@ enum FocusedField: Hashable {
          featureScript,
          commentScript,
          originalPostScript,
-         newMembershipScript
-}
+         newMembershipScript,
 
-enum ValidationResult: String {
-    case valid = "Valid"
-    case warning = "Warning"
-    case error = "Error"
-}
-
-extension ValidationResult {
-    var color: Color {
-        switch self {
-        case .error: return Color.red
-        case .warning: return Color.yellow
-        case .valid: return Color.label
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .error: return "exclamationmark.triangle.fill"
-        case .warning: return "exclamationmark.triangle.fill"
-        case .valid: return ""
-        }
-    }
-
-    var iconColor1: Color {
-        switch self {
-        case .error: return .white
-        case .warning: return .black
-        case .valid: return .clear
-        }
-    }
-
-    var iconColor2: Color {
-        switch self {
-        case .error: return .red
-        case .warning: return .yellow
-        case .valid: return .clear
-        }
-    }
+         postUserAlias, // Post downloader
+         postUserLevel,
+         postUserName,
+         postDescription
 }
 
 enum MembershipCase: String, CaseIterable, Identifiable, Codable {
@@ -364,6 +329,23 @@ struct LoadedPage: Codable, Identifiable, Hashable {
         }
         return "\(hub)_\(name)"
     }
+    var displayTitle: String {
+        return title ?? "\(hub) \(name)"
+    }
+    var hashTags: [String] {
+        if hub == "snap" {
+            if let basePageName = pageName {
+                if basePageName != name {
+                    return [hashTag ?? "#snap_\(name)", "#raw_\(name)", "#snap_\(basePageName)", "#raw_\(basePageName)"]
+                }
+            }
+            return [hashTag ?? "#snap_\(name)", "#raw_\(name)"]
+        } else if hub == "click" {
+            return [hashTag ?? "#click_\(name)"]
+        } else {
+            return [hashTag ?? name]
+        }
+    }
 
     static func from(hub: String, page: Page) -> LoadedPage {
         return LoadedPage(hub: hub, name: page.name, pageName: page.pageName, title: page.title, hashTag: page.hashTag)
@@ -395,11 +377,4 @@ struct Template: Codable, Identifiable {
     var id: String { self.name }
     let name: String
     let template: String
-}
-
-enum ToastDuration: Int {
-    case disabled = 0,
-         short = 3,
-         medium = 10,
-         long = 20
 }

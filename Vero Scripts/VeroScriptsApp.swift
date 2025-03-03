@@ -81,8 +81,14 @@ struct VeroScriptsApp: App {
         // About view window with id "about"
         Window("About \(Bundle.main.displayName ?? "Vero Scripts")", id: "about") {
             AboutView(packages: [
+                "Kingfisher": [
+                    "Wei Wang ([Github profile](https://github.com/onevcat))",
+                ],
                 "SystemColors": [
                     "Denis ([Github profile](https://github.com/diniska))"
+                ],
+                "SwiftSoup": [
+                    "Nabil Chatbi ([Github profile](https://github.com/scinfu))",
                 ],
                 "SwiftyBeaver": [
                     "SwiftyBeaver ([Github profile](https://github.com/SwiftyBeaver))"

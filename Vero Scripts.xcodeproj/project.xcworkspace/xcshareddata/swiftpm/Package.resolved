@@ -1,6 +1,24 @@
 {
-  "originHash" : "ff7df9a6a19a9981238fcb5ce06c8fc4b51e15316a71b7d0b2fd224d4dae3ad4",
+  "originHash" : "4be6101a962f08ec9a63f12e782ed93f6faf3023a93e134cecd9464c0e836f7f",
   "pins" : [
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher.git",
+      "state" : {
+        "revision" : "3db26ab625d194c38e68c1a40e43d1bc12743fe0",
+        "version" : "8.2.0"
+      }
+    },
+    {
+      "identity" : "swiftsoup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AndyDragon/SwiftSoup.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "18ad8b8ff0f03f3c0a5544ffccfa2ea1c051ae6e"
+      }
+    },
     {
       "identity" : "swiftui-system-colors",
       "kind" : "remoteSourceControl",

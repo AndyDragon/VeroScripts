@@ -13,12 +13,12 @@ struct FieldEditor: View {
     var placeholder: String
     @Binding var field: String
     var fieldChanged: (_ to: String) -> Void
-    @Binding var fieldValidation: (validation: ValidationResult, reason: String?)
-    var validate: (String) -> (validation: ValidationResult, reason: String?) = { value in
+    @Binding var fieldValidation: ValidationResult
+    var validate: (String) -> ValidationResult = { value in
         if value.count == 0 {
-            return (.error, "Required value")
+            return .error("Required value")
         }
-        return (.valid, nil)
+        return .valid
     }
     var focus: FocusState<FocusedField?>.Binding
     var focusField: FocusedField
@@ -26,23 +26,20 @@ struct FieldEditor: View {
     var body: some View {
         HStack {
             // Title validator
-            if fieldValidation.validation != .valid {
-                Image(systemName: fieldValidation.validation.icon)
-                    .foregroundStyle(fieldValidation.validation.iconColor1, fieldValidation.validation.iconColor2)
-                    .help(fieldValidation.reason ?? "")
-                    .imageScale(.small)
+            if !fieldValidation.isValid {
+                fieldValidation.getImage()
             }
             
             // Title
             if title.count != 0 {
                 if titleWidth.isEmpty {
                     Text(title)
-                        .foregroundStyle(fieldValidation.validation.color, Color.secondaryLabel)
+                        .foregroundStyle(fieldValidation.getColor(), Color.secondaryLabel)
                         .lineLimit(1)
                         .truncationMode(.tail)
                 } else {
                     Text(title)
-                        .foregroundStyle(fieldValidation.validation.color, Color.secondaryLabel)
+                        .foregroundStyle(fieldValidation.getColor(), Color.secondaryLabel)
                         .frame(width: titleWidth[0], alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)

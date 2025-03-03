@@ -15,6 +15,16 @@
 		496BEA292B7861A1001D36C1 /* ScriptEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA282B7861A1001D36C1 /* ScriptEditor.swift */; };
 		496BEA2B2B786830001D36C1 /* FieldEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496BEA2A2B78682F001D36C1 /* FieldEditor.swift */; };
 		496E918C2D338F1A006BCEB4 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496E918B2D338F1A006BCEB4 /* AboutView.swift */; };
+		499570E52D761AB60078A171 /* ImageValidationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570E22D761AB60078A171 /* ImageValidationView.swift */; };
+		499570E62D761AB60078A171 /* PostData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570E32D761AB60078A171 /* PostData.swift */; };
+		499570E72D761AB60078A171 /* CarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570E12D761AB60078A171 /* CarouselView.swift */; };
+		499570E82D761AB60078A171 /* PostDownloaderImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570E42D761AB60078A171 /* PostDownloaderImageView.swift */; };
+		499570EA2D761AF40078A171 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570E92D761AF40078A171 /* WebView.swift */; };
+		499570ED2D761B150078A171 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 499570EC2D761B150078A171 /* Kingfisher */; };
+		499570F02D761B900078A171 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 499570EF2D761B900078A171 /* SwiftSoup */; };
+		499570F22D761C710078A171 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570F12D761C710078A171 /* CustomTabView.swift */; };
+		499570F42D7624490078A171 /* PostDownloaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570F32D7624490078A171 /* PostDownloaderView.swift */; };
+		499570F62D7625010078A171 /* ValidationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499570F52D7625010078A171 /* ValidationLabel.swift */; };
 		49C546D42B7874C60048DEDA /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D32B7874C60048DEDA /* Types.swift */; };
 		49C546D62B78750A0048DEDA /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D52B78750A0048DEDA /* Helpers.swift */; };
 		49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C546D72B7875630048DEDA /* PlaceholderEditor.swift */; };
@@ -39,6 +49,14 @@
 		496BEA282B7861A1001D36C1 /* ScriptEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptEditor.swift; sourceTree = "<group>"; };
 		496BEA2A2B78682F001D36C1 /* FieldEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldEditor.swift; sourceTree = "<group>"; };
 		496E918B2D338F1A006BCEB4 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		499570E12D761AB60078A171 /* CarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselView.swift; sourceTree = "<group>"; };
+		499570E22D761AB60078A171 /* ImageValidationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageValidationView.swift; sourceTree = "<group>"; };
+		499570E32D761AB60078A171 /* PostData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostData.swift; sourceTree = "<group>"; };
+		499570E42D761AB60078A171 /* PostDownloaderImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDownloaderImageView.swift; sourceTree = "<group>"; };
+		499570E92D761AF40078A171 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		499570F12D761C710078A171 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
+		499570F32D7624490078A171 /* PostDownloaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDownloaderView.swift; sourceTree = "<group>"; };
+		499570F52D7625010078A171 /* ValidationLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationLabel.swift; sourceTree = "<group>"; };
 		49C546D32B7874C60048DEDA /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		49C546D52B78750A0048DEDA /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		49C546D72B7875630048DEDA /* PlaceholderEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderEditor.swift; sourceTree = "<group>"; };
@@ -56,6 +74,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				499570ED2D761B150078A171 /* Kingfisher in Frameworks */,
+				499570F02D761B900078A171 /* SwiftSoup in Frameworks */,
 				4919020E2B8D502000D0CB93 /* SystemColors in Frameworks */,
 				49CD18092D348B1600F08A56 /* SwiftyBeaver in Frameworks */,
 			);
@@ -92,8 +112,16 @@
 				49C546D72B7875630048DEDA /* PlaceholderEditor.swift */,
 				496BEA2A2B78682F001D36C1 /* FieldEditor.swift */,
 				496BEA282B7861A1001D36C1 /* ScriptEditor.swift */,
+				499570E12D761AB60078A171 /* CarouselView.swift */,
+				499570F12D761C710078A171 /* CustomTabView.swift */,
+				499570E22D761AB60078A171 /* ImageValidationView.swift */,
+				499570E32D761AB60078A171 /* PostData.swift */,
+				499570F32D7624490078A171 /* PostDownloaderView.swift */,
+				499570E42D761AB60078A171 /* PostDownloaderImageView.swift */,
+				499570E92D761AF40078A171 /* WebView.swift */,
 				49C546D52B78750A0048DEDA /* Helpers.swift */,
 				49C546D32B7874C60048DEDA /* Types.swift */,
+				499570F52D7625010078A171 /* ValidationLabel.swift */,
 				49498D212BA296F600F125E7 /* VersionCheckAppState.swift */,
 				495CCC542B45E3AC00BBA415 /* Vero_Scripts.entitlements */,
 				4923C2322B4A833F0057D781 /* Assets.xcassets */,
@@ -141,6 +169,8 @@
 			packageProductDependencies = (
 				4919020D2B8D502000D0CB93 /* SystemColors */,
 				49CD18082D348B1600F08A56 /* SwiftyBeaver */,
+				499570EC2D761B150078A171 /* Kingfisher */,
+				499570EF2D761B900078A171 /* SwiftSoup */,
 			);
 			productName = "Vero Scripts";
 			productReference = 495CCC482B45E3AA00BBA415 /* Vero Scripts.app */;
@@ -173,6 +203,8 @@
 			packageReferences = (
 				4919020C2B8D502000D0CB93 /* XCRemoteSwiftPackageReference "swiftui-system-colors" */,
 				49CD18072D348B1600F08A56 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */,
+				499570EB2D761B150078A171 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				499570EE2D761B900078A171 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			productRefGroup = 495CCC492B45E3AA00BBA415 /* Products */;
 			projectDirPath = "";
@@ -203,6 +235,13 @@
 				49C546DA2B787B340048DEDA /* NewMembershipEditor.swift in Sources */,
 				496E918C2D338F1A006BCEB4 /* AboutView.swift in Sources */,
 				49C546D62B78750A0048DEDA /* Helpers.swift in Sources */,
+				499570E52D761AB60078A171 /* ImageValidationView.swift in Sources */,
+				499570E62D761AB60078A171 /* PostData.swift in Sources */,
+				499570F42D7624490078A171 /* PostDownloaderView.swift in Sources */,
+				499570EA2D761AF40078A171 /* WebView.swift in Sources */,
+				499570F22D761C710078A171 /* CustomTabView.swift in Sources */,
+				499570E72D761AB60078A171 /* CarouselView.swift in Sources */,
+				499570E82D761AB60078A171 /* PostDownloaderImageView.swift in Sources */,
 				49C546D82B7875630048DEDA /* PlaceholderEditor.swift in Sources */,
 				49498D222BA296F600F125E7 /* VersionCheckAppState.swift in Sources */,
 				49FE12272D32EE6E0018C3DE /* ContentView.ViewModel.swift in Sources */,
@@ -211,6 +250,7 @@
 				49FE12222D32EDF90018C3DE /* AdvancedToastView.swift in Sources */,
 				49FE12232D32EDF90018C3DE /* AdvancedToastStyle.swift in Sources */,
 				49FE12242D32EDF90018C3DE /* AdvancedToast.swift in Sources */,
+				499570F62D7625010078A171 /* ValidationLabel.swift in Sources */,
 				49FE12252D32EDF90018C3DE /* AdvancedToastModifiers.swift in Sources */,
 				495CCC4C2B45E3AA00BBA415 /* VeroScriptsApp.swift in Sources */,
 				49C546D42B7874C60048DEDA /* Types.swift in Sources */,
@@ -290,7 +330,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -308,7 +348,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -450,7 +490,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -468,7 +508,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -490,7 +530,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Vero Scripts/Preview Content\"";
 				DEVELOPMENT_TEAM = 7U6K972H9Q;
@@ -508,7 +548,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.andydragon.Vero-Scripts";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -553,6 +593,22 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		499570EB2D761B150078A171 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.2.0;
+			};
+		};
+		499570EE2D761B900078A171 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AndyDragon/SwiftSoup.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		49CD18072D348B1600F08A56 /* XCRemoteSwiftPackageReference "SwiftyBeaver" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyBeaver/SwiftyBeaver.git";
@@ -568,6 +624,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4919020C2B8D502000D0CB93 /* XCRemoteSwiftPackageReference "swiftui-system-colors" */;
 			productName = SystemColors;
+		};
+		499570EC2D761B150078A171 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 499570EB2D761B150078A171 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		499570EF2D761B900078A171 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 499570EE2D761B900078A171 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 		49CD18082D348B1600F08A56 /* SwiftyBeaver */ = {
 			isa = XCSwiftPackageProductDependency;

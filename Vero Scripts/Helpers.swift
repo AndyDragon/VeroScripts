@@ -49,6 +49,31 @@ func matches(of regex: String, in text: String) -> [String] {
     }
 }
 
+extension NSImage {
+    var pixelSize: NSSize? {
+        if let rep = representations.first {
+            let size = NSSize(width: rep.pixelsWide, height: rep.pixelsHigh)
+            return size
+        }
+        return nil
+    }
+}
+
+extension Locale {
+    static var preferredLanguageCode: String {
+        guard let preferredLanguage = preferredLanguages.first,
+              let code = Locale(identifier: preferredLanguage).language.languageCode?.identifier
+        else {
+            return "en"
+        }
+        return code
+    }
+
+    static var preferredLanguageCodes: [String] {
+        return Locale.preferredLanguages.compactMap({ Locale(identifier: $0).language.languageCode?.identifier })
+    }
+}
+
 extension URLSession {
     func decode<T: Decodable>(
         _ type: T.Type = T.self,
@@ -67,6 +92,13 @@ extension URLSession {
 
         let decoded = try decoder.decode(T.self, from: data)
         return decoded
+    }
+
+    func dataTask(
+        with request: MultipartFormDataRequest,
+        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> URLSessionDataTask {
+        return dataTask(with: request.asURLRequest(), completionHandler: completionHandler)
     }
 }
 
@@ -127,6 +159,22 @@ extension Array<String> {
 }
 
 extension String {
+    public func timestamp() -> Date? {
+        let dateParserFormatter = DateFormatter()
+        dateParserFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'"
+        dateParserFormatter.timeZone = .gmt
+        return dateParserFormatter.date(from: self)
+    }
+
+    public func removeExtraSpaces(includeNewlines: Bool = true) -> String {
+        if includeNewlines {
+            return replacingOccurrences(of: "[\\s]+", with: " ", options: .regularExpression)
+        }
+        return split(separator: "\n", omittingEmptySubsequences: false)
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "[\\s]+", with: " ", options: .regularExpression) }
+            .joined(separator: "\n")
+    }
+
     func sha256() -> Data {
         let data = self.data(using: .utf8)
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
@@ -135,6 +183,132 @@ extension String {
         }
         return Data(hash)
     }
+}
+
+extension Double {
+    public func formatUsingPrecision(_ precision: Int) -> String {
+        return String(format: "%.\(precision)f", self)
+    }
+}
+
+extension Date? {
+    public func formatTimestamp() -> String {
+        if let date = self {
+            let distance = -date.timeIntervalSinceNow
+            let days = floor(distance / (24 * 60 * 60))
+            if days <= 1 {
+                let hours = floor(distance / (60 * 60))
+                return "\(hours.formatUsingPrecision(0))h"
+            } else if days <= 7 {
+                return "\(days.formatUsingPrecision(0))d"
+            }
+            let components = Calendar.current.dateComponents([.year], from: date)
+            let componentsNow = Calendar.current.dateComponents([.year], from: Date.now)
+            let dateFormatter = DateFormatter()
+            if components.year == componentsNow.year {
+                dateFormatter.dateFormat = "MMM d"
+            } else {
+                dateFormatter.dateFormat = "MMM d, yyyy"
+            }
+            return dateFormatter.string(from: date)
+        }
+        return "-"
+    }
+}
+
+enum Direction {
+    case first, previous, same, next, last
+}
+
+func directionFromModifiers(_ keyPress: KeyPress, horizontal: Bool = false) -> Direction {
+    let maskedModifiers = keyPress.modifiers.rawValue &
+    (EventModifiers.shift.rawValue | EventModifiers.control.rawValue | EventModifiers.option.rawValue | EventModifiers.command.rawValue)
+    if (keyPress.key == .downArrow && !horizontal) || (keyPress.key == .rightArrow && horizontal) {
+        if maskedModifiers == EventModifiers.command.rawValue {
+            return .last
+        }
+        if maskedModifiers == 0 {
+            return .next
+        }
+    } else if (keyPress.key == .upArrow && !horizontal) || (keyPress.key == .leftArrow && horizontal) {
+        if maskedModifiers == EventModifiers.command.rawValue {
+            return .first
+        }
+        if maskedModifiers == 0 {
+            return .previous
+        }
+    }
+    return .same
+}
+
+func navigateGeneric<T>(_ values: [T], _ selected: T, _ direction: Direction, allowWrap: Bool = true) -> (change: Bool, newValue: T) where T: Equatable {
+    let count = values.count
+    if count != 0 {
+        if direction == .last {
+            return (true, values.last!)
+        }
+        if direction == .next {
+            if let current = values.firstIndex(where: { $0 == selected }) {
+                if !allowWrap && current == (count - 1) {
+                    return (false, selected)
+                }
+                return (true, values[(current + 1) % count])
+            } else {
+                return (true, values.first!)
+            }
+        }
+        if direction == .previous {
+            if let current = values.firstIndex(where: { $0 == selected }) {
+                if !allowWrap && current == 0 {
+                    return (false, selected)
+                }
+                return (true, values[(current - 1 + count) % count])
+            } else {
+                return (true, values.last!)
+            }
+        }
+        if direction == .first {
+            return (true, values.first!)
+        }
+        return (true, selected)
+    }
+    return (false, selected)
+}
+
+func navigateGenericWithPrefix(_ values: [String], _ selected: String, _ lowercasePrefix: String) -> (change: Bool, newValue: String) {
+    let current = values.firstIndex(where: { selected == $0 })
+    if let current {
+        if let nextMatch = values[(current + 1) ..< values.count].first(where: { $0.lowercased().hasPrefix(lowercasePrefix) }) {
+            return (nextMatch != selected, nextMatch)
+        } else {
+            if let firstMatch = values.first(where: { $0.lowercased().hasPrefix(lowercasePrefix) }) {
+                return (firstMatch != selected, firstMatch)
+            }
+        }
+    } else {
+        if let firstMatch = values.first(where: { $0.lowercased().hasPrefix(lowercasePrefix) }) {
+            return (firstMatch != selected, firstMatch)
+        }
+    }
+    return (false, selected)
+}
+
+func navigateGenericWithPrefix<T: RawRepresentable<String>>(_ values: [T], _ selected: T, _ lowercasePrefix: String) -> (change: Bool, newValue: T) {
+    let current = values.firstIndex(where: { selected == $0 })
+    if let current {
+        if let nextMatch = values[(current + 1) ..< values.count].first(where: { $0.rawValue.lowercased().hasPrefix(lowercasePrefix) }) {
+            return (nextMatch != selected, nextMatch)
+        } else {
+            if let firstMatch = values.first(where: { $0.rawValue.lowercased().hasPrefix(lowercasePrefix) }) {
+                return (firstMatch != selected, firstMatch)
+            }
+        }
+    } else {
+        if let firstMatch = values.first(where: { $0.rawValue.lowercased().hasPrefix(lowercasePrefix) }) {
+            return (firstMatch != selected, firstMatch)
+        }
+    }
+    return (false, selected)
 }
 
 extension Data {
@@ -172,5 +346,69 @@ extension Data {
 extension URL {
     var lastPathComponentWithoutExtension: String {
         return String(NSString(string: lastPathComponent).deletingPathExtension)
+    }
+}
+
+extension NSMutableData {
+    func appendString(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            append(data)
+        }
+    }
+}
+
+struct MultipartFormDataRequest {
+    private let boundary: String = UUID().uuidString
+    var httpBody = NSMutableData()
+    var headers = [String: String]()
+    let url: URL
+
+    init(url: URL) {
+        self.url = url
+    }
+
+    func addTextField(named name: String, value: String) {
+        httpBody.appendString(textFormField(named: name, value: value))
+    }
+
+    private func textFormField(named name: String, value: String) -> String {
+        var fieldString = "--\(boundary)\r\n"
+        fieldString += "Content-Disposition: form-data; name=\"\(name)\"\r\n"
+        fieldString += "Content-Type: text/plain; charset=ISO-8859-1\r\n"
+        fieldString += "Content-Transfer-Encoding: 8bit\r\n"
+        fieldString += "\r\n"
+        fieldString += "\(value)\r\n"
+
+        return fieldString
+    }
+
+    func addDataField(fieldName: String, fieldValue: String) {
+        httpBody.append(dataFormField(fieldName: fieldName, fieldValue: fieldValue))
+    }
+
+    private func dataFormField(fieldName: String, fieldValue: String) -> Data {
+        let fieldData = NSMutableData()
+        fieldData.appendString("--\(boundary)\r\n")
+        fieldData.appendString("Content-Disposition: form-data; name=\"\(fieldName)\"\r\n")
+        fieldData.appendString("\r\n")
+        fieldData.appendString(fieldValue)
+        fieldData.appendString("\r\n")
+        return fieldData as Data
+    }
+
+    mutating func addHeader(header: String, value: String) {
+        headers[header] = value
+    }
+
+    func asURLRequest() -> URLRequest {
+        var request = URLRequest(url: url)
+        for header in headers {
+            request.addValue(header.value, forHTTPHeaderField: header.key)
+        }
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        httpBody.appendString("--\(boundary)--")
+        request.httpBody = httpBody as Data
+        return request
     }
 }
