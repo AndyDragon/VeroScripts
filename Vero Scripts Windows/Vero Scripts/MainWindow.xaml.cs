@@ -63,5 +63,27 @@ namespace VeroScripts
                 WindowState = WindowState.Maximized;
             }
         }
+
+        internal void PrepareFocusForView(MainViewModel.ViewMode view, bool isPush = true)
+        {
+            switch (view)
+            {
+                case MainViewModel.ViewMode.ScriptView:
+                    // No focus needed
+                    break;
+                case MainViewModel.ViewMode.PostDownloaderView:
+                    if (isPush)
+                    {
+                        UserNameEditor.Focus();
+                    } 
+                    break;
+                case MainViewModel.ViewMode.ImageView:
+                    // No focus needed
+                    break;
+                case MainViewModel.ViewMode.ImageValidationView:
+                    // No focus needed
+                    break;
+            }
+        }
     }
 }

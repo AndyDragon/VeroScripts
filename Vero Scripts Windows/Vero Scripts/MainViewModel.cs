@@ -136,6 +136,22 @@ namespace VeroScripts
                 { Script.OriginalPost, new ObservableCollection<Placeholder>() }
             };
             ClearUserCommand = new Command(ClearUser);
+            LoadPhotosCommand = new Command(() =>
+            {
+                LoadedPost = new DownloadedPostViewModel(this);
+                View = ViewMode.PostDownloaderView;
+
+            }, () => !string.IsNullOrEmpty(PostLink));
+            CloseCurrentViewCommand = new Command(() =>
+            {
+                View = View switch
+                {
+                    ViewMode.PostDownloaderView => ViewMode.ScriptView,
+                    ViewMode.ImageView => ViewMode.PostDownloaderView,
+                    ViewMode.ImageValidationView => ViewMode.PostDownloaderView,
+                    _ => ViewMode.ScriptView,
+                };
+            });
             CopyFeatureScriptCommand = new Command(() => CopyScript(Script.Feature, force: true));
             CopyFeatureScriptWithPlaceholdersCommand = new Command(() => CopyScript(Script.Feature, force: true, withPlaceholders: true));
             CopyCommentScriptCommand = new Command(() => CopyScript(Script.Comment, force: true));
@@ -314,6 +330,7 @@ namespace VeroScripts
                 var postLink = Clipboard.GetText().Trim();
                 if (postLink.StartsWith("https://vero.co/"))
                 {
+                    PostLink = postLink;
                     var possibleUserAlias = postLink[16..].Split('/').FirstOrDefault() ?? "";
                     if (possibleUserAlias.Length > 1)
                     {
@@ -344,6 +361,10 @@ namespace VeroScripts
             }
         }, () => Clipboard.ContainsText());
 
+        public Command LoadPhotosCommand { get; }
+
+        public Command CloseCurrentViewCommand { get; }
+
         public ICommand CopyFeatureScriptCommand { get; }
 
         public ICommand CopyFeatureScriptWithPlaceholdersCommand { get; }
@@ -361,6 +382,47 @@ namespace VeroScripts
         public ICommand CopyNewMembershipScriptCommand { get; }
 
         public ICommand SetThemeCommand { get; }
+
+        #endregion
+
+        #region View management
+
+        public enum ViewMode { ScriptView, PostDownloaderView, ImageValidationView, ImageView }
+        private ViewMode view = ViewMode.ScriptView;
+
+        public ViewMode View
+        {
+            get => view;
+            set
+            {
+                var oldView = view;
+                if (Set(ref view, value))
+                {
+                    OnPropertyChanged(nameof(ScriptViewVisibility));
+                    OnPropertyChanged(nameof(PostDownloaderViewVisibility));
+                    OnPropertyChanged(nameof(ImageValidationViewVisibility));
+                    OnPropertyChanged(nameof(ImageViewVisibility));
+                    if (view != ViewMode.PostDownloaderView && view != ViewMode.ImageValidationView && view != ViewMode.ImageView)
+                    {
+                        LoadedPost = null;
+                    }
+                    switch(view)
+                    {
+                        case ViewMode.ScriptView:
+                            MainWindow!.PrepareFocusForView(view);
+                            break;
+                        case ViewMode.PostDownloaderView:
+                            MainWindow!.PrepareFocusForView(view, oldView == ViewMode.ScriptView);
+                            break;
+                    }
+                }
+            }
+        }
+
+        public Visibility ScriptViewVisibility => view == ViewMode.ScriptView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PostDownloaderViewVisibility => view == ViewMode.PostDownloaderView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ImageValidationViewVisibility => view == ViewMode.ImageValidationView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ImageViewVisibility => view == ViewMode.ImageView ? Visibility.Visible : Visibility.Collapsed;
 
         #endregion
 
@@ -438,6 +500,23 @@ namespace VeroScripts
             CommunityTag = false;
             NewMembership = "None";
         }
+
+        private string postLink = "";
+
+        public string PostLink
+        {
+            get => postLink;
+            set
+            {
+                if (Set(ref postLink, value))
+                {
+                    LoadPhotosCommand.OnCanExecuteChanged();
+                    OnPropertyChanged(nameof(PostLinkValidation));
+                }
+            }
+        }
+
+        public ValidationResult PostLinkValidation => ValidateValueNotEmpty(PostLink);
 
         private string userName = "";
 
@@ -646,6 +725,15 @@ namespace VeroScripts
                             StaffLevel = StaffLevels[0];
                         }
                         UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
+                        if (SelectedPage != null)
+                        {
+                            excludedTags = UserSettings.Get(nameof(ExcludedTags) + ":" + SelectedPage.Id, "");
+                        }
+                        else
+                        {
+                            excludedTags = "";
+                        }
+                        OnPropertyChanged(nameof(ExcludedTags));
                     }
                 }
             }
@@ -746,6 +834,23 @@ namespace VeroScripts
                     ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
+                }
+            }
+        }
+
+        private string excludedTags = "";
+        public string ExcludedTags
+        {
+            get => excludedTags;
+            set
+            {
+                if (Set(ref excludedTags, value))
+                {
+                    if (SelectedPage != null)
+                    {
+                        UserSettings.Store(nameof(ExcludedTags) + ":" + SelectedPage.Id, ExcludedTags);
+                    }
+                    LoadedPost?.UpdateExcludedTags();
                 }
             }
         }
@@ -1379,7 +1484,7 @@ namespace VeroScripts
 
         #region Clipboard management
 
-        private static bool TrySetClipboardText(string text)
+        public static bool TrySetClipboardText(string text)
         {
             const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
             var retriesLeft = 9;
@@ -1464,6 +1569,24 @@ namespace VeroScripts
                 TransferPlaceholders(script);
                 CopyTextToClipboard(ProcessPlaceholders(script), "Copied the " + scriptNames[script] + " script to the clipboard");
             }
+        }
+
+        #endregion
+
+        #region Loaded post
+
+        private DownloadedPostViewModel? loadedPost;
+
+        public DownloadedPostViewModel? LoadedPost
+        {
+            get => loadedPost;
+            private set => Set(ref loadedPost, value, [nameof(TinEyeSource)]);
+        }
+
+        public string TinEyeSource { get => LoadedPost?.ImageValidation?.TinEyeUri ?? "about:blank"; }
+        internal void TriggerTinEyeSource()
+        {
+            OnPropertyChanged(nameof(TinEyeSource));
         }
 
         #endregion

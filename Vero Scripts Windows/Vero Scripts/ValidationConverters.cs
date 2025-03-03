@@ -6,8 +6,12 @@ using System.Windows.Media;
 
 namespace VeroScripts
 {
-    class ValidationResultBrushConverter : IValueConverter
+    class ValidationResultColorConverter : IValueConverter
     {
+        public Brush? ValidBrush { get; set; }
+        public Brush? WarningBrush { get; set; }
+        public Brush? InvalidBrush { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var brushName = "MahApps.Brushes.Text";
@@ -17,47 +21,21 @@ namespace VeroScripts
                 switch (validationResult.Type)
                 {
                     case ValidationResultType.Error:
-                        brushName = "MahApps.Brushes.Control.Validation";
-                        defaultBrush = new SolidColorBrush(Colors.Red);
+                        brushName = (InvalidBrush != null) ? "- force -" : "MahApps.Brushes.Control.Validation";
+                        defaultBrush = (InvalidBrush != null) ? (SolidColorBrush)InvalidBrush : new SolidColorBrush(Colors.Red);
                         break;
-
                     case ValidationResultType.Warning:
-                        brushName = "MahApps.Brushes.Control.Warning";
-                        defaultBrush = new SolidColorBrush(Colors.Orange);
+                        brushName = (WarningBrush != null) ? "- force -" : "MahApps.Brushes.Control.Warning";
+                        defaultBrush = (WarningBrush != null) ? (SolidColorBrush)WarningBrush : new SolidColorBrush(Colors.Orange);
                         break;
                 }
+            }
+            else if (ValidBrush != null)
+            {
+                brushName = "- force -";
+                defaultBrush = (SolidColorBrush)ValidBrush;
             }
             return (ThemeManager.Current.DetectTheme(Application.Current)?.Resources[brushName] as Brush) ?? defaultBrush;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class ValidationResultColorConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var colorName = "MahApps.Colors.Text";
-            var defaultColor = SystemColors.ControlTextColor;
-            if (value is ValidationResult validationResult)
-            {
-                switch (validationResult.Type)
-                {
-                    case ValidationResultType.Error:
-                        colorName = "MahApps.Colors.Control.Validation";
-                        defaultColor = Colors.Red;
-                        break;
-
-                    case ValidationResultType.Warning:
-                        colorName = "MahApps.Colors.Control.Warning";
-                        defaultColor = Colors.Orange;
-                        break;
-                }
-            }
-            return (ThemeManager.Current.DetectTheme(Application.Current)?.Resources[colorName] as Color?) ?? defaultColor;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -70,11 +48,17 @@ namespace VeroScripts
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ValidationResult validationResult && !validationResult.IsValid)
+            bool inverted = false;
+            if (parameter is bool isInverted)
             {
-                return Visibility.Visible;
+                inverted = isInverted;
             }
-            return Visibility.Collapsed;
+            var validationResult = value as ValidationResult?;
+            if (validationResult == null || !(validationResult?.IsValid ?? false))
+            {
+                return inverted ? Visibility.Collapsed : Visibility.Visible;
+            }
+            return inverted ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -103,7 +87,6 @@ namespace VeroScripts
             throw new NotImplementedException();
         }
     }
-
     class ValidationBooleanVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
