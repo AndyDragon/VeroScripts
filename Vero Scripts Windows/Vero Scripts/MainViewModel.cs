@@ -499,6 +499,7 @@ namespace VeroScripts
             RawTag = false;
             CommunityTag = false;
             NewMembership = "None";
+            PostLink = "";
         }
 
         private string postLink = "";
