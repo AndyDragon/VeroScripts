@@ -238,6 +238,7 @@ struct ContentView: View {
                             viewModel.newMembership = NewMembershipCase.none
                             newMembershipChanged(to: viewModel.newMembership)
                             focusedField = .userName
+                            viewModel.postLink = nil
                             logger.verbose("Cleared user", context: "System")
                         }) {
                             HStack {
