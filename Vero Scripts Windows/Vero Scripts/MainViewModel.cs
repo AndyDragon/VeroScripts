@@ -408,7 +408,7 @@ namespace VeroScripts
                     }
                     switch(view)
                     {
-                        case ViewMode.ScriptView:
+                        default:
                             MainWindow!.PrepareFocusForView(view);
                             break;
                         case ViewMode.PostDownloaderView:

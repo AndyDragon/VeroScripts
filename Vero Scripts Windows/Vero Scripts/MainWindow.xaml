@@ -927,7 +927,7 @@
                                 </StackPanel>
                             </Label>
                             <TextBox
-                                x:Name="UserNameEditor"
+                                x:Name="PostDownloaderUserNameEditor"
                                 Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 VerticalAlignment="Center"
                                 FontSize="11"
