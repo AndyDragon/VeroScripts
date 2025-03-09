@@ -89,7 +89,7 @@ struct ImageValidationView: View {
                     viewModel.visibleView = .PostDownloadView
                 }) {
                     HStack {
-                        Image(systemName: "xmark")
+                        Image(systemName: "xmark.circle")
                             .foregroundStyle(Color.accentColor, Color.secondaryLabel)
                         Text("Close")
                             .font(.system(.body, design: .rounded).bold())
@@ -102,6 +102,24 @@ struct ImageValidationView: View {
                 }
                 .disabled(viewModel.hasModalToasts || uploadToServer != nil)
                 .keyboardShortcut(languagePrefix == "en" ? "`" : "x", modifiers: languagePrefix == "en" ? .command : [.command, .option])
+
+                Button(action: {
+                    viewModel.visibleView = .ScriptView
+                }) {
+                    HStack {
+                        Image(systemName: "house.circle")
+                            .foregroundStyle(Color.accentColor, Color.secondaryLabel)
+                        Text("Home")
+                            .font(.system(.body, design: .rounded).bold())
+                            .foregroundStyle(Color.label, Color.secondaryLabel)
+                        Text(languagePrefix == "en" ? "    ⌘ ⇧ `" : "    ⌘ ⇧ ⌥ x")
+                            .font(.system(.body, design: .rounded))
+                            .foregroundStyle(Color.gray, Color.secondaryLabel)
+                    }
+                    .padding(4)
+                }
+                .disabled(viewModel.hasModalToasts || uploadToServer != nil)
+                .keyboardShortcut(languagePrefix == "en" ? "`" : "x", modifiers: languagePrefix == "en" ? [.command, .shift] : [.command, .shift, .option])
             }
         }
         .frame(minWidth: 1280, minHeight: 800)

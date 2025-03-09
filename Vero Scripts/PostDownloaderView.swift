@@ -160,7 +160,7 @@ struct PostDownloaderView: View {
                     viewModel.visibleView = .ScriptView
                 }) {
                     HStack {
-                        Image(systemName: "xmark")
+                        Image(systemName: "xmark.circle")
                             .foregroundStyle(Color.accentColor, Color.secondaryLabel)
                         Text("Close")
                             .font(.system(.body, design: .rounded).bold())
