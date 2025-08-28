@@ -300,7 +300,16 @@ struct CodableFeatureUser: Codable {
 }
 
 struct ScriptsCatalog: Codable {
+    var hubManifests: [String: HubManifest]
     var hubs: [String: [Page]]
+}
+
+struct HubManifest: Codable {
+    var id: String { self.hub }
+    let hub: String
+    let title: String?
+    let aiWarningLimit: Double
+    let aiTriggerLimit: Double
 }
 
 struct Page: Codable {
@@ -309,6 +318,43 @@ struct Page: Codable {
     let pageName: String?
     let title: String?
     let hashTag: String?
+}
+
+struct LoadedHubManifest: Codable, Identifiable, Hashable {
+    var id: String {
+        return hub
+    }
+    var hub: String
+    var title: String?
+    var aiWarningLimit: Double
+    var aiTriggerLimit: Double
+
+    var displayTitle: String {
+        return title ?? hub
+    }
+
+    init(hubManifest: HubManifest) {
+        self.hub = hubManifest.hub
+        self.title = hubManifest.title
+        self.aiWarningLimit = hubManifest.aiWarningLimit
+        self.aiTriggerLimit = hubManifest.aiTriggerLimit
+    }
+
+    private init()
+    {
+        hub = ""
+        title = nil
+        aiWarningLimit = 0.75
+        aiTriggerLimit = 0.9
+    }
+
+    static func == (lhs: LoadedHubManifest, rhs: LoadedHubManifest) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 struct LoadedPage: Codable, Identifiable, Hashable {

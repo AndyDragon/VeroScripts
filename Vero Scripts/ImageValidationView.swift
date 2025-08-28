@@ -215,6 +215,14 @@ struct ImageValidationView: View {
                 ScrollView(.vertical) {
                     HStack {
                         VStack(alignment: .leading) {
+                            Text("Limits for hub \(viewModel.currentHubManifest?.title ?? viewModel.currentHubManifest?.hub ?? "snap"): ")
+                                .font(.system(size: 16))
+                                .bold()
+                                .padding([.top, .leading], 8)
+                            Spacer().frame(height: 0) // fix bug with text being truncated
+                            Text("Warning limit: \((viewModel.currentHubManifest?.aiWarningLimit ?? 0.75) * 100.0, specifier: "%.1f")% | Trigger limit: \((viewModel.currentHubManifest?.aiTriggerLimit ?? 0.9) * 100.0, specifier: "%.1f")%")
+                                .lineLimit(...2048)
+                                .padding(8)
                             Text("Result from server: ")
                                 .font(.system(size: 16))
                                 .bold()
@@ -291,9 +299,11 @@ extension ImageValidationView {
                     let decoder = JSONDecoder()
                     let results = try decoder.decode(HiveResponse.self, from: dataResult)
                     if results.status_code >= 200 && results.status_code <= 299 {
+                        let warningLimit = viewModel.currentHubManifest?.aiWarningLimit ?? 0.75
+                        let triggerLimit = viewModel.currentHubManifest?.aiTriggerLimit ?? 0.9
                         if let verdictClass = results.data.classes.first(where: { $0.class == "not_ai_generated" }) {
-                            aiVerdictString = "\(verdictClass.score > 0.8 ? "Not AI" : verdictClass.score < 0.5 ? "AI" : "Indeterminate") (\(String(format: "%.1f", verdictClass.score * 100)) % not AI)"
-                            aiVerdict = verdictClass.score > 0.8 ? .notAi : verdictClass.score < 0.5 ? .ai : .indeterminate
+                            aiVerdictString = "\(verdictClass.score > warningLimit ? "Not AI" : verdictClass.score < triggerLimit ? "AI" : "Indeterminate") (\(String(format: "%.1f", verdictClass.score * 100)) % not AI)"
+                            aiVerdict = verdictClass.score > warningLimit ? .notAi : verdictClass.score < triggerLimit ? .ai : .indeterminate
                         }
                     } else {
                         aiVerdictString = "unknown (non-success result)"

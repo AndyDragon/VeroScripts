@@ -583,6 +583,21 @@ struct ContentView: View {
         do {
             let pagesUrl = URL(string: "https://vero.andydragon.com/static/data/pages.json")!
             let pagesCatalog = try await URLSession.shared.decode(ScriptsCatalog.self, from: pagesUrl)
+            var hubManifests = [LoadedHubManifest]()
+            for hubPair in pagesCatalog.hubManifests {
+                hubManifests.append(LoadedHubManifest(hubManifest: hubPair.value))
+            }
+            viewModel.loadedHubManifests.removeAll()
+            viewModel.loadedHubManifests.append(
+                contentsOf: hubManifests.sorted(by: {
+                    if $0.hub == "other" {
+                        return false
+                    }
+                    if $1.hub == "other" {
+                        return true
+                    }
+                    return $0.hub < $1.hub
+                }))
             var pages = [LoadedPage]()
             for hubPair in (pagesCatalog.hubs) {
                 for hubPage in hubPair.value {
@@ -610,6 +625,7 @@ struct ContentView: View {
             } else {
                 viewModel.pageValidation = .valid
             }
+            viewModel.currentHubManifest = viewModel.loadedHubManifests.first(where: { $0.id == viewModel.currentPage?.hub })
 
             logger.verbose("Loaded page catalog from server with \(viewModel.loadedPages.count) pages", context: "System")
 
@@ -770,6 +786,7 @@ struct ContentView: View {
             updateScripts()
             updateNewMembershipScripts()
             lastPage = value
+            viewModel.currentHubManifest = viewModel.loadedHubManifests.first(where: { $0.id == viewModel.currentPage?.hub })
         }
     }
 

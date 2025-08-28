@@ -35,12 +35,14 @@ extension ContentView {
         var visibleView = VisibleView.ScriptView
         var postLink: String?
 
+        var loadedHubManifests = [LoadedHubManifest]()
         var loadedPages = [LoadedPage]()
         var waitingForTemplates = true
         var templatesCatalog = TemplateCatalog(pages: [], specialTemplates: [])
         var disallowLists = [String:[String]]()
         var cautionLists = [String:[String]]()
 
+        var currentHubManifest: LoadedHubManifest? = nil
         var currentPage: LoadedPage? = nil
         var pageValidation: ValidationResult = .valid
         var pageStaffLevel = StaffLevelCase.mod
