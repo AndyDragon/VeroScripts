@@ -76,6 +76,37 @@ public class FeatureViewModel : NotifyPropertyChanged
             }
         }
     }, _ => CanCopyScripts);
+
+    public bool CanPastePostLink => !WaitingForPages && SelectedPage != null;
+    
+    public SimpleCommand PastePostLinkCommand => new(() =>
+    {
+        if (Clipboard.HasText)
+        {
+            var text = Clipboard.GetTextAsync().Result ?? "";
+            if (text.StartsWith("https://vero.co/"))
+            {
+                var possibleUserAlias = text[16..].Split('/').FirstOrDefault() ?? "";
+                if (possibleUserAlias.Length > 1)
+                {
+                    UserName = possibleUserAlias;
+                    _ = Toast.Make($"Found user name {possibleUserAlias}").Show();
+                }
+                else
+                {
+                    _ = Toast.Make($"No user name provided").Show();
+                }
+            }
+            else
+            {
+                _ = Toast.Make($"Clipboard doesn't contain any post link").Show();
+            }
+        }
+        else
+        {
+            _ = Toast.Make($"Clipboard doesn't contain any text").Show();
+        }
+    }, () => CanPastePostLink);
     
     public SimpleCommand CopyNewMembershipScriptCommand => new(() =>
     {
@@ -252,7 +283,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     private bool WaitingForPages
     {
         get => _waitingForPages;
-        set => Set(ref _waitingForPages, value, [nameof(CanChangePage), nameof(CanChangeStaffLevel)]);
+        set => Set(ref _waitingForPages, value, [nameof(CanChangePage), nameof(CanChangeStaffLevel), nameof(CanPastePostLink)]);
     }
 
     #endregion
@@ -278,6 +309,7 @@ public class FeatureViewModel : NotifyPropertyChanged
                 OnPropertyChanged(nameof(SnapOrClickHubVisibility));
                 OnPropertyChanged(nameof(HasSelectedPage));
                 OnPropertyChanged(nameof(NoSelectedPage));
+                OnPropertyChanged(nameof(CanPastePostLink));
                 StaffLevel = SelectedPage != null
                     ? Preferences.Default.Get(nameof(StaffLevel) + ":" + SelectedPage.Id, StaffLevels[0])
                     : Preferences.Default.Get(nameof(StaffLevel), StaffLevels[0]);

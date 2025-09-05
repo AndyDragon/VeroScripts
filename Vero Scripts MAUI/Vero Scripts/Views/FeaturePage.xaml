@@ -189,7 +189,9 @@
                     Margin="0,0,0,4"
                     HeightRequest="28"
                     MaximumHeightRequest="28"
-                    Text="Paste from post link" />
+                    Text="Paste from post link"
+                    IsEnabled="{Binding CanPastePostLink}"
+                    Command="{Binding PastePostLinkCommand}" />
             </Grid>
             
             <Border 
