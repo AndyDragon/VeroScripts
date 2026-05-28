@@ -561,7 +561,7 @@ namespace VeroScripts
             DumpValue("FirstName", FirstName);
             DumpValue("LastName", LastName ?? string.Empty);
             DumpValue("Connectable", Connectable);
-            DumpValue("UserName", UserName);
+            DumpValue("UserAlias", UserName);
             DumpValue("Bio", Bio.Replace("\\n", "\n").StripExtraSpaces(true));
             DumpValue("BioLang", BioLang);
             DumpValue("Url", Url);
@@ -710,7 +710,7 @@ namespace VeroScripts
             Dump("author", ["id", "firstname", "username", "picture", "connectable", "verified", "followable", "following", "follower", "url"]);
             DumpValue("Id", Id);
             DumpValue("FirstName", FirstName);
-            DumpValue("UserName", UserName);
+            DumpValue("UserAlias", UserName);
             DumpValue("Picture", "{object}");
             DumpValue("Connectable", Connectable);
             DumpValue("Verified", Verified);
@@ -780,7 +780,7 @@ namespace VeroScripts
         {
             foreach (var property in _properties.Keys)
             {
-                if (property != "type" && properties.IndexOf(property) == -1)
+                if (property != "type" && Array.IndexOf(properties, property) == -1)
                 {
                     throw new Exception($"Found unhandled property for type {Type}");
                 }

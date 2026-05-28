@@ -269,21 +269,21 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" VerticalAlignment="Center" FontSize="11" Margin="0,0,4,0">
-                    <StackPanel Orientation="Horizontal" ToolTip="{Binding UserNameValidation.Error}">
+                    <StackPanel Orientation="Horizontal" ToolTip="{Binding UserAliasValidation.Error}">
                         <iconPacks:PackIconModern
                             VerticalAlignment="Center"
                             Kind="Warning"
                             Margin="0,0,6,0"
-                            Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultBrushConverter}}"
-                            Visibility="{Binding UserNameValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
+                            Foreground="{Binding UserAliasValidation, Converter={StaticResource validationResultBrushConverter}}"
+                            Visibility="{Binding UserAliasValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                         <TextBlock
                             Text="User:"
                             FontWeight="Bold"
                             VerticalAlignment="Center"
-                            Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultBrushConverter}}" />
+                            Foreground="{Binding UserAliasValidation, Converter={StaticResource validationResultBrushConverter}}" />
                     </StackPanel>
                 </Label>
-                <TextBox Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" VerticalAlignment="Center" Height="20" />
+                <TextBox Text="{Binding UserAlias, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" VerticalAlignment="Center" Height="20" />
                 <Button
                     Grid.Column="2"
                     Padding="8,0"
@@ -940,23 +940,23 @@
                             Height="26"
                             Margin="0,4,12,0">
                             <Label VerticalAlignment="Center" FontSize="11" Margin="10,0,4,0" Height="26">
-                                <StackPanel Orientation="Horizontal" ToolTip="{Binding UserNameValidation.Error}">
+                                <StackPanel Orientation="Horizontal" ToolTip="{Binding LoadedPost.UserAliasValidation.Error}">
                                     <iconPacks:PackIconModern
                                         VerticalAlignment="Center"
                                         Kind="Warning"
                                         Margin="0,0,6,0"
-                                        Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultColorConverter}}"
-                                        Visibility="{Binding UserNameValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
+                                        Foreground="{Binding UserAliasValidation, Converter={StaticResource validationResultColorConverter}}"
+                                        Visibility="{Binding UserAliasValidation, Converter={StaticResource validationResultVisibilityConverter}}" />
                                     <TextBlock
                                         Text="User alias:"
                                         FontWeight="Bold"
                                         VerticalAlignment="Center"
-                                        Foreground="{Binding UserNameValidation, Converter={StaticResource validationResultColorConverter}}" />
+                                        Foreground="{Binding UserAliasValidation, Converter={StaticResource validationResultColorConverter}}" />
                                 </StackPanel>
                             </Label>
                             <TextBox
-                                x:Name="PostDownloaderUserNameEditor"
-                                Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                x:Name="PostDownloaderUserAliasEditor"
+                                Text="{Binding UserAlias, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 VerticalAlignment="Center"
                                 FontSize="11"
                                 FontWeight="Bold"
@@ -965,7 +965,7 @@
                                 Height="22"
                                 Padding="4,0,4,0"
                                 Margin="8,0,0,0"
-                                Command="{Binding LoadedPost.TransferUserNameCommand}"
+                                Command="{Binding LoadedPost.TransferUserAliasCommand}"
                                 MinHeight="22">
                                 <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
                                     <iconPacks:PackIconFeatherIcons
@@ -999,6 +999,17 @@
                                     VerticalAlignment="Center"
                                     Foreground="{Binding LoadedPost.UserNameValidation, Converter={StaticResource greenValidationResultColorConverter}}" />
                             </StackPanel>
+                        </Label>
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Margin="0,0,4,0">
+                            <TextBlock
+                                Text="{Binding LoadedPost.UserName}"
+                                FontWeight="Bold"
+                                VerticalAlignment="Center" />
                         </Label>
                         <!-- User bio -->
                         <Label

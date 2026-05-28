@@ -26,20 +26,20 @@ namespace VeroScripts
     {
         #region Field validation
 
-        public static ValidationResult ValidateUser(string hubName, string userName)
+        public static ValidationResult ValidateUser(string hubName, string userAlias)
         {
-            var userNameValidationResult = ValidateUserName(userName);
-            if (!userNameValidationResult.IsValid)
+            var userAliasValidationResult = ValidateUserAlias(userAlias);
+            if (!userAliasValidationResult.IsValid)
             {
-                return userNameValidationResult;
+                return userAliasValidationResult;
             }
             if (DisallowLists.TryGetValue(hubName, out List<string>? disallowList) &&
-                disallowList.FirstOrDefault(disallow => string.Equals(disallow, userName, StringComparison.OrdinalIgnoreCase)) != null)
+                disallowList.FirstOrDefault(disallow => string.Equals(disallow, userAlias, StringComparison.OrdinalIgnoreCase)) != null)
             {
                 return new ValidationResult(ValidationResultType.Error, "User is on the disallow list");
             }
             if (CautionLists.TryGetValue(hubName, out List<string>? cautionList) &&
-                cautionList.FirstOrDefault(caution => string.Equals(caution, userName, StringComparison.OrdinalIgnoreCase)) != null)
+                cautionList.FirstOrDefault(caution => string.Equals(caution, userAlias, StringComparison.OrdinalIgnoreCase)) != null)
             {
                 return new ValidationResult(ValidationResultType.Warning, "User is on the caution list");
             }
@@ -64,25 +64,25 @@ namespace VeroScripts
             return new ValidationResult(ValidationResultType.Valid);
         }
 
-        public static ValidationResult ValidateUserName(string userName)
+        public static ValidationResult ValidateUserAlias(string userAlias)
         {
-            if (string.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(userAlias))
             {
                 return new ValidationResult(ValidationResultType.Error, "Required value");
             }
-            if (userName.StartsWith('@'))
+            if (userAlias.StartsWith('@'))
             {
                 return new ValidationResult(ValidationResultType.Error, "Don't include the '@' in user names");
             }
-            if (userName.Contains('\n') || userName.Contains('\r'))
+            if (userAlias.Contains('\n') || userAlias.Contains('\r'))
             {
                 return new ValidationResult(ValidationResultType.Error, "Value cannot contain newline");
             }
-            if (userName.Contains(' '))
+            if (userAlias.Contains(' '))
             {
                 return new ValidationResult(ValidationResultType.Error, "Value cannot contain spaces");
             }
-            if (userName.Length <= 1)
+            if (userAlias.Length <= 1)
             {
                 return new ValidationResult(ValidationResultType.Error, "User name should be more than 1 character long");
             }
@@ -319,7 +319,7 @@ namespace VeroScripts
                         cautionLists = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(cautionListsContent) ?? [];
                     }
                 }
-                UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
+                UserAliasValidation = ValidateUser(SelectedPage?.HubName ?? "", UserAlias);
                 UpdateScripts();
                 UpdateNewMembershipScripts();
             }
@@ -347,7 +347,7 @@ namespace VeroScripts
                     var possibleUserAlias = postLink[16..].Split('/').FirstOrDefault() ?? "";
                     if (possibleUserAlias.Length > 1)
                     {
-                        UserName = possibleUserAlias;
+                        UserAlias = possibleUserAlias;
                         ShowToast(
                             "Found user name", 
                             "Parsed the user name from the post link", 
@@ -358,7 +358,7 @@ namespace VeroScripts
                     {
                         ShowToast(
                             "User name not in VERO link", 
-                            "Could not parse the user name from the VERO link, user might not have user name, use their name without spaces", 
+                            "Could not parse the user name from the VERO link, user might not have user name, use their name without spaces or try loading the photos", 
                             NotificationType.Error,
                             expirationTime: TimeSpan.FromSeconds(12));
                     }
@@ -467,7 +467,7 @@ namespace VeroScripts
                     {
                         ThemeManager.Current.ChangeTheme(Application.Current, Theme);
                         UserSettings.Store("theme", Theme.Name);
-                        OnPropertyChanged(nameof(UserNameValidation));
+                        OnPropertyChanged(nameof(UserAliasValidation));
                         OnPropertyChanged(nameof(MembershipValidation));
                         OnPropertyChanged(nameof(YourNameValidation));
                         OnPropertyChanged(nameof(YourFirstNameValidation));
@@ -506,7 +506,7 @@ namespace VeroScripts
 
         public void ClearUser()
         {
-            UserName = "";
+            UserAlias = "";
             Membership = "None";
             FirstForPage = false;
             RawTag = false;
@@ -532,16 +532,16 @@ namespace VeroScripts
 
         public ValidationResult PostLinkValidation => ValidateValueNotEmpty(PostLink);
 
-        private string userName = "";
+        private string userAlias = "";
 
-        public string UserName
+        public string UserAlias
         {
-            get => userName;
+            get => userAlias;
             set
             {
-                if (Set(ref userName, value))
+                if (Set(ref userAlias, value))
                 {
-                    UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
+                    UserAliasValidation = ValidateUser(SelectedPage?.HubName ?? "", UserAlias);
                     ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
@@ -549,14 +549,14 @@ namespace VeroScripts
             }
         }
 
-        private ValidationResult userNameValidation = ValidateUser("", "");
+        private ValidationResult userAliasValidation = ValidateUser("", "");
 
-        public ValidationResult UserNameValidation
+        public ValidationResult UserAliasValidation
         {
-            get => userNameValidation;
+            get => userAliasValidation;
             private set
             {
-                if (Set(ref userNameValidation, value))
+                if (Set(ref userAliasValidation, value))
                 {
                     OnPropertyChanged(nameof(CanCopyScripts));
                     OnPropertyChanged(nameof(CanCopyNewMembershipScript));
@@ -648,7 +648,7 @@ namespace VeroScripts
                 if (Set(ref yourName, value))
                 {
                     UserSettings.Store(nameof(YourName), YourName);
-                    YourNameValidation = ValidateUserName(YourName);
+                    YourNameValidation = ValidateUserAlias(YourName);
                     ClearAllPlaceholders();
                     UpdateScripts();
                     UpdateNewMembershipScripts();
@@ -656,7 +656,7 @@ namespace VeroScripts
             }
         }
 
-        private ValidationResult yourNameValidation = ValidateUserName(UserSettings.Get(nameof(YourName), ""));
+        private ValidationResult yourNameValidation = ValidateUserAlias(UserSettings.Get(nameof(YourName), ""));
 
         public ValidationResult YourNameValidation
         {
@@ -693,7 +693,7 @@ namespace VeroScripts
             }
         }
 
-        private ValidationResult yourFirstNameValidation = ValidateUserName(UserSettings.Get(nameof(YourFirstName), ""));
+        private ValidationResult yourFirstNameValidation = ValidateUserAlias(UserSettings.Get(nameof(YourFirstName), ""));
 
         public ValidationResult YourFirstNameValidation
         {
@@ -765,7 +765,7 @@ namespace VeroScripts
                         {
                             StaffLevel = StaffLevels[0];
                         }
-                        UserNameValidation = ValidateUser(SelectedPage?.HubName ?? "", UserName);
+                        UserAliasValidation = ValidateUser(SelectedPage?.HubName ?? "", UserAlias);
                         if (SelectedPage != null)
                         {
                             excludedTags = UserSettings.Get(nameof(ExcludedTags) + ":" + SelectedPage.Id, "");
@@ -1247,7 +1247,7 @@ namespace VeroScripts
         #region Script management
 
         public bool CanCopyScripts =>
-            !UserNameValidation.IsError &&
+            !UserAliasValidation.IsError &&
             !MembershipValidation.IsError &&
             !YourNameValidation.IsError &&
             !YourFirstNameValidation.IsError &&
@@ -1255,7 +1255,7 @@ namespace VeroScripts
 
         public bool CanCopyNewMembershipScript =>
             NewMembership != "None" &&
-            !UserNameValidation.IsError;
+            !UserAliasValidation.IsError;
 
         public MainWindow? MainWindow { get; internal set; }
 
@@ -1304,7 +1304,7 @@ namespace VeroScripts
                     }
                 }
 
-                CheckValidation("User", UserNameValidation);
+                CheckValidation("User", UserAliasValidation);
                 CheckValidation("Level", MembershipValidation);
                 CheckValidation("You", YourNameValidation);
                 CheckValidation("Your first name", YourFirstNameValidation);
@@ -1326,7 +1326,7 @@ namespace VeroScripts
                     .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", membershipString)
-                    .Replace("%%USERNAME%%", UserName)
+                    .Replace("%%USERNAME%%", UserAlias)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
@@ -1336,7 +1336,7 @@ namespace VeroScripts
                     .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", membershipString)
-                    .Replace("%%USERNAME%%", UserName)
+                    .Replace("%%USERNAME%%", UserAlias)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
@@ -1346,7 +1346,7 @@ namespace VeroScripts
                     .Replace("%%PAGETITLE%%", scriptPageTitle)
                     .Replace("%%PAGEHASH%%", scriptPageHash)
                     .Replace("%%MEMBERLEVEL%%", membershipString)
-                    .Replace("%%USERNAME%%", UserName)
+                    .Replace("%%USERNAME%%", UserAlias)
                     .Replace("%%YOURNAME%%", YourName)
                     .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                     .Replace("%%STAFFLEVEL%%", StaffLevel);
@@ -1445,7 +1445,7 @@ namespace VeroScripts
 
                 if (newMembership != "None")
                 {
-                    CheckValidation("User", UserNameValidation);
+                    CheckValidation("User", UserAliasValidation);
                 }
 
                 NewMembershipScript = validationErrors;
@@ -1488,7 +1488,7 @@ namespace VeroScripts
                         .Replace("%%FULLPAGENAME%%", pageName)
                         .Replace("%%PAGETITLE%%", scriptPageTitle)
                         .Replace("%%PAGEHASH%%", scriptPageHash)
-                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%USERNAME%%", UserAlias)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);
@@ -1501,7 +1501,7 @@ namespace VeroScripts
                         .Replace("%%FULLPAGENAME%%", pageName)
                         .Replace("%%PAGETITLE%%", scriptPageTitle)
                         .Replace("%%PAGEHASH%%", scriptPageHash)
-                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%USERNAME%%", UserAlias)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);
@@ -1514,7 +1514,7 @@ namespace VeroScripts
                         .Replace("%%FULLPAGENAME%%", pageName)
                         .Replace("%%PAGETITLE%%", scriptPageTitle)
                         .Replace("%%PAGEHASH%%", scriptPageHash)
-                        .Replace("%%USERNAME%%", UserName)
+                        .Replace("%%USERNAME%%", UserAlias)
                         .Replace("%%YOURNAME%%", YourName)
                         .Replace("%%YOURFIRSTNAME%%", YourFirstName)
                         .Replace("%%STAFFLEVEL%%", StaffLevel);

@@ -74,7 +74,7 @@ namespace VeroScripts
                 case MainViewModel.ViewMode.PostDownloaderView:
                     if (isPush)
                     {
-                        PostDownloaderUserNameEditor.Focus();
+                        PostDownloaderUserAliasEditor.Focus();
                     } 
                     break;
                 case MainViewModel.ViewMode.ImageView:

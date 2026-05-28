@@ -69,10 +69,10 @@ namespace VeroScripts
                 }
             }, () => !string.IsNullOrEmpty(UserProfileUrl));
 
-            transferUserNameCommand = new Command(() =>
+            transferUserAliasCommand = new Command(() =>
             {
-                vm.UserName = UserName!;
-            }, () => !string.IsNullOrEmpty(UserName));
+                vm.UserAlias = UserAlias!;
+            }, () => !string.IsNullOrEmpty(UserAlias));
 
             copyLogCommand = new Command(() =>
             {
@@ -142,9 +142,9 @@ namespace VeroScripts
                             UserProfileUrl = parsedPayload.Profile.Url;
                             UserBio = parsedPayload.Profile.Bio;
 
-                            if (string.IsNullOrWhiteSpace(vm.UserName) && !string.IsNullOrWhiteSpace(UserName))
+                            if (string.IsNullOrWhiteSpace(vm.UserAlias) && !string.IsNullOrWhiteSpace(UserAlias))
                             {
-                                vm.UserName = UserName!;
+                                vm.UserAlias = UserAlias!;
                             }
 
                             LogEntries.Add(new LogEntry($"Profile source: {parsedPayload.ProfileSource}", defaultLogColor));
@@ -156,6 +156,7 @@ namespace VeroScripts
                         else
                         {
                             LogEntries.Add(new LogEntry("Profile data was not found in the selected data mode", Colors.Orange));
+                            LogEntries.Add(new LogEntry("The user's profile might not be available (private), bio is not available", Colors.Red));
                         }
 
                         if (parsedPayload.Post != null)
@@ -212,6 +213,7 @@ namespace VeroScripts
                         else
                         {
                             LogEntries.Add(new LogEntry("Post data was not found in the selected data mode", Colors.Orange));
+                            LogEntries.Add(new LogEntry("The user's posts might not be available (private), photos and comments are not available", Colors.Red));
                         }
 
                         if (parsedPayload.Profile == null && parsedPayload.Post == null)
@@ -787,7 +789,7 @@ namespace VeroScripts
                 if (Set(ref userAlias, value))
                 {
                     UserAliasValidation = ValidateUserAlias(userAlias);
-                    TransferUserNameCommand.OnCanExecuteChanged();
+                    TransferUserAliasCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -820,7 +822,7 @@ namespace VeroScripts
                 if (Set(ref userName, value))
                 {
                     UserNameValidation = ValidateUserName(userName);
-                    TransferUserNameCommand.OnCanExecuteChanged();
+                    TransferUserAliasCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -1057,8 +1059,8 @@ namespace VeroScripts
         private readonly Command launchUserProfileUrlCommand;
         public Command LaunchUserProfileUrlCommand { get => launchUserProfileUrlCommand; }
 
-        private readonly Command transferUserNameCommand;
-        public Command TransferUserNameCommand { get => transferUserNameCommand; }
+        private readonly Command transferUserAliasCommand;
+        public Command TransferUserAliasCommand { get => transferUserAliasCommand; }
 
         private readonly Command copyLogCommand;
         public Command CopyLogCommand { get => copyLogCommand; }
@@ -1206,7 +1208,7 @@ namespace VeroScripts
     {
         private readonly DownloadedPostViewModel postVm;
 
-        public ImageEntry(Uri source, string username, DownloadedPostViewModel postVm, NotificationManager notificationManager)
+        public ImageEntry(Uri source, string userName, DownloadedPostViewModel postVm, NotificationManager notificationManager)
         {
             this.postVm = postVm;
             this.source = source;
@@ -1252,7 +1254,7 @@ namespace VeroScripts
                 }
                 try
                 {
-                    using var stream = File.Create(Path.Combine(veroSnapshotsFolder, $"{username}.png"));
+                    using var stream = File.Create(Path.Combine(veroSnapshotsFolder, $"{userName}.png"));
                     png.Save(stream);
                     notificationManager.Show(
                         "Saved image",
