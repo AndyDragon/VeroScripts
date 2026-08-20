@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Alerts;
 using VeroScripts.ViewModels;
 using MauiIcons.Core;
 
@@ -22,6 +23,10 @@ public partial class FeaturePage
     {
         base.OnAppearing();
         AdjustForKeyboard(KeyboardHelper.IsKeyboardVisible);
+
+        if (BindingContext is FeatureViewModel { WaitingForPages: true } vm) {
+            _ = vm.LoadPages();
+        }
     }
 
     private void OnKeyboardVisibilityChanged(object? sender, bool isVisible)

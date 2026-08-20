@@ -25,8 +25,8 @@
     <ApplicationId>com.andydragon.vero_scripts</ApplicationId>
 
     <!-- Versions -->
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+    <ApplicationVersion>1.1</ApplicationVersion>
 
     <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
     <WindowsPackageType>None</WindowsPackageType>
@@ -37,14 +37,14 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <Configurations>Release;Debug</Configurations>
-    <ReleaseVersion>1.0.6</ReleaseVersion>
-    <AssemblyVersion>1.0.6</AssemblyVersion>
+    <ReleaseVersion>1.1.7</ReleaseVersion>
+    <AssemblyVersion>1.1.7</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <WarningLevel>4</WarningLevel>
-    <AssemblyName>Feature Logging</AssemblyName>
+    <AssemblyName>Vero Scripts</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <!-- App Icon -->
@@ -85,5 +85,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(TargetFramework)' == 'net10.0-android'">
+    <AndroidEnableMarshalMethods>false</AndroidEnableMarshalMethods>
+    <AndroidUseFastDeployment>false</AndroidUseFastDeployment>
+    <PublishTrimmed>true</PublishTrimmed>
+    <RunAOTCompilation>true</RunAOTCompilation>
+  </PropertyGroup>
 
 </Project>

@@ -49,10 +49,8 @@ public class FeatureViewModel : NotifyPropertyChanged
                 IncludeSpace = Preferences.Default.Get(nameof(IncludeSpace), false);
             }
         };
-
-        _ = LoadPages();
     }
-    
+
     #region Commands
 
     public SimpleCommand FeatureScriptCommand => new(() =>
@@ -78,7 +76,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     }, _ => CanCopyScripts);
 
     public bool CanPastePostLink => !WaitingForPages && SelectedPage != null;
-    
+
     public SimpleCommand PastePostLinkCommand => new(() =>
     {
         if (Clipboard.HasText)
@@ -107,7 +105,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             _ = Toast.Make($"Clipboard doesn't contain any text").Show();
         }
     }, () => CanPastePostLink);
-    
+
     public SimpleCommand CopyNewMembershipScriptCommand => new(() =>
     {
         _ = CopyTextToClipboardAsync(NewMembershipScript, "Copied the new membership script to the clipboard");
@@ -155,7 +153,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     #endregion
 
     #region User settings
-    
+
     private bool _includeSpace = Preferences.Default.Get(nameof(IncludeSpace), false);
     public bool IncludeSpace
     {
@@ -174,8 +172,9 @@ public class FeatureViewModel : NotifyPropertyChanged
 
     #region Server access
 
-    private async Task LoadPages()
+    public async Task LoadPages(int tries = 0)
     {
+        await Task.Delay(100);
         try
         {
             // Disable client-side caching.
@@ -201,26 +200,47 @@ public class FeatureViewModel : NotifyPropertyChanged
                 {
                     LoadedPages.Add(loadedPage);
                 }
-
-                _ = Toast.Make($"Loaded {LoadedPages.Count} pages from the server").Show();
             }
             var page = Preferences.Default.Get(nameof(Page), "");
             SelectedPage = LoadedPages.FirstOrDefault(loadedPage => loadedPage.Id == page);
-            WaitingForPages = false;
-            
-            await LoadTemplates();
-            await LoadDisallowList();
+            MainThread.BeginInvokeOnMainThread(() => { WaitingForPages = false; });
+
+            var templatesTask = LoadTemplates();
+            var disallowListTask = LoadDisallowList();
+
+            await Task.WhenAll(templatesTask, disallowListTask);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _ = Toast.Make($"Loaded {LoadedPages.Count} pages from the server").Show();
+            });
         }
         catch (Exception ex)
         {
-            Console.WriteLine("IsError occurred loading page catalog (will retry): {0}", ex.Message);
-            await Toast.Make($"Failed to load the page catalog: {ex.Message}", ToastDuration.Long).Show();
-            Application.Current!.Quit();
+#if ANDROID
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+            Android.Util.Log.Debug("VeroScripts", $"CRITICAL STARTUP ERROR in LoadPages: {ex}");
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+#endif
+            if (tries < 2)
+            {
+                MainThread.BeginInvokeOnMainThread(() => {
+                    _ = Toast.Make($"Failed to load the page catalog: {ex.Message} -- retrying...", ToastDuration.Long).Show();
+                });
+                await LoadTemplates(tries + 1);
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => {
+                    _ = Toast.Make($"Failed to load the page catalog: {ex.Message}", ToastDuration.Long).Show();
+                    Application.Current!.Quit();
+                });
+            }
         }
     }
 
-    private async Task LoadTemplates()
+    private async Task LoadTemplates(int tries = 0)
     {
+        await Task.Delay(100);
         try
         {
             // Disable client-side caching.
@@ -237,14 +257,31 @@ public class FeatureViewModel : NotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            Console.WriteLine("IsError occurred loading the template catalog (will retry): {0}", ex.Message);
-            await Toast.Make($"Failed to load the page templates: {ex.Message}", ToastDuration.Long).Show();
-            Application.Current!.Quit();
+#if ANDROID
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+            Android.Util.Log.Debug("VeroScripts", $"CRITICAL STARTUP ERROR in LoadTemplates: {ex}");
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+#endif
+            if (tries < 2)
+            {
+                MainThread.BeginInvokeOnMainThread(() => {
+                    _ = Toast.Make($"Failed to load the page templates: {ex.Message} -- retrying...", ToastDuration.Long).Show();
+                });
+                await LoadTemplates(tries + 1);
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() => {
+                    _ = Toast.Make($"Failed to load the page templates: {ex.Message}", ToastDuration.Long).Show();
+                    Application.Current!.Quit();
+                });
+            }
         }
     }
 
     private async Task LoadDisallowList()
     {
+        await Task.Delay(100);
         try
         {
             // Disable client-side caching.
@@ -270,7 +307,12 @@ public class FeatureViewModel : NotifyPropertyChanged
         catch (Exception ex)
         {
             // Do nothing, not vital
-            Console.WriteLine("IsError occurred loading the disallow or caution lists (ignoring): {0}", ex.Message);
+            Console.WriteLine("Error occurred loading the disallow or caution lists (ignoring): {0}", ex.Message);
+#if ANDROID
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+            Android.Util.Log.Debug("VeroScripts", $"NONCRITICAL STARTUP ERROR in LoadDisallowList: {ex}");
+            Android.Util.Log.Debug("VeroScripts", $"====================================");
+#endif
         }
     }
 
@@ -280,7 +322,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
     private bool _waitingForPages = true;
 
-    private bool WaitingForPages
+    public bool WaitingForPages
     {
         get => _waitingForPages;
         set => Set(ref _waitingForPages, value, [nameof(CanChangePage), nameof(CanChangeStaffLevel), nameof(CanPastePostLink)]);
@@ -679,7 +721,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             }
         }
     }
-    
+
     public int FeatureScriptLength => Scripts[Script.Feature].Length;
 
     public Visibility FeatureScriptPlaceholderVisibility =>
@@ -703,7 +745,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             }
         }
     }
-    
+
     public int CommentScriptLength => Scripts[Script.Comment].Length;
 
     public Visibility CommentScriptPlaceholderVisibility =>
@@ -727,7 +769,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             }
         }
     }
-    
+
     public int OriginalPostScriptLength => Scripts[Script.OriginalPost].Length;
 
     public Visibility OriginalPostScriptPlaceholderVisibility =>
@@ -1249,7 +1291,7 @@ public class FeatureViewModel : NotifyPropertyChanged
             _ = CopyTextToClipboardAsync(processedScript, "Copied the " + _scriptNames[script] + " script to the clipboard");
         }
     }
-    
+
     public void CopyScriptFromPlaceholders(Script script, bool withPlaceholders = false)
     {
         if (withPlaceholders)
@@ -1264,7 +1306,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     }
 
     #endregion
-    
+
     #region Script
 
     public string GetScriptTitle(Script script)
@@ -1282,7 +1324,7 @@ public class FeatureViewModel : NotifyPropertyChanged
     {
         return Scripts[script];
     }
-    
+
     public bool SetScriptText(Script script, string scriptText)
     {
         if (scriptText != Scripts[script])
@@ -1293,7 +1335,7 @@ public class FeatureViewModel : NotifyPropertyChanged
 
         return false;
     }
-    
+
     public int GetScriptLength(Script script)
     {
         return Scripts[script].Length;
